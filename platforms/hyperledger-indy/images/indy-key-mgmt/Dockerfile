@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 USER root
 
@@ -27,14 +27,32 @@ ENV VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3 \
     CLIENT_PORTS="9705,9706,9707,9708" \
     VAULT_TOKEN=""
 
-# Installing python and pip
-RUN apt-get update && \
-    apt-get install -y software-properties-common python-software-properties && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y python3.5 python3-pip python3.5-dev jq
+RUN apt-get update && apt-get install -y
+RUN apt-get install apt-utils -y
 
+Run apt-get -y install wget
+RUN apt install software-properties-common -y
+RUN apt install xz-utils -y
+
+RUN apt-get install build-essential -y
+RUN apt-get install zlib1g-dev
+
+RUN wget https://www.python.org/ftp/python/3.8.1/Python-3.8.1.tar.xz \
+    && tar xvf Python-3.8.1.tar.xz \
+    && rm Python-3.8.1.tar.xz \
+    && cd Python-3.8.1 \
+    && ./configure \
+    && make altinstall \
+    && cd / \
+    && rm -rf Python-3.8.1
+
+RUN apt-get update && apt-get install -y
+RUN apt-get install python3-pip -y
 RUN pip3 install --upgrade "pip < 21.0" setuptools
+
+RUN pip3 install --upgrade pip
+RUN apt-get update
+RUN pip install portalocker
 
 # Installing virtualenvwrapper
 RUN pip3 install virtualenvwrapper
@@ -66,11 +84,13 @@ RUN apt-get install -y libindy libindy-crypto=${LIBINDY_CRYPTO_VERSION}
 RUN mkdir -p ${INDY_HOME}
 WORKDIR ${INDY_HOME}
 COPY config/indy_config.py ${INDY_CONFIG_DIR}
-RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv ${NETWORK_NAME}; workon ${NETWORK_NAME}; pip3 install indy-node==${INDY_NODE_VERSION}"  && \    
+RUN pip3 install --upgrade pip
+RUN pip install --upgrade setuptools pip
+RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv ${NETWORK_NAME}; workon ${NETWORK_NAME}; pip3 install indy-node==${INDY_NODE_VERSION}"  && \
     /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh; workon ${NETWORK_NAME}; pip3 install flake8 requests"
 
-COPY src/identity_crypto_generator.py /.virtualenvs/${NETWORK_NAME}/lib/python3.5/site-packages/plenum/common/identity_crypto_generator.py
-COPY src/identity_crypto_generator_v2.py /.virtualenvs/${NETWORK_NAME}/lib/python3.5/site-packages/plenum/common/identity_crypto_generator_v2.py
+COPY src/identity_crypto_generator.py /.virtualenvs/${NETWORK_NAME}/lib/Python-3.8.1/site-packages/plenum/common/identity_crypto_generator.py
+COPY src/identity_crypto_generator_v2.py /.virtualenvs/${NETWORK_NAME}/lib/Python-3.8.1/site-packages/plenum/common/identity_crypto_generator_v2.py
 COPY src/generate_identity /.virtualenvs/${NETWORK_NAME}/bin/generate_identity
 COPY src/generate_identityv2 /.virtualenvs/${NETWORK_NAME}/bin/generate_identityv2
 COPY src/generate_identity.sh /usr/bin/generate_identity
