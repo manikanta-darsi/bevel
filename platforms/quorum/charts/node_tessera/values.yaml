@@ -37,6 +37,9 @@ images:
   busybox: busybox
   #Provide the valid image name and version for MySQL. This is used as the DB for TM
   mysql: mysql/mysql-server:5.7
+  # Pull policy to be used for the Docker image
+  # Eg. pullPolicy: IfNotPresent
+  pullPolicy:
 
 node:
   #Provide the name for Quorum node
