@@ -115,7 +115,7 @@ spec:
             jq -r 'if .errors then . else . end')
           validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
           nodekey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["nodekey"]')
-          keystore=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["keystore"]' | base64 -d )           
+          keystore=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["keystore"]' | base64 -d )         
           gethpassword=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["geth_password"]')
           username=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["db_user"]')
           password=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["db_password"]')
@@ -215,15 +215,12 @@ spec:
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             echo "Getting secrets from Vault Server: ${VAULT_ADDR}"
             # Login to Vault and so I can get an approle token
-            VAULT_CLIENT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login \
+            export HASHICORP_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login \
               -H "Content-Type: application/json" \
               -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
               jq -r 'if .errors then . else .auth.client_token end')
-            validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
-            
-            # required for tessera vault integration
-            export HASHICORP_TOKEN=${VAULT_CLIENT_TOKEN};        
-
+            validateVaultResponse 'vault login token' "${HASHICORP_TOKEN}"
+                                                       
             printenv;
             # mysql connector required for mysql tessera DB 
             wget -q http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.25.tar.gz;
