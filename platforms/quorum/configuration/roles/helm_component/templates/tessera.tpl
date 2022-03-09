@@ -45,7 +45,6 @@ spec:
       lock: {{ peer.lock | lower }}
       ports:
         rpc: {{ peer.rpc.port }}
-        raft: {{ peer.raft.port }}
         tm: {{ peer.transaction_manager.port }}
         quorum: {{ peer.p2p.port }}
         db: {{ peer.db.port }}
@@ -86,9 +85,6 @@ spec:
       rpcport: {{ peer.rpc.ambassador }}
       quorumport: {{ peer.p2p.ambassador }}
       clientport: {{ peer.transaction_manager.clientport }}
-{% if network.config.consensus == 'raft' %}  
-      portRaft: {{ peer.raft.ambassador }}
-{% endif %}
     storage:
       storageclassname: {{ storageclass_name }}
       storagesize: 1Gi
