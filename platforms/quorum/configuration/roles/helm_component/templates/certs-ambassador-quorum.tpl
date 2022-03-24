@@ -10,7 +10,7 @@ spec:
   chart:
     git: {{ org.gitops.git_url }}
     ref: {{ org.gitops.branch }}
-    path: {{ charts_dir }}/ambassador
+    path: {{ charts_dir }}/certs-ambassador-quorum
   values:
     peer:
       name: {{ peer.name }}
