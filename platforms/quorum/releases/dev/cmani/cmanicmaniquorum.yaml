@@ -17,6 +17,10 @@ spec:
       domain_name_api: "cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_web: "cmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_tessera: "cmani-tessera.cmani-quo"
+    vars:
+     ambassadortls: "/home/mani/bevel/platforms/quorum/configuration/build/cmanicmaniquorum/cmani"
+     rootca: "/home/mani/bevel/platforms/quorum/configuration/build/quorumrootca" 
+     kubernetes: "{'context': 'arn:aws:eks:eu-west-1:895052373684:cluster/dev2-CLUSTER', 'config_file': '/home/mani/.kube/config'}"
     peer:
       name: cmani
       gethPassphrase: 12345

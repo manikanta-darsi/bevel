@@ -102,3 +102,8 @@ opensslVars:
   domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
   domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
   domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+vars:
+  ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
+  rootca: "{{playbook_dir}}/build/quorumrootca"
+  kubernetes: "{{ item.k8s }}"
+  NODE_NAME: "{{ node_name }}"

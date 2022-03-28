@@ -37,7 +37,7 @@ spec:
             - name: VAULT_ADDR
               value: {{ $.Values.vault.address }}
             - name: NODE_NAME
-              value: "{{ $.node.name | lower }}"
+              value: {{.Values.vault.NODE_NAME}}
             - name: VAULT_APP_ROLE
               value: {{.Values.vault.role}}
             - name: KUBERNETES_AUTH_PATH
@@ -170,7 +170,7 @@ spec:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
             - name: NODE_NAME
-              value: "{{ $.node.name | lower }}"
+              value: "{{ .Values.vars.NODE_NAME }}"
             - name: domain_name
               value: "{{ .Values.opensslVars.domain_name }}"
             - name: domain_name_api
@@ -178,7 +178,12 @@ spec:
             - name: domain_name_web
               value: "{{ .Values.opensslVars.domain_name_web }}"
             - name: domain_name_tessera
-              value: "{{ .Values.opensslVars.domain_name_web }}"                          
+              value: "{{ .Values.opensslVars.domain_name_web }}" 
+            - name: ambassadortls
+              value: "{{ .Values.subjects.ambassadortls }}"
+            - name: rootca
+              value: "{{ .Values.subjects.rootca }}"
+
                            
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/bash", "-c"]
@@ -227,13 +232,13 @@ spec:
             cd ${BASE_DIR}/DATA/ambassadortls
             openssl ecparam -name prime256v1 -genkey -noout -out ${NODE_NAME}.key
             openssl req -new -nodes -key ${NODE_NAME}.key -days 1000 -out ${NODE_NAME}.csr \
-            -extensions EXT -subj "/CN={{domain_name}}" -config "{{ambassadortls}}/openssl${NODE_NAME}.conf"
-            openssl x509 -extfile ${BASE_DIR}/openssl.conf -req -days 1000 -in ${NODE_NAME}.csr -CA {{ rootca }}/rootca.pem -CAkey {{ rootca }}/rootca.key -out ${NODE_NAME}.pem -set_serial 01 -extensions v3_nonca
+            -extensions EXT -subj "/CN=${domain_name}" -config "{{ .Values.subjects.ambassadortls }}/openssl${NODE_NAME}.conf"
+            openssl x509 -extfile ${BASE_DIR}/openssl.conf -req -days 1000 -in ${NODE_NAME}.csr -CA{{ .Values.subjects.rootca }}/rootca.pem -CAkey ${rootca}/rootca.key -out ${NODE_NAME}.pem -set_serial 01 -extensions v3_nonca
             cat ${NODE_NAME}.pem > ${NODE_NAME}-certchain.pem
-            cat {{ rootca }}/rootca.pem >> ${NODE_NAME}-certchain.pem
+            cat ${rootca}/rootca.pem >> ${NODE_NAME}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
             touch ${BASE_DIR}/DATA/done.txt
-            KUBECONFIG={{ kubernetes.config_file }} kubectl create secret tls ${NODE_NAME} -ambassador-certs --cert={{ ambassadortls }}/${NODE_NAME}-certchain.pem --key={{ ambassadortls }}/${NODE_NAME}.key -n ${CERTS_SECRET_PREFIX}
+            KUBECONFIG= kubectl create secret tls ${NODE_NAME} -ambassador-certs --cert=${ambassadortls}/${NODE_NAME}-certchain.pem --key=${ambassadortls}/${NODE_NAME}.key -n ${CERTS_SECRET_PREFIX}
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
@@ -304,11 +309,11 @@ spec:
                     \"cacerts\": \"${CA_CERTS}\",
                     \"keystore\": \"${KEYSTORE}\",
                     \"ambassadortls{{ .Values.nodeName }}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
-                    \"ambassadortls{{ .Values.nodeName }}.key": \"${AMBASSODOR_KEYS}\",
-					          \"rootcacerts\":\"${ROOTCACERTPKCS_12}\",
-					          \"rootcakeys\":\"${ROOTCAKEYSPKCS_12}\"
-                   }}" > payload.json
-
+                    \"ambassadortls{{ .Values.nodeName }}.key": \"${AMBASSODOR_KEYS}\"
+                    \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
+                    \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
+                  }}" > payload.json
+                   
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
@@ -374,4 +379,4 @@ spec:
               medium: Memory
           - name: openssl-config
             configMap:
-              name: {{ .Values.nodeName }}-conf
+              name: {{ .Values.nodeName }}-config
