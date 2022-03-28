@@ -171,6 +171,9 @@ spec:
               value: "{{ .Values.volume.baseDir }}"
             - name: NODE_NAME
               value: "{{ $.node.name | lower }}"
+            - name: domain_name
+              value: "{{ $.node.name | lower.item.external_url_suffix }}"
+
 
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/bash", "-c"]
@@ -200,7 +203,7 @@ spec:
             subjectAltName = @alt_names
 
             [alt_names]
-            DNS.1 = {{domain_name}}
+            DNS.1 = ${domain_name}
             DNS.2 = {{domain_name_api}}
             DNS.3 = {{domain_name_web}}
             DNS.4 = {{domain_name_tessera}}
