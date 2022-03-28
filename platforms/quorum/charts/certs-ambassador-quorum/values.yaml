@@ -98,7 +98,7 @@ volume:
   # Eg. baseDir: /opt/quorum
   baseDir: /home/bevel
 opensslVars: 
-  domain_name: "{{ component_name }}.{{ item.external_url_suffix }}"
-  domain_name_api: "{{ component_name }}api.{{ item.external_url_suffix }}"
-  domain_name_web: "{{ component_name }}web.{{ item.external_url_suffix }}"
-  domain_name_tessera: "{{ component_name }}-tessera.{{ item.external_url_suffix }}"
+  domain_name: "name.external_url"
+  domain_name_api: "name.api.external_url"
+  domain_name_web: "name.web.external_url"
+  domain_name_tessera: "name-tessera.name"

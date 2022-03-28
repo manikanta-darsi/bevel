@@ -15,6 +15,12 @@ spec:
     peer:
       name: cmani
       gethPassphrase: 12345
+      external_url: "rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name: "cmani.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_api: "cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_web: "cmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_tessera: "cmani-tessera.cmani-quo"
+
     metadata:
       name: cmanicmaniquorum
       namespace: cmani-quo
