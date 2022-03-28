@@ -173,8 +173,13 @@ spec:
               value: "{{ $.node.name | lower }}"
             - name: domain_name
               value: "{{ $.node.name | lower.item.external_url_suffix }}"
-
-
+            - name: domain_name_api
+              value: "{{ $node_name |lower }}api.{{ item.external_url_suffix }}" 
+            - name: domain_name_web
+              value: "{{ $node_name |lower }}web.{{ item.external_url_suffix }}"
+            - name: domain_name_tessera
+              value: "{{ $node_name | lower }}-tessera.{{ component_ns }}"                           
+                           
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/bash", "-c"]
           args:
@@ -204,16 +209,11 @@ spec:
 
             [alt_names]
             DNS.1 = ${domain_name}
-            DNS.2 = {{domain_name_api}}
-            DNS.3 = {{domain_name_web}}
-            DNS.4 = {{domain_name_tessera}}
+            DNS.2 = ${domain_name_api}
+            DNS.3 = ${domain_name_web}
+            DNS.4 = ${domain_name_tessera}
             EOF
-            vars:
-            domain_name: "{{ .Values.opensslVars.domain_name }}"
-            domain_name_api: "{{ .Values.opensslVars.domain_name_api}}"
-            domain_name_web: "{{ .Values.opensslVars.domain_name_web }}"
-            domain_name_tessera: "{{ .Values.opensslVars.domain_name_tessera }}"
-            when: ambassador_tls_certs.failed == True       
+       
             cd ${BASE_DIR}/DATA/rootca
             set -x
             keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS
