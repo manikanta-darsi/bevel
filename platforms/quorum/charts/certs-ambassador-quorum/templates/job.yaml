@@ -199,12 +199,11 @@ spec:
             subjectAltName = @alt_names
 
             [alt_names]
-            DNS.1 = ${domain_name}
-            DNS.2 = ${domain_name_api}
-            DNS.3 = ${domain_name_web}
-            DNS.4 = ${domain_name_tessera}
-            EOF
-
+            DNS.1 = {{domain_name}}
+            DNS.2 = {{domain_name_api}}
+            DNS.3 = {{domain_name_web}}
+            DNS.4 = {{domain_name_tessera}}
+            EOF          
             cd ${BASE_DIR}/DATA/rootca
             set -x
             keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS
