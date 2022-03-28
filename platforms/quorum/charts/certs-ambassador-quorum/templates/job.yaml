@@ -172,7 +172,7 @@ spec:
             - name: NODE_NAME
               value: "{{ $.node.name | lower }}"
             - name: domain_name
-              value: "{{ $.node.name | lower.$.item.external_url_suffix }}"
+              value: "{{ $.node.name | lower }}.{{ $.item.external_url_suffix }}"
             - name: domain_name_api
               value: "{{ $.node_name |lower }}api.{{ $.item.external_url_suffix }}" 
             - name: domain_name_web
