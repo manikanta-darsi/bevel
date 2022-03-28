@@ -97,7 +97,8 @@ healthcheck:
 volume:
   # Eg. baseDir: /opt/quorum
   baseDir: /home/bevel
-  domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
-  domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
-  domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
-  domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+opensslVars: 
+  domain_name: "{{ component_name }}.{{ item.external_url_suffix }}"
+  domain_name_api: "{{ component_name }}api.{{ item.external_url_suffix }}"
+  domain_name_web: "{{ component_name }}web.{{ item.external_url_suffix }}"
+  domain_name_tessera: "{{ component_name }}-tessera.{{ item.external_url_suffix }}"

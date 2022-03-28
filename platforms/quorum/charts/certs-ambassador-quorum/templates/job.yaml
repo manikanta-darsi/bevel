@@ -170,7 +170,8 @@ spec:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
             - name: NODE_NAME
-              value: "{{ $.node.name | lower }}"             
+              value: "{{ $.node.name | lower }}"
+
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/bash", "-c"]
           args:
@@ -205,10 +206,10 @@ spec:
             DNS.4 = {{domain_name_tessera}}
             EOF
             vars:
-            domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
-            domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
-            domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
-            domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+            domain_name: "{{ .Values.opensslVars.domain_name }}"
+            domain_name_api: "{{ .Values.opensslVars.domain_name_api}}"
+            domain_name_web: "{{ .Values.opensslVars.domain_name_web }}"
+            domain_name_tessera: "{{ .Values.opensslVars.domain_name_tessera }}"
             when: ambassador_tls_certs.failed == True       
             cd ${BASE_DIR}/DATA/rootca
             set -x
