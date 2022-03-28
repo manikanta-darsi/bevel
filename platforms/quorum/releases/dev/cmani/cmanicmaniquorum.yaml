@@ -12,18 +12,20 @@ spec:
     ref: dev-ansible
     path: platforms/quorum/charts/certs-ambassador-quorum
   values:
-    peer:
-      name: cmani
-      gethPassphrase: 12345
-      external_url: "rc.dev2.aws.blockchaincloudpoc-develop.com"
+    opensslVars:
       domain_name: "cmani.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_api: "cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_web: "cmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_tessera: "cmani-tessera.cmani-quo"
+    peer:
+      name: cmani
+      gethPassphrase: 12345
+    
 
     metadata:
       name: cmanicmaniquorum
       namespace: cmani-quo
+      external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
     image:
       initContainerName: index.docker.io/hyperledgerlabs/alpine-utils:1.0
       node: quorumengineering/quorum:21.4.2
