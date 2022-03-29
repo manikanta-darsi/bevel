@@ -1,0 +1,51 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: wmaniwmaniquorum
+  namespace: wmani-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: wmaniwmaniquorum
+  chart:
+    git: https://github.com/manikanta-darsi/bevel.git
+    ref: dev-ansible
+    path: platforms/quorum/charts/certs-ambassador-quorum
+  values:
+    opensslVars:
+      domain_name: "wmani.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_api: "wmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_web: "wmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_tessera: "wmani-tessera.wmani-quo"
+    vars:
+     ambassadortls: "/home/mani/bevel/platforms/quorum/configuration/build/wmaniwmaniquorum/wmani"
+     rootca: "/home/mani/bevel/platforms/quorum/configuration/build/quorumrootca" 
+     kubernetes: "{'context': 'arn:aws:eks:eu-west-1:895052373684:cluster/dev2-CLUSTER', 'config_file': '/home/mani/.kube/config'}"
+    peer:
+      name: wmani
+      gethPassphrase: 12345
+    
+
+    metadata:
+      name: wmaniwmaniquorum
+      namespace: wmani-quo
+      external_url: wmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+    image:
+      initContainerName: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      node: quorumengineering/quorum:21.4.2
+      pullPolicy: Always
+    acceptLicense: YES
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      role: vault-role
+      authpath: quorumwmani
+      serviceaccountname: vault-auth
+      certsecretprefix: secretsv2/data/wmani-quo
+      retries: 30
+    healthCheckNodePort: 0
+    sleepTimeAfterError: 60
+    sleepTime: 10
+    healthcheck:
+      readinesscheckinterval: 10
+      readinessthreshold: 1
+
