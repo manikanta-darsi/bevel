@@ -7,11 +7,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.nodeName }}-generate-certs
+  name: {{ .Values.vars.node_name }}-generate-certs
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app: {{ .Values.nodeName }}-generate-certs
-    app.kubernetes.io/name: {{ .Values.nodeName }}-generate-certs
+    app: {{ .Values.vars.node_name }}-generate-certs
+    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-certs
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -21,8 +21,8 @@ spec:
     template:
       metadata:
         labels:
-          app: {{ .Values.nodeName }}-generate-certs
-          app.kubernetes.io/name: {{ .Values.nodeName }}-generate-certs
+          app: {{ .Values.vars.node_name }}-generate-certs
+          app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-certs
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
@@ -36,8 +36,6 @@ spec:
           env:
             - name: VAULT_ADDR
               value: {{ $.Values.vault.address }}
-            - name: NODE_NAME
-              value: {{.Values.vault.NODE_NAME}}
             - name: VAULT_APP_ROLE
               value: {{.Values.vault.role}}
             - name: KUBERNETES_AUTH_PATH
@@ -77,7 +75,7 @@ spec:
               validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
               echo "Logged into Vault"
               mkdir -p ${MOUNT_PATH}
-              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/${NODE_NAME}/certs | jq -r 'if .errors then . else . end')
+              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs | jq -r 'if .errors then . else . end')
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["rootCA"]')"
               
               if [ "$data_info" == "null" ]           
@@ -109,8 +107,6 @@ spec:
               value: {{ .Values.vault.certSecretPrefix }}
             - name: MOUNT_PATH
               value: "/DATA"
-            - name: NODEINFO_MOUNT_PATH
-              value: "/notary-nodeinfo"
           command: ["sh", "-c"]
           args:
           - |-
@@ -169,8 +165,6 @@ spec:
           env:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
-            - name: NODE_NAME
-              value: "{{ .Values.vars.NODE_NAME }}"
             - name: domain_name
               value: "{{ .Values.opensslVars.domain_name }}"
             - name: domain_name_api
@@ -183,8 +177,10 @@ spec:
               value: "{{ .Values.subjects.ambassadortls }}"
             - name: rootca
               value: "{{ .Values.subjects.rootca }}"
-
-                           
+            - name: node_name
+              value: "{{ .Values.vars.node_name }}"
+            - name: CERTS_SECRET_PREFIX
+              value: {{ .Values.vault.certSecretPrefix }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/bash", "-c"]
           args:
@@ -201,8 +197,18 @@ spec:
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
             KEYSTORE_PASS=$(cat ${BASE_DIR}/credentials/keystore/keystorepass)
 
+            cd ${BASE_DIR}/DATA/rootca
+            set -x
+            keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS quorum
+            openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
+            openssl req -x509 -config ${BASE_DIR}/openssl.conf -new -nodes -key quorumrootca.key -days 1024 -out quorumrootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
+            openssl pkcs12 -export -name cert -inkey quorumrootca.key -in quorumrootca.pem -out quorumrootcacert.pkcs12 -cacerts -passin pass:${KEYSTORE_PASS} -passout pass:${KEYSTORE_PASS}
+            openssl pkcs12 -export -name key -inkey quorumrootca.key -in quorumrootca.pem -out quorumrootcakey.pkcs12 -passin pass:${KEYSTORE_PASS} -passout pass:${KEYSTORE_PASS}
+            eval "yes | keytool -importkeystore -srckeystore quorumrootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass $KEYSTORE_PASS -destkeystore keys.jks -deststorepass $KEYSTORE_PASS"
+            eval "yes | keytool -importkeystore -srckeystore quorumrootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass $KEYSTORE_PASS -destkeystore keys.jks -deststorepass $KEYSTORE_PASS"
+
             cd ${BASE_DIR}/DATA/ambassadortls
-            cat <<EOF >openssl ${NODE_NAME}.conf
+            cat <<EOF >openssl ${node_name}.conf
             [dn]
             CN=${domain_name}
             [req]
@@ -218,27 +224,16 @@ spec:
             DNS.3 = ${domain_name_web}
             DNS.4 = ${domain_name_tessera}
             EOF
-       
-            cd ${BASE_DIR}/DATA/rootca
-            set -x
-            keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS
-            openssl ecparam -name prime256v1 -genkey -noout -out quorumrootca.key
-            openssl req -x509 -config ${BASE_DIR}/openssl.conf -new -nodes -key quorumrootca.key -days 1024 -out quorumrootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
-            openssl pkcs12 -export -name cert -inkey quorumrootca.key -in quorumrootca.pem -out quorumrootcacert.pkcs12 -cacerts -passin pass:${KEYSTORE_PASS} -passout pass:${KEYSTORE_PASS}
-            openssl pkcs12 -export -name key -inkey quorumrootca.key -in quorumrootca.pem -out quorumrootcakey.pkcs12 -passin pass:${KEYSTORE_PASS} -passout pass:${KEYSTORE_PASS}
-            eval "yes | keytool -importkeystore -srckeystore quorumrootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass $KEYSTORE_PASS -destkeystore keys.jks -deststorepass $KEYSTORE_PASS"
-            eval "yes | keytool -importkeystore -srckeystore quorumrootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass $KEYSTORE_PASS -destkeystore keys.jks -deststorepass $KEYSTORE_PASS"
-
             cd ${BASE_DIR}/DATA/ambassadortls
-            openssl ecparam -name prime256v1 -genkey -noout -out ${NODE_NAME}.key
-            openssl req -new -nodes -key ${NODE_NAME}.key -days 1000 -out ${NODE_NAME}.csr \
-            -extensions EXT -subj "/CN=${domain_name}" -config "{{ .Values.subjects.ambassadortls }}/openssl${NODE_NAME}.conf"
-            openssl x509 -extfile ${BASE_DIR}/openssl.conf -req -days 1000 -in ${NODE_NAME}.csr -CA{{ .Values.subjects.rootca }}/rootca.pem -CAkey ${rootca}/rootca.key -out ${NODE_NAME}.pem -set_serial 01 -extensions v3_nonca
-            cat ${NODE_NAME}.pem > ${NODE_NAME}-certchain.pem
-            cat ${rootca}/rootca.pem >> ${NODE_NAME}-certchain.pem
+            openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
+            openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name} .csr -subj '/{{ .Values.subjects.ambassadortls | replace "," "/" }}'
+            -extensions EXT -subj "/CN=${domain_name}" -config "{{ambassadortls}}/openssl${node_name}.conf"
+            openssl req -x509 -extfile ${BASE_DIR}/openssl.conf -req -days 1000 -in ${node_name}.csr -CA ${rootca}/rootca.pem -CAkey ${rootca}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
+            cat ${node_name}.pem > ${node_name}-certchain.pem
+            cat ${rootca}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
             touch ${BASE_DIR}/DATA/done.txt
-            KUBECONFIG= kubectl create secret tls ${NODE_NAME} -ambassador-certs --cert=${ambassadortls}/${NODE_NAME}-certchain.pem --key=${ambassadortls}/${NODE_NAME}.key -n ${CERTS_SECRET_PREFIX}
+            KUBECONFIG= kubectl create secret tls ${node_name} -ambassador-certs --cert=${ambassadortls}/${NODE_NAME}-certchain.pem --key=${ambassadortls}/${node_name}.key -n ${CERTS_SECRET_PREFIX}
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
@@ -265,6 +260,8 @@ spec:
                value: {{ $.Values.volume.baseDir }}
              - name: CERTS_SECRET_PREFIX
                value: {{ .Values.vault.certSecretPrefix }}
+             - name: node_name
+               value: "{{ .Values.vars.node_name }}"
           command: ["sh", "-c"]
           args:
           - |-
@@ -298,22 +295,21 @@ spec:
                 ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
                 CA_CERTS=$(cat ./rootca/rootca.pem | base64 -w0)
                 KEYSTORE=$(cat ./rootca/rootca.key | base64 -w0)
-                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}-certchain.pem | base64-w0)
-                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
+                AMBASSODOR_CERTS=$(cat ./ambassadortls/${node_name}-certchain.pem | base64-w0)
+                AMBASSODOR_CERTS=$(cat ./ambassadortls/${node_name}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootkeys.pkcs12 | base64 -w0)
 
                 echo "{\"data\": {
-                    \"{{ .Values.nodeName }}.jks\",
+                    \"{{ .Values.vars.node_name }}.jks\",
                     \"rootcakey\": \"${ROOT_CA}\",
                     \"cacerts\": \"${CA_CERTS}\",
                     \"keystore\": \"${KEYSTORE}\",
-                    \"ambassadortls{{ .Values.nodeName }}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
-                    \"ambassadortls{{ .Values.nodeName }}.key": \"${AMBASSODOR_KEYS}\"
+                    \"ambassadortls{{ .Values.vars.node_name }}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
+                    \"ambassadortls{{ .Values.vars.node_name }}.key": \"${AMBASSODOR_KEYS}\"
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
                   }}" > payload.json
-                   
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
@@ -379,4 +375,4 @@ spec:
               medium: Memory
           - name: openssl-config
             configMap:
-              name: {{ .Values.nodeName }}-conf
+              name: {{ .Values.vars.node_name }}-conf

@@ -106,4 +106,4 @@ vars:
   ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
   rootca: "{{playbook_dir}}/build/quorumrootca"
   kubernetes: "{{ item.k8s }}"
-  NODE_NAME: "{{ node_name }}"
+  node_name: "{{ node_name }}"
