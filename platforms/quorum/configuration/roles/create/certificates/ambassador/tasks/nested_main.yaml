@@ -17,27 +17,28 @@
     check: "ensure_dir"
 
 # Ensures the ambassador tls directory
-- name: "Ensure rootca dir exists"
+- name: "Ensure ambassadortls dir exists"
   include_role:
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/setup"
   vars:
     path: "{{ ambassadortls }}"
     check: "ensure_dir"
 
+
 # This task creates the Quorum value files for each node of organization
-- name: Create value file for Quorum Nodes
+- name: Create value file for ambassador job
   include_role:
     name: helm_component
   vars:
     component_name: "{{ name }}{{ peer.name }}quorum"
-    type: "validatorquorum"
+    type: "certs-ambassador-quorum"
     genesis: "{{ lookup('file', '{{ network.config.genesis }}') | b64encode }}"
     staticnodes: "{{ lookup('file', '{{ network.config.staticnodes }}') | from_yaml | to_nice_json }}"
   loop: "{{ peers }}"
   loop_control:
     loop_var: peer
-  when: peer.type == 'validator'    
 
+    
 # Git Push : Pushes the above generated files to git directory 
 - name: Git Push
   include_role: 

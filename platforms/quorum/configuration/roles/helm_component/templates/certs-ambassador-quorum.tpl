@@ -12,12 +12,25 @@ spec:
     ref: {{ org.gitops.branch }}
     path: {{ charts_dir }}/certs-ambassador-quorum
   values:
+    opensslVars:
+      domain_name: "{{ peer.name }}.{{ external_url }}"
+      domain_name_api: "{{ peer.name }}api.{{ external_url }}"
+      domain_name_web: "{{ peer.name }}web.{{ external_url }}"
+      domain_name_tessera: "{{ peer.name }}-tessera.{{ component_ns }}"
+    vars:
+     ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
+     rootca: "{{playbook_dir}}/build/quorumrootca" 
+     kubernetes: "{{ item.k8s }}"
+     node_name: "{{ peer.name }}"
     peer:
       name: {{ peer.name }}
       gethPassphrase: {{ peer.geth_passphrase }}
+    
+
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
+      external_url: {{ name }}.{{ external_url }}
     image:
       initContainerName: {{ network.docker.url }}/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
