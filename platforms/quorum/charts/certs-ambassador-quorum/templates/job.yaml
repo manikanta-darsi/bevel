@@ -379,4 +379,4 @@ spec:
               medium: Memory
           - name: openssl-config
             configMap:
-              name: {{ .Values.nodeName }}-config
+              name: {{ .Values.nodeName }}-conf
