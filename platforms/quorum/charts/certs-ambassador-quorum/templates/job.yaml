@@ -226,8 +226,8 @@ spec:
             EOF
             cd ${BASE_DIR}/DATA/ambassadortls
             openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
-            openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name} .csr -subj '/{{ .Values.subjects.ambassadortls | replace "," "/" }}'
-            -extensions EXT -subj "/CN=${domain_name}" -config "{{ambassadortls}}/openssl${node_name}.conf"
+            openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -subj '/{{ .Values.subjects.ambassadortls | replace "," "/" }}'
+            -extensions EXT -subj "/CN=${domain_name}" -config "${ambassadortls}/openssl${node_name}.conf"
             openssl req -x509 -extfile ${BASE_DIR}/openssl.conf -req -days 1000 -in ${node_name}.csr -CA ${rootca}/rootca.pem -CAkey ${rootca}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
             cat ${node_name}.pem > ${node_name}-certchain.pem
             cat ${rootca}/rootca.pem >> ${node_name}-certchain.pem
