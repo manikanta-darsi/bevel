@@ -82,7 +82,6 @@ spec:
               echo ${LOOKUP_SECRET_RESPONSE}
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["rootCA"]')"
               echo ${data_info}
-              tail -f /dev/null
               if [ "$data_info" == "null" ]           
               then
                 echo "Certficates absent in vault. Ignore error warning"
