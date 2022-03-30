@@ -41,7 +41,7 @@ spec:
             - name: KUBERNETES_AUTH_PATH
               value: {{ $.Values.vault.authpath }}
             - name: CERTS_SECRET_PREFIX
-              value: {{ .Values.vault.certsecretprefix }}
+              value: {{ $.Values.vault.certsecretprefix }}
             - name: MOUNT_PATH
               value: "/certcheck"
           command: ["sh", "-c"]
