@@ -95,6 +95,7 @@ spec:
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
+            tail -f /dev/null
         - name: init-credentials
           image: {{ .Values.image.initContainerName }}
           imagePullPolicy: IfNotPresent
