@@ -92,10 +92,11 @@ spec:
                 touch ${MOUNT_PATH}/present.txt
               fi 
               echo "Done checking for certificates in vault"
+              tail -f /dev/null
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
-            tail -f /dev/null
+
         - name: init-credentials
           image: {{ .Values.image.initContainerName }}
           imagePullPolicy: IfNotPresent
