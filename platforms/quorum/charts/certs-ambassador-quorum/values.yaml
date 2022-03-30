@@ -78,6 +78,16 @@ subjects:
   # Eg. ambassadortls: "CN=Test Subordinate CA Certificate, OU=HQ, O=HoldCo LLC, L=New York, C=US"
   ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN= DLT ambassadortls"
 
+opensslVars: 
+  domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
+  domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
+  domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
+  domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+vars:
+  ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
+  rootca: "{{playbook_dir}}/build/quorumrootca"
+  kubernetes: "{{ item.k8s }}"
+  node_name: "{{ node_name }}"
 
 #############################################################
 #                       Settings                            #
@@ -97,13 +107,3 @@ healthcheck:
 volume:
   # Eg. baseDir: /opt/quorum
   baseDir: /home/bevel
-opensslVars: 
-  domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
-  domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
-  domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
-  domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
-vars:
-  ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
-  rootca: "{{playbook_dir}}/build/quorumrootca"
-  kubernetes: "{{ item.k8s }}"
-  node_name: "{{ node_name }}"
