@@ -77,6 +77,7 @@ spec:
               mkdir -p ${MOUNT_PATH}
               LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.node_name }}/certs | jq -r 'if .errors then . else . end')
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["rootCA"]')"
+              echo ${data_info}
               /dev/null -f
               if [ "$data_info" == "null" ]           
               then
