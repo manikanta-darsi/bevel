@@ -39,7 +39,7 @@ spec:
             - name: VAULT_APP_ROLE
               value: {{.Values.vault.role}}
             - name: KUBERNETES_AUTH_PATH
-              value: {{ $.Values.vault.authPath }}
+              value: {{ $.Values.vault.authpath }}
             - name: CERTS_SECRET_PREFIX
               value: {{ .Values.vault.certSecretPrefix }}
             - name: MOUNT_PATH
