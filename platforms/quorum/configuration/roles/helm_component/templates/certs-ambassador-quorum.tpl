@@ -12,21 +12,7 @@ spec:
     ref: {{ org.gitops.branch }}
     path: {{ charts_dir }}/certs-ambassador-quorum
   values:
-    opensslVars:
-      domain_name: "{{ peer.name }}.{{ external_url }}"
-      domain_name_api: "{{ peer.name }}api.{{ external_url }}"
-      domain_name_web: "{{ peer.name }}web.{{ external_url }}"
-      domain_name_tessera: "{{ peer.name }}-tessera.{{ component_ns }}"
-    vars:
-     ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
-     rootca: "{{playbook_dir}}/build/quorumrootca" 
-     kubernetes: "{{ item.k8s }}"
-     node_name: "{{ peer.name }}"
-    peer:
-      name: {{ peer.name }}
-      gethPassphrase: {{ peer.geth_passphrase }}
-    
-
+    nodeName: {{ peer.name }}
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
@@ -35,7 +21,9 @@ spec:
       initContainerName: {{ network.docker.url }}/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
       pullPolicy: Always
-    acceptLicense: YES
+      certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
+      imagePullSecret: regcred
+      pullPolicy: Always
     vault:
       address: {{ vault.url }}
       role: vault-role
@@ -43,10 +31,31 @@ spec:
       serviceaccountname: vault-auth
       certsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ org.name | lower }}-quo
       retries: 30
+    subjects:
+      rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
+      ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN= DLT ambassadortls"
+    opensslVars:
+      domain_name: "{{ peer.name }}.{{ external_url }}"
+      domain_name_api: "{{ peer.name }}api.{{ external_url }}"
+      domain_name_web: "{{ peer.name }}web.{{ external_url }}"
+      domain_name_tessera: "{{ peer.name }}-tessera.{{ component_ns }}"
+    vars:
+      ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
+      rootca: "{{playbook_dir}}/build/quorumrootca" 
+      kubernetes: "{{ item.k8s }}"
+      node_name: "{{ peer.name }}"
+    peer:
+      name: {{ peer.name }}
+      gethPassphrase: {{ peer.geth_passphrase }}
+    
+    metadata:
+      name: {{ component_name }}
+      namespace: {{ component_ns }}
+      external_url: {{ name }}.{{ external_url }}
+    acceptLicense: YES
     healthCheckNodePort: 0
     sleepTimeAfterError: 60
     sleepTime: 10
     healthcheck:
       readinesscheckinterval: 10
       readinessthreshold: 1
-
