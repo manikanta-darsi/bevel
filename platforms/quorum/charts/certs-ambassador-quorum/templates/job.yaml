@@ -148,16 +148,15 @@ spec:
               echo "logged into vault"
               # Creating dirs for storing certificates
               mkdir -p ${MOUNT_PATH}/keystore;
-
               OUTPUT_PATH=${MOUNT_PATH}/keystore;
               # Fetching credentials for keystores
               LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/credentials/keystore | jq -r 'if .errors then . else . end')
               validateVaultResponse "${CERTS_SECRET_PREFIX}/credentials/keystore" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
               KEYSTORE_PASS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["keystorepass"]')
-              echo "${KEYSTORE_PASS}"> ${OUTPUT_PATH}/keystorepass
-              
+              echo "${KEYSTORE_PASS}"> ${OUTPUT_PATH}/keystorepass             
               touch /DATA/done.txt
               echo "Done"
+              tail -f /dev/null
           volumeMounts:
           - name: credentials
             mountPath: /DATA
@@ -238,7 +237,6 @@ spec:
             #creating a dummy file to perform check if last line is executed or not.
             touch ${BASE_DIR}/DATA/done.txt
             KUBECONFIG= kubectl create secret tls ${node_name} -ambassador-certs --cert=${ambassadortls}/${NODE_NAME}-certchain.pem --key=${ambassadortls}/${node_name}.key -n ${CERTS_SECRET_PREFIX}
-            tail -f /dev/null
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
