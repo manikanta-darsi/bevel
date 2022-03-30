@@ -74,8 +74,9 @@ spec:
               VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
               validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
               echo "Logged into Vault"
-              mkdir -p ${MOUNT_PATH}
+              mkdir -p ${MOUNT_PATH}              
               LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.node_name }}/certs | jq -r 'if .errors then . else . end')
+              echo ${LOOKUP_SECRET_RESPONSE}
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["rootCA"]')"
               echo ${data_info}
               tail -f /dev/null
