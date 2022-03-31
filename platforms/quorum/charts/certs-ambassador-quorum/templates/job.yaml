@@ -99,7 +99,7 @@ spec:
             mountPath: /certcheck
         containers:
         - name: certs
-          image: "{{ required "certs[main]: missing value for .Values.image.certsContainerName" .Values.image.certsContainerName }}"
+          image: ghcr.io/hyperledger/bevel-build:jdk8-latest
           env:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
@@ -142,7 +142,6 @@ spec:
             openssl pkcs12 -export -name key -inkey rootca.key -in rootca.pem -out rootcakey.pkcs12 -passin pass:'quorum' -passout pass:'quorum'
             eval "yes | keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
             eval "yes | keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
-            tail -f /dev/null
             cd ${BASE_DIR}/DATA/ambassadortls
             cat <<EOF >openssl ${node_name}.conf
             [dn]
