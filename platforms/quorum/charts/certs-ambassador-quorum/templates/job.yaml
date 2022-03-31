@@ -132,7 +132,7 @@ spec:
             mkdir -p ${BASE_DIR}/DATA/rootca
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
 
-            cd {{ .values.vars.rootca }}
+            cd ${BASE_DIR}/DATA/rootca
             set -x
             tail -f /dev/null
             keytool -genkey -alias rootca -dname {{ .Values.subjects.rootca }} -keystore rootca.jks -storepass quorum -keypass quorum
