@@ -132,8 +132,9 @@ spec:
             mkdir -p ${BASE_DIR}/DATA/rootca
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
 
-            cd ${BASE_DIR}/DATA/rootca
+            cd {{ .values.vars.rootca }}
             set -x
+            tail -f /dev/null
             keytool -genkey -alias rootca -dname {{ .Values.subjects.rootca }} -keystore rootca.jks -storepass quorum -keypass quorum
             openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
             openssl req -x509 -config ${BASE_DIR}/openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
