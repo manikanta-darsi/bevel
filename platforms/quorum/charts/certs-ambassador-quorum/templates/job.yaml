@@ -253,7 +253,7 @@ spec:
           - name: openssl-config
             mountPath: {{ .Values.volume.baseDir }}/openssl.conf
             subPath: openssl.conf
-        - name: store-certs
+        # - name: store-certs
           image: {{ .Values.image.initContainerName }}
           imagePullPolicy: IfNotPresent
           env:
