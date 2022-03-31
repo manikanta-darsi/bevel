@@ -99,7 +99,7 @@ spec:
             mountPath: /certcheck
         containers:
         - name: certs
-          image: "ghcr.io/hyperledger/bevel-build:jdk8-latest"
+          image: {{ .Values.image.certsContainerName }}
           env:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
