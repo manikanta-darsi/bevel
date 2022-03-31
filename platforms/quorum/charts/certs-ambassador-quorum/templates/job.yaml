@@ -134,6 +134,3 @@ spec:
             mkdir -p ${BASE_DIR}/DATA/rootca
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
             tail -f /dev/null
-          volumeMounts:
-          - name: certcheck
-            mountPath: /certcheck
