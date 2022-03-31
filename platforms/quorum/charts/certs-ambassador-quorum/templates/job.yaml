@@ -99,7 +99,7 @@ spec:
             mountPath: /certcheck
         containers:
         - name: certs
-          image: {{ .Values.image.certsContainerName }}
+          image: "{{ required "certs[main]: missing value for .Values.image.certsContainerName" .Values.image.certsContainerName }}"
           env:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
