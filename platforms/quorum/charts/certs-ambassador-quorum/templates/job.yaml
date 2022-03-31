@@ -134,7 +134,7 @@ spec:
             mkdir -p ${BASE_DIR}/DATA/rootca
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
             KEYSTORE_PASS=$(cat ${BASE_DIR}/credentials/keystore/keystorepass)
-
+            echo ${KEYSTORE_PASS}
             cd ${BASE_DIR}/DATA/rootca
             set -x
             keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS quorum
