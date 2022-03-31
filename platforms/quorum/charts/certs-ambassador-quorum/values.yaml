@@ -88,7 +88,8 @@ vars:
   rootca: "{{playbook_dir}}/build/quorumrootca"
   kubernetes: "{{ item.k8s }}"
   node_name: "{{ node_name }}"
-
+  root_subject: "{{ network.config.subject }}"
+  cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
 #############################################################
 #                       Settings                            #
 ############################################################# 

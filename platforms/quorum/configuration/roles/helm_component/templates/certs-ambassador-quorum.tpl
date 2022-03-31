@@ -44,6 +44,8 @@ spec:
       rootca: "{{playbook_dir}}/build/quorumrootca" 
       kubernetes: "{{ item.k8s }}"
       node_name: "{{ peer.name }}"
+      root_subject: "{{ network.config.subject }}"
+      cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
     peer:
       name: {{ peer.name }}
       gethPassphrase: {{ peer.geth_passphrase }}
