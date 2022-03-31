@@ -127,8 +127,7 @@ spec:
             then
               echo "Certificates already present in the vault. Skipping.."
               exit 0
-            fi
-            
+            fi            
             # create directories
             mkdir -p ${BASE_DIR}/DATA/rootca
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
@@ -137,7 +136,7 @@ spec:
             set -x
             keytool -genkey -alias rootca -dname {{ root_subject | quote }} -keystore rootca.jks -storepass quorum -keypass quorum
             openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
-            openssl req -x509 -config {{playbook_dir}}/openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
+            openssl req -x509 -config ${BASE_DIR}/openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
             openssl pkcs12 -export -name cert -inkey rootca.key -in rootca.pem -out rootcacert.pkcs12 -cacerts -passin pass:'quorum' -passout pass:'quorum'
             openssl pkcs12 -export -name key -inkey rootca.key -in rootca.pem -out rootcakey.pkcs12 -passin pass:'quorum' -passout pass:'quorum'
             eval "yes | keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
