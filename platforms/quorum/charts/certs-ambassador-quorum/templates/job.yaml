@@ -99,7 +99,7 @@ spec:
             mountPath: /certcheck
         containers:
         - name: certs
-          image: "{{ required "certs[main]: missing value for .Values.image.certsContainerName" .Values.image.certsContainerName }}"
+          image: "ghcr.io/hyperledger/bevel-build:jdk8-latest"
           env:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
@@ -128,24 +128,21 @@ spec:
               echo "Certificates already present in the vault. Skipping.."
               exit 0
             fi
-            rm -r ${BASE_DIR}/DATA/done.txt
             
             # create directories
             mkdir -p ${BASE_DIR}/DATA/rootca
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
-            KEYSTORE_PASS=$(cat ${BASE_DIR}/credentials/keystore/keystorepass)
-            echo ${KEYSTORE_PASS}
-            cd ${BASE_DIR}/DATA/rootca
-            tail -f /dev/null
-            set -x
-            keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS quorum
-            openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
-            openssl req -x509 -config ${BASE_DIR}/openssl.conf -new -nodes -key quorumrootca.key -days 1024 -out quorumrootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
-            openssl pkcs12 -export -name cert -inkey quorumrootca.key -in quorumrootca.pem -out quorumrootcacert.pkcs12 -cacerts -passin pass:${KEYSTORE_PASS} -passout pass:${KEYSTORE_PASS}
-            openssl pkcs12 -export -name key -inkey quorumrootca.key -in quorumrootca.pem -out quorumrootcakey.pkcs12 -passin pass:${KEYSTORE_PASS} -passout pass:${KEYSTORE_PASS}
-            eval "yes | keytool -importkeystore -srckeystore quorumrootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass $KEYSTORE_PASS -destkeystore keys.jks -deststorepass $KEYSTORE_PASS"
-            eval "yes | keytool -importkeystore -srckeystore quorumrootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass $KEYSTORE_PASS -destkeystore keys.jks -deststorepass $KEYSTORE_PASS"
 
+            cd ${BASE_DIR}/DATA/rootca
+            set -x
+            keytool -genkey -alias rootca -dname {{ root_subject | quote }} -keystore rootca.jks -storepass quorum -keypass quorum
+            openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
+            openssl req -x509 -config {{playbook_dir}}/openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
+            openssl pkcs12 -export -name cert -inkey rootca.key -in rootca.pem -out rootcacert.pkcs12 -cacerts -passin pass:'quorum' -passout pass:'quorum'
+            openssl pkcs12 -export -name key -inkey rootca.key -in rootca.pem -out rootcakey.pkcs12 -passin pass:'quorum' -passout pass:'quorum'
+            eval "yes | keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
+            eval "yes | keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
+            tail -f /dev/null
             cd ${BASE_DIR}/DATA/ambassadortls
             cat <<EOF >openssl ${node_name}.conf
             [dn]
