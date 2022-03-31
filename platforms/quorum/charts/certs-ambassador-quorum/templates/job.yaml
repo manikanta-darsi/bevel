@@ -92,45 +92,10 @@ spec:
                 touch ${MOUNT_PATH}/present.txt
               fi 
               echo "Done checking for certificates in vault"
+              tail -f /dev/null
           volumeMounts:
           - name: credentials
             mountPath: /DATA
           - name: certcheck
             mountPath: /certcheck
-        containers:
-        - name: certs
-          image: {{ .Values.image.certsContainerName }}
-          env:
-            - name: BASE_DIR
-              value: "{{ .Values.volume.baseDir }}"
-            - name: domain_name
-              value: "{{ .Values.opensslVars.domain_name }}"
-            - name: domain_name_api
-              value: "{{ .Values.opensslVars.domain_name_api }}" 
-            - name: domain_name_web
-              value: "{{ .Values.opensslVars.domain_name_web }}"
-            - name: domain_name_tessera
-              value: "{{ .Values.opensslVars.domain_name_web }}" 
-            - name: ambassadortls
-              value: "{{ $.Values.subjects.ambassadortls }}"
-            - name: rootca
-              value: "{{ .Values.subjects.rootca }}"
-            - name: node_name
-              value: "{{ $.Values.vars.node_name }}"
-            - name: CERTS_SECRET_PREFIX
-              value: {{ $.Values.vault.certsecretprefix }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/bash", "-c"]
-          args:
-          - |-
-            if [ -e /certcheck/present.txt ]
-            then
-              echo "Certificates already present in the vault. Skipping.."
-              exit 0
-            fi
-            else
-            
-            # create directories
-            mkdir -p ${BASE_DIR}/DATA/rootca
-            mkdir -p ${BASE_DIR}/DATA/ambassadortls
-            tail -f /dev/null
+          
