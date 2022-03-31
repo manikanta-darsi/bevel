@@ -95,7 +95,7 @@ spec:
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
-        - name: init-credentials
+        # - name: init-credentials
           image: {{ .Values.image.initContainerName }}
           imagePullPolicy: IfNotPresent
           env:
@@ -198,14 +198,15 @@ spec:
               echo "Certificates already present in the vault. Skipping.."
               exit 0
             fi
-            
+            else
             # create directories
             mkdir -p ${BASE_DIR}/DATA/rootca
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
 
             cd ${BASE_DIR}/DATA/rootca
             set -x
-            keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS quorum
+            tail -f /dev/null
+            keytool -genkey -keyalg RSA -alias key -dname "{{ .Values.subjects.rootca |  }}" -keystore keys.jks -storepass $KEYSTORE_PASS -keypass $KEYSTORE_PASS quorum
             openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
             openssl req -x509 -config ${BASE_DIR}/openssl.conf -new -nodes -key quorumrootca.key -days 1024 -out quorumrootca.pem -extensions v3_ca -subj '/{{ .Values.subjects.rootca | replace "," "/" }}'
             openssl pkcs12 -export -name cert -inkey quorumrootca.key -in quorumrootca.pem -out quorumrootcacert.pkcs12 -cacerts -passin pass:${KEYSTORE_PASS} -passout pass:${KEYSTORE_PASS}
