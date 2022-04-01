@@ -31,7 +31,7 @@ image:
   initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
   # Provide the image for the certs container.
   # Eg. certsContainerName: ghcr.io/hyperledger/bevel-doorman:latest
-  certsContainerName: ghcr.io/hyperledger/alpine-utils:1.0
+  certsContainerName: hyperledgerlabs/alpine-utils:1.0
   # Provide the docker-registry secret created and stored in kubernetes cluster as a secret.
   # Eg. imagePullSecret: regcred
   imagePullSecret: 
