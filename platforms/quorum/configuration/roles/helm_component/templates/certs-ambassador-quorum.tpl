@@ -40,8 +40,8 @@ spec:
       domain_name_web: "{{ peer.name }}web.{{ external_url }}"
       domain_name_tessera: "{{ peer.name }}-tessera.{{ component_ns }}"
     vars:
-      ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
-      rootca: "{{playbook_dir}}/build/quorumrootca" 
+      ambassadortls: "/home/bevel/DATA/ambassadortls"
+      rootca: "/home/bevel/DATA/rootca" 
       kubernetes: "{{ item.k8s }}"
       node_name: "{{ peer.name }}"
       root_subject: "{{ network.config.subject }}"

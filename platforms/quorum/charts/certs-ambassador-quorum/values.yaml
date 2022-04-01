@@ -84,8 +84,8 @@ opensslVars:
   domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
   domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
 vars:
-  ambassadortls: "{{playbook_dir}}/build/{{component_name}}/{{node_name}}"
-  rootca: "{{playbook_dir}}/build/quorumrootca"
+  ambassadortls: "/home/bevel/DATA/ambassadortls"
+  rootca: "/home/bevel/DATA/rootca"
   kubernetes: "{{ item.k8s }}"
   node_name: "{{ node_name }}"
   root_subject: "{{ network.config.subject }}"
