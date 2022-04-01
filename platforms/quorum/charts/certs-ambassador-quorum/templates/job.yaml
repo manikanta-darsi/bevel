@@ -151,13 +151,32 @@ spec:
             mkdir -p ${BASE_DIR}/DATA/ambassadortls
             cd ${BASE_DIR}/DATA/rootca
             set -x
-            keytool -genkey -alias rootca -dname ${root_subject} | quote -keystore rootca.jks -storepass quorum -keypass quorum
+            cat <<EOF >openssl.conf
+            [req]
+            req_extensions = v3_ca
+            distinguished_name = dn
+            [dn]
+            [v3_ca]
+            basicConstraints = critical, CA:TRUE
+            keyUsage = critical,digitalSignature, keyCertSign, cRLSign
+            extendedKeyUsage=serverAuth,clientAuth
+            subjectKeyIdentifier = hash
+            authorityKeyIdentifier = keyid:always
+
+            [v3_nonca]
+            basicConstraints = critical, CA:FALSE
+            keyUsage = critical,digitalSignature, keyCertSign, cRLSign
+            extendedKeyUsage=serverAuth,clientAuth
+            subjectKeyIdentifier = hash
+            authorityKeyIdentifier = keyid:always
+            EOF
+            keytool -genkey -alias rootca -dname {${root_subject} | quote} -keystore rootca.jks -storepass quorum -keypass quorum
             openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
-            openssl req -x509 -new -nodes -key rootca.key -sha256 -days 1024 -out rootca.pem -extensions v3_ca -subj "/${cert_subject}"
+            openssl req -x509 -config ${rootca_path}/openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj "/${cert_subject}"
             openssl pkcs12 -export -name cert -inkey rootca.key -in rootca.pem -out rootcacert.pkcs12 -cacerts -passin pass:'quorum' -passout pass:'quorum'
             openssl pkcs12 -export -name key -inkey rootca.key -in rootca.pem -out rootcakey.pkcs12 -passin pass:'quorum' -passout pass:'quorum'
-            eval "yes | keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
-            eval "yes | keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
+            keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
+            keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
             pwd
             cd ${BASE_DIR}/DATA/ambassadortls
             cat <<EOF >openssl${node_name}.conf

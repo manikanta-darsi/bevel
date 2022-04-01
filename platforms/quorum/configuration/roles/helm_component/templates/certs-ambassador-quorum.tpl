@@ -43,7 +43,7 @@ spec:
       ambassadortls: "/home/bevel/DATA/ambassadortls"
       rootca: "/home/bevel/DATA/rootca" 
       kubernetes: "{{ item.k8s }}"
-      node_name: "{{ peer.name }}"
+      node_name: "{{ item.name | lower }}"
       root_subject: "{{ network.config.subject }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
     peer:
