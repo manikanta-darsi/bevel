@@ -40,8 +40,8 @@ spec:
       domain_name_web: "mmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_tessera: "mmani-tessera.mmani-quo"
     vars:
-      ambassadortls: "/home/mani/bevel/platforms/quorum/configuration/build/mmanimmaniquorum/mmani"
-      rootca: "/home/mani/bevel/platforms/quorum/configuration/build/quorumrootca" 
+      ambassadortls: "/home/bevel/DATA/ambassadortls"
+      rootca: "/home/bevel/DATA/rootca" 
       kubernetes: "{'context': 'arn:aws:eks:eu-west-1:895052373684:cluster/dev2-CLUSTER', 'config_file': '/home/mani/.kube/config'}"
       node_name: "mmani"
       root_subject: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
