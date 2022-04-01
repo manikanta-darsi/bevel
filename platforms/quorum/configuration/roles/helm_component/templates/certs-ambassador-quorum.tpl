@@ -33,7 +33,7 @@ spec:
       retries: 30
     subjects:
       rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
-      ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN= DLT ambassadortls"
+      ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN=DLT ambassadortls CA"
     opensslVars:
       domain_name: "{{ peer.name }}.{{ external_url }}"
       domain_name_api: "{{ peer.name }}api.{{ external_url }}"
