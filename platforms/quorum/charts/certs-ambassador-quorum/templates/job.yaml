@@ -199,7 +199,7 @@ spec:
             cd ${BASE_DIR}/DATA/ambassadortls
             openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
             openssl req -x509 -config ${ambassadortls_path}/openssl${node_name}.conf -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -extensions EXT -subj "/CN=${domain_name}"
-            openssl req -x509  -days 1000 -in ${node_name}.csr -CA ${rootca_path}/rootca.pem -CAkey ${rootca_path}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
+            openssl x509 -req -days 1000 -in ${node_name}.csr -CA ${rootca_path}/rootca.pem -CAkey ${rootca_path}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
             cat ${node_name}.pem > ${node_name}-certchain.pem
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
