@@ -76,7 +76,7 @@ subjects:
   rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
   # Mention the subject for ambassadortls
   # Eg. ambassadortls: "CN=Test Subordinate CA Certificate, OU=HQ, O=HoldCo LLC, L=New York, C=US"
-  ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN= DLT ambassadortls"
+  ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN= DLT ambassadortls CA "
 
 opensslVars: 
   domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
