@@ -186,7 +186,7 @@ spec:
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
             touch ${BASE_DIR}/DATA/done.txt
-            KUBECONFIG= kubectl create secret tls ${node_name} -ambassador-certs --cert=${ambassadortls}/${NODE_NAME}-certchain.pem --key=${ambassadortls}/${node_name}.key -n ${CERTS_SECRET_PREFIX}
+            KUBECONFIG= kubectl create secret tls ${node_name} -ambassador-certs --cert=${rootca_path}/${NODE_NAME}-certchain.pem --key=${ambassadortls}/${node_name}.key -n ${CERTS_SECRET_PREFIX}
             tail -f /dev/null
         imagePullSecrets:
           - name: {{ .Values.image.imagePullSecret }}
