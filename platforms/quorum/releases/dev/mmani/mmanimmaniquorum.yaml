@@ -21,7 +21,7 @@ spec:
       initContainerName: index.docker.io/hyperledgerlabs/alpine-utils:1.0
       node: quorumengineering/quorum:21.4.2
       pullPolicy: Always
-      certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
+      certsContainerName: index.docker.io/hyperledgerlabs/alpine-utils:1.0
       imagePullSecret: regcred
       pullPolicy: Always
     vault:
