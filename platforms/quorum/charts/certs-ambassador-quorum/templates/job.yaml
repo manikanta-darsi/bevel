@@ -170,13 +170,13 @@ spec:
             subjectKeyIdentifier = hash
             authorityKeyIdentifier = keyid:always
             EOF
-            keytool -genkey -alias rootca -dname {${root_subject} | quote} -keystore rootca.jks -storepass quorum -keypass quorum
+            keytool -genkey -alias rootca -dname "${root_subject}" -keystore rootca.jks -storepass quorum -keypass quorum
             openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
-            openssl req -x509 -config ${rootca_path}/openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj "/${cert_subject}"
+            openssl req -x509 -config openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj "/${root_subject}"
             openssl pkcs12 -export -name cert -inkey rootca.key -in rootca.pem -out rootcacert.pkcs12 -cacerts -passin pass:'quorum' -passout pass:'quorum'
             openssl pkcs12 -export -name key -inkey rootca.key -in rootca.pem -out rootcakey.pkcs12 -passin pass:'quorum' -passout pass:'quorum'
-            keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
-            keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum"
+            keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
+            keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
             pwd
             cd ${BASE_DIR}/DATA/ambassadortls
             cat <<EOF >openssl${node_name}.conf
@@ -197,9 +197,9 @@ spec:
             EOF
             cat openssl${node_name}.conf
             cd ${BASE_DIR}/DATA/ambassadortls
-            openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
-            openssl req -x509 -config ${ambassadortls_path}/openssl${node_name}.conf -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -extensions EXT -subj "/CN=${domain_name}"
-            openssl x509 -req -days 1000 -in ${node_name}.csr -CA ${rootca_path}/rootca.pem -CAkey ${rootca_path}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
+            openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key 
+            openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -extensions EXT -subj "/CN=${domain_name}" -config openssl${node_name}.conf
+            openssl x509 -extfile openssl${node_name}.conf -req -days 1000 -in ${node_name}.csr -CA ${rootca_path}/rootca.pem -CAkey ${rootca_path}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
             cat ${node_name}.pem > ${node_name}-certchain.pem
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
