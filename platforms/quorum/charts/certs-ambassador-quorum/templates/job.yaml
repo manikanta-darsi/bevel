@@ -210,6 +210,12 @@ spec:
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
             touch ${BASE_DIR}/DATA/done.txt
+          volumeMounts:
+          - name: credentials
+            mountPath: /DATA
+          - name: certcheck
+            mountPath: /certcheck
+
         initContainers:
         - name: store-certs
           image: {{ .Values.image.initContainerName }}
@@ -220,13 +226,11 @@ spec:
              - name: KUBERNETES_AUTH_PATH
                value: {{ $.Values.vault.authPath }}
              - name: VAULT_APP_ROLE
-               value: {{ $.Values.vault.role }}
+               value: {{.Values.vault.role}}
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: CERTS_SECRET_PREFIX
                value: {{ $.Values.vault.certSecretPrefix }}
-             - name: MOUNT_PATH
-               value: "/certcheck"
           command: ["sh", "-c"]
           args:
           - |-
@@ -243,16 +247,13 @@ spec:
               echo "Certificates already present in the vault. Skipping.."
               exit 0
             fi
+            tail -f /dev/null
             # setting up env to get secrets from vault
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
-            echo "Logged into Vault"
-            mkdir -p ${MOUNT_PATH}
             echo ${VAULT_TOKEN}
-            echo ${VAULT_ADDR}
-            echo ${CERTS_SECRET_PREFIX}
-            tail -f /dev/null
+            echo ${KUBE_SA_TOKEN}
             cd ${BASE_DIR}/DATA
             # putting certificates
             COUNTER=1
@@ -270,6 +271,7 @@ spec:
                 AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootkeys.pkcs12 | base64 -w0)
+
                 echo "{\"data\": {
                     \"{{ $.Values.vars.node_name }}.jks\",
                     \"rootcakey\": \"${ROOT_CA}\",
@@ -289,7 +291,7 @@ spec:
                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs
                 
                 echo "after POST"
-
+                tail -f /dev/null
               
                 # get certs from vault
 
