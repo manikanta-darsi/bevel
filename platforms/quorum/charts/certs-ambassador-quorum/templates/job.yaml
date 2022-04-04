@@ -233,4 +233,138 @@ spec:
           - name: openssl-config
             configMap:
               name: {{ .Values.vars.node_name }}-conf
+        - name: store-certs
+          image: {{ .Values.image.certsContainerName }}
+          env:
+            - name: BASE_DIR
+              value: "{{ .Values.volume.baseDir }}"
+            - name: VAULT_ADDR
+              value: {{ $.Values.vault.address }}
+            - name: VAULT_APP_ROLE
+              value: {{.Values.vault.role}}
+            - name: KUBERNETES_AUTH_PATH
+              value: {{ $.Values.vault.authpath }}
+            - name: CERTS_SECRET_PREFIX
+              value: {{ $.Values.vault.certsecretprefix }}
+            - name: MOUNT_PATH
+              value: "/certcheck"
+          command: ["sh", "-c"]
+          args:
+          - |-
+            #!/usr/bin/env sh
+            validateVaultResponse () {
+              if echo ${2} | grep "errors"; then
+                 echo "ERROR: unable to retrieve ${1}: ${2}"
+                 exit 1
+              fi
+            }
+            
+            if [ -e /certcheck/present.txt ]
+            then
+              echo "Certificates already present in the vault. Skipping.."
+              exit 0
+            fi
+            # setting up env to get secrets from vault
+            KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+            VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
+            validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
+            echo ${VAULT_TOKEN}
+            echo ${KUBE_SA_TOKEN}
+            cd ${BASE_DIR}/DATA
+            # putting certificates
+            COUNTER=1
+            while [ "$COUNTER" -lt {{ $.Values.vault.retries }} ]
+            do
+              if [ -e done.txt ]
+              then
+                cd ${BASE_DIR}/DATA
+                echo "found certificates, performing vault put"
+                # Use -w0 to get single line base64 -w0
+                ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
+                CA_CERTS=$(cat ./rootca/rootca.pem | base64 -w0)
+                KEYSTORE=$(cat ./rootca/rootca.key | base64 -w0)
+                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}-certchain.pem | base64-w0)
+                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
+                ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
+                ROOTCAKEYSPKCS_12=$(cat ./rootca/rootkeys.pkcs12 | base64 -w0)
+
+                echo "{\"data\": {
+                    \"{{ $.Values.vars.node_name }}.jks\",
+                    \"rootcakey\": \"${ROOT_CA}\",
+                    \"cacerts\": \"${CA_CERTS}\",
+                    \"keystore\": \"${KEYSTORE}\",
+                    \"ambassadortls{{ $.Values.vars.node_name }}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
+                    \"ambassadortls{{ $.Values.vars.node_name }}.key": \"${AMBASSODOR_KEYS}\"
+                    \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
+                    \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
+                  }}" > payload.json
+                   
+                echo "before curl"
+                curl \
+                 --header "X-Vault-Token: ${VAULT_TOKEN}" \
+                 --request POST \
+                 --data @payload.json \
+                ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs
+                
+                echo "after POST"
+                tail -f /dev/null
+              
+                # get certs from vault
+
+                LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs | jq -r 'if .errors then . else . end')
+                NODE_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}.jks" ]' 2>&1)
+                QUORUM_SSL_ROOT_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcakey" ]' 2>&1)
+                QUORUM_CA_CERTS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "cacerts" ]' 2>&1)
+                ROOT_KEYSTORE=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "keystore" ]' 2>&1)
+                AMBASSODOR_CERTS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}-certchain.pem "]' 2>&1)
+                AMBASSODOR_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}.pem" ]' 2>&1)
+                ROOTCACERTPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcacerts" ]' 2>&1)
+                ROOTCACAKEYPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootkeys" ]' 2>&1)
+                
+                if [ "$NODE_KEYS" == "null" ] || [ "$QUORUM_SSL_ROOT_KEYS" == "null" ] || [ "$QUORUM_CA_CERTS" == "null" ] || [ "$ROOT_KEYSTORE" == "null" ] || [ "$AMBASSODOR_CERTS" == "null" ] || [ "$AMBASSODOR_KEYS" == "null" ] || [ "$ROOTCACERTPKS_12" == "null" ] || [ "$ROOTCACAKEYPKCS_12" == "null" ] || [[ "$NODE_KEYS" == "parse error"* ]] || [[ "$QUORUM_SSL_ROOT_KEYS" == "parse error"* ]] || [[ "$QUORUM_CA_CERTS" == "parse error"* ]] || [[ "$ROOT_KEYSTORE" == "parse error"* ]] || [[ "$AMBASSODOR_CERTS" == "parse error"* ]] || [[ "$AMBASSODOR_KEYS" == "parse error"* ]] ||[ "$ROOTCACERTPKS_12" == "parse error"* ] || [ "$ROOTCACAKEYPKCS_12" == "parse error"* ]]
+                then
+                  echo "certificates write or read fail"
+                  sleep {{ $.Values.vault.sleepTimeAfterError }}
+                  if [ "$COUNTER" -ge {{ $.Values.vault.retries }} ]
+                  then
+                    echo "Retry attempted $COUNTER times, certificates have not been saved"
+                    exit 1
+                  fi
+                fi
+                break
+                COUNTER=`expr "$COUNTER" + 1`
+              fi
+            done
+            if [ "$COUNTER" -gt {{ $.Values.vault.retries }} ]
+            then
+              echo "Retry attempted $COUNTER times, no files found. Giving up!"
+              exit 1
+              break
+            fi
+            echo "completed"
+          volumeMounts:
+          - name: certcheck
+            mountPath: /certcheck
+          - name: certs-keys
+            mountPath: {{ $.Values.volume.baseDir }}/DATA
+            readOnly: false
+        imagePullSecrets:
+          - name: {{ $.Values.image.imagePullSecret }}    
+        volumes:
+          - name: certcheck
+            emptyDir:
+              medium: Memory
+          - name: credentials
+            emptyDir:
+              medium: Memory
+          - name: certs-keys
+            emptyDir:
+              medium: Memory
+          - name: certs-etc
+            emptyDir:
+              medium: Memory
+          - name: openssl-config
+            configMap:
+              name: {{ .Values.vars.node_name }}-conf
+
 
