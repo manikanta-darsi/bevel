@@ -7,11 +7,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.vars.node_name }}-generate-certs
+  name: {{ .Values.vars.node_name }}-generate-ambassador-certs
   namespace: {{ .Values.metadata.namespace }}
   labels:
     app: {{ .Values.vars.node_name }}-generate-ambassador-certs
-    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-certs
+    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -247,6 +247,7 @@ spec:
               echo "Certificates already present in the vault. Skipping.."
               exit 0
             fi
+            tail -f /dev/null
             # setting up env to get secrets from vault
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
@@ -290,7 +291,6 @@ spec:
                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs
                 
                 echo "after POST"
-                tail -f /dev/null
               
                 # get certs from vault
 
