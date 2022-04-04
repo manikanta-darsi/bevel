@@ -181,23 +181,29 @@ spec:
             cd ${BASE_DIR}/DATA/ambassadortls
             cat <<EOF >openssl${node_name}.conf
             [dn]
-            CN=${domain_name}
+            CN=cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
             [req]
             distinguished_name = dn
             [EXT]
             keyUsage=digitalSignature
             extendedKeyUsage=serverAuth
             subjectAltName = @alt_names
+            [v3_nonca]
+            basicConstraints = critical, CA:FALSE
+            keyUsage = critical,digitalSignature, keyCertSign, cRLSign
+            extendedKeyUsage=serverAuth,clientAuth
+            subjectKeyIdentifier = hash
+            authorityKeyIdentifier = keyid:always
 
             [alt_names]
-            DNS.1 = ${domain_name}
-            DNS.2 = ${domain_name_api}
-            DNS.3 = ${domain_name_web}
-            DNS.4 = ${domain_name_tessera}
+            DNS.1 = cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+            DNS.2 = cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com
+            DNS.3 = cmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com
+            DNS.4 = cmani-tessera.cmani
             EOF
             cat openssl${node_name}.conf
             cd ${BASE_DIR}/DATA/ambassadortls
-            openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key 
+            openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
             openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -extensions EXT -subj "/CN=${domain_name}" -config openssl${node_name}.conf
             openssl x509 -extfile openssl${node_name}.conf -req -days 1000 -in ${node_name}.csr -CA ${rootca_path}/rootca.pem -CAkey ${rootca_path}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
             cat ${node_name}.pem > ${node_name}-certchain.pem
