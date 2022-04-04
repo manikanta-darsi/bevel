@@ -97,8 +97,6 @@ spec:
             mountPath: /DATA
           - name: certcheck
             mountPath: /certcheck
-        imagePullSecrets:
-          - name: {{ $.Values.image.imagePullSecret }}
         containers:
         - name: certs-generation
           image: {{ .Values.image.certsContainerName }}
@@ -213,41 +211,26 @@ spec:
             #creating a dummy file to perform check if last line is executed or not.
             touch ${BASE_DIR}/DATA/done.txt
           volumeMounts:
+          - name: credentials
+            mountPath: /DATA
           - name: certcheck
             mountPath: /certcheck
-        imagePullSecrets:
-          - name: {{ $.Values.image.imagePullSecret }}
-        volumes:
-          - name: certcheck
-            emptyDir:
-              medium: Memory
-          - name: credentials
-            emptyDir:
-              medium: Memory
-          - name: certs-keys
-            emptyDir:
-              medium: Memory
-          - name: certs-etc
-            emptyDir:
-              medium: Memory
-          - name: openssl-config
-            configMap:
-              name: {{ .Values.vars.node_name }}-conf
         - name: store-certs
-          image: {{ $.Values.image.certsContainerName }}
+          image: {{ .Values.image.initContainerName }}
+          imagePullPolicy: IfNotPresent
           env:
-            - name: BASE_DIR
-              value: "{{ .Values.volume.baseDir }}"
-            - name: VAULT_ADDR
-              value: {{ $.Values.vault.address }}
-            - name: VAULT_APP_ROLE
-              value: {{.Values.vault.role}}
-            - name: KUBERNETES_AUTH_PATH
-              value: {{ $.Values.vault.authpath }}
-            - name: CERTS_SECRET_PREFIX
-              value: {{ $.Values.vault.certsecretprefix }}
-            - name: MOUNT_PATH
-              value: "/certcheck"
+             - name: VAULT_ADDR
+               value: {{ $.Values.vault.address }}
+             - name: KUBERNETES_AUTH_PATH
+               value: {{ $.Values.vault.authPath }}
+             - name: VAULT_APP_ROLE
+               value: {{.Values.vault.role}}
+             - name: BASE_DIR
+               value: {{ $.Values.volume.baseDir }}
+             - name: node_name
+               value: "{{ $.Values.vars.node_name }}"
+             - name: CERTS_SECRET_PREFIX
+               value: {{ $.Values.vault.certSecretPrefix }}
           command: ["sh", "-c"]
           args:
           - |-
@@ -283,18 +266,18 @@ spec:
                 ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
                 CA_CERTS=$(cat ./rootca/rootca.pem | base64 -w0)
                 KEYSTORE=$(cat ./rootca/rootca.key | base64 -w0)
-                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}-certchain.pem | base64-w0)
-                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
+                AMBASSODOR_CERTS=$(cat ./ambassadortls/$${node_name}-certchain.pem | base64-w0)
+                AMBASSODOR_CERTS=$(cat ./ambassadortls/$${node_name}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootkeys.pkcs12 | base64 -w0)
 
                 echo "{\"data\": {
-                    \"{{ $.Values.vars.node_name }}.jks\",
+                    \"${node_name}.jks\",
                     \"rootcakey\": \"${ROOT_CA}\",
                     \"cacerts\": \"${CA_CERTS}\",
                     \"keystore\": \"${KEYSTORE}\",
-                    \"ambassadortls{{ $.Values.vars.node_name }}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
-                    \"ambassadortls{{ $.Values.vars.node_name }}.key": \"${AMBASSODOR_KEYS}\"
+                    \"ambassadortls${node_name}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
+                    \"ambassadortls${node_name}.key": \"${AMBASSODOR_KEYS}\"
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
                   }}" > payload.json
@@ -307,7 +290,6 @@ spec:
                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs
                 
                 echo "after POST"
-                tail -f /dev/null
               
                 # get certs from vault
 
@@ -366,5 +348,3 @@ spec:
           - name: openssl-config
             configMap:
               name: {{ .Values.vars.node_name }}-conf
-
-
