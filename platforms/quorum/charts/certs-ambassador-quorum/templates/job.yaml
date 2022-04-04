@@ -216,7 +216,7 @@ spec:
           - name: certcheck
             mountPath: /certcheck
         - name: store-certs
-          image: {{ .Values.image.initContainerName }}
+          image: {{ .Values.image.certsContainerName }}
           imagePullPolicy: IfNotPresent
           env:
              - name: VAULT_ADDR
