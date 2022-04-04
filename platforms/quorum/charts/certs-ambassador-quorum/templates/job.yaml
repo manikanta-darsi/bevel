@@ -231,7 +231,7 @@ spec:
                value: "{{ $.Values.vars.node_name }}"
              - name: CERTS_SECRET_PREFIX
                value: {{ $.Values.vault.certSecretPrefix }}
-          command: ["sh", "-c"]
+          command: ["/bin/bash", "-c"]
           args:
           - |-
             #!/usr/bin/env sh
@@ -290,6 +290,7 @@ spec:
                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs
                 
                 echo "after POST"
+                tail -f /dev/null
               
                 # get certs from vault
 
