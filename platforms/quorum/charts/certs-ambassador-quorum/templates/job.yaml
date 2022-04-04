@@ -110,7 +110,7 @@ spec:
             - name: domain_name_web
               value: "{{ .Values.opensslVars.domain_name_web }}"
             - name: domain_name_tessera
-              value: "{{ .Values.opensslVars.domain_name_web }}" 
+              value: "{{ .Values.opensslVars.domain_name_tessera }}" 
             - name: ambassadortls
               value: "{{ $.Values.subjects.ambassadortls }}"
             - name: rootca
@@ -196,10 +196,10 @@ spec:
             authorityKeyIdentifier = keyid:always
 
             [alt_names]
-            DNS.1 = cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
-            DNS.2 = cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com
-            DNS.3 = cmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com
-            DNS.4 = cmani-tessera.cmani
+            DNS.1 = ${domain_name}
+            DNS.2 = ${domain_name_api}
+            DNS.3 = ${domain_name_web}
+            DNS.4 = ${domain_name_tessera}
             EOF
             cat openssl${node_name}.conf
             cd ${BASE_DIR}/DATA/ambassadortls
@@ -247,7 +247,6 @@ spec:
               echo "Certificates already present in the vault. Skipping.."
               exit 0
             fi
-            tail -f /dev/null
             # setting up env to get secrets from vault
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
@@ -255,6 +254,12 @@ spec:
             echo ${VAULT_TOKEN}
             echo ${KUBE_SA_TOKEN}
             cd ${BASE_DIR}/DATA
+            while ! [ -f ${BASE_DIR}/DATA/done.txt ]
+            do
+              echo 'Waiting for generation of certificates'
+              sleep 2s
+            done
+
             # putting certificates
             COUNTER=1
             while [ "$COUNTER" -lt {{ $.Values.vault.retries }} ]
