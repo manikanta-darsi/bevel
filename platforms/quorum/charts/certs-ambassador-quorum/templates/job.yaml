@@ -272,7 +272,7 @@ spec:
                 AMBASSODOR_CERTS=$(cat ./ambassadortls/$${node_name}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootkeys.pkcs12 | base64 -w0)
-
+                tail -f /dev/null
                 echo "{\"data\": {
                     \"${node_name}.jks\",
                     \"rootcakey\": \"${ROOT_CA}\",
