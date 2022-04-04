@@ -217,6 +217,22 @@ spec:
             mountPath: /certcheck
         imagePullSecrets:
           - name: {{ $.Values.image.imagePullSecret }}
+        volumes:
+          - name: certcheck
+            emptyDir:
+              medium: Memory
+          - name: credentials
+            emptyDir:
+              medium: Memory
+          - name: certs-keys
+            emptyDir:
+              medium: Memory
+          - name: certs-etc
+            emptyDir:
+              medium: Memory
+          - name: openssl-config
+            configMap:
+              name: {{ .Values.vars.node_name }}-conf
 
         initContainers:
         - name: store-certs
