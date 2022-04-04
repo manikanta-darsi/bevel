@@ -256,7 +256,7 @@ spec:
             echo ${VAULT_TOKEN}
             echo ${KUBE_SA_TOKEN}
             cd ${BASE_DIR}/DATA
-            while ! [ -f ${BASE_DIR}/DATA/done.txt ]
+            while ! [ -f ${MOUNT_PATH}/done.txt ]
             do
               echo 'Waiting for generation of certificates'
               sleep 2s
