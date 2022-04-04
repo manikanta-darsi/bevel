@@ -18,7 +18,7 @@ spec:
       namespace: mmani-quo
       external_url: mmani.rc.dev2.aws.blockchaincloudpoc-develop.com
     image:
-      initContainerName: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      initContainerName: ghcr.io/hyperledger/alpine-utils
       node: quorumengineering/quorum:21.4.2
       pullPolicy: Always
       certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
