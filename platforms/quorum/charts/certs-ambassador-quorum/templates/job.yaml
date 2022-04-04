@@ -221,16 +221,18 @@ spec:
           env:
              - name: VAULT_ADDR
                value: {{ $.Values.vault.address }}
-             - name: KUBERNETES_AUTH_PATH
-               value: {{ $.Values.vault.authPath }}
              - name: VAULT_APP_ROLE
                value: {{.Values.vault.role}}
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: node_name
                value: "{{ $.Values.vars.node_name }}"
+             - name: KUBERNETES_AUTH_PATH
+               value: {{ $.Values.vault.authpath }}
              - name: CERTS_SECRET_PREFIX
                value: {{ $.Values.vault.certSecretPrefix }}
+             - name: MOUNT_PATH
+               value: "/certcheck"
           command: ["/bin/bash", "-c"]
           args:
           - |-
