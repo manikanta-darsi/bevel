@@ -234,7 +234,7 @@ spec:
             configMap:
               name: {{ .Values.vars.node_name }}-conf
         - name: store-certs
-          image: {{ .Values.image.certsContainerName }}
+          image: {{ $.Values.image.certsContainerName }}
           env:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
