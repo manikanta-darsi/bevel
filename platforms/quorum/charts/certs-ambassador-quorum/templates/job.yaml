@@ -304,7 +304,7 @@ spec:
                 AMBASSODOR_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}.pem" ]' 2>&1)
                 ROOTCACERTPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcacerts" ]' 2>&1)
                 ROOTCACAKEYPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootkeys" ]' 2>&1)
-                
+                tail -f /dev/null
                 if [ "$NODE_KEYS" == "null" ] || [ "$QUORUM_SSL_ROOT_KEYS" == "null" ] || [ "$QUORUM_CA_CERTS" == "null" ] || [ "$ROOT_KEYSTORE" == "null" ] || [ "$AMBASSODOR_CERTS" == "null" ] || [ "$AMBASSODOR_KEYS" == "null" ] || [ "$ROOTCACERTPKS_12" == "null" ] || [ "$ROOTCACAKEYPKCS_12" == "null" ] || [[ "$NODE_KEYS" == "parse error"* ]] || [[ "$QUORUM_SSL_ROOT_KEYS" == "parse error"* ]] || [[ "$QUORUM_CA_CERTS" == "parse error"* ]] || [[ "$ROOT_KEYSTORE" == "parse error"* ]] || [[ "$AMBASSODOR_CERTS" == "parse error"* ]] || [[ "$AMBASSODOR_KEYS" == "parse error"* ]] ||[ "$ROOTCACERTPKS_12" == "parse error"* ] || [ "$ROOTCACAKEYPKCS_12" == "parse error"* ]]
                 then
                   echo "certificates write or read fail"
