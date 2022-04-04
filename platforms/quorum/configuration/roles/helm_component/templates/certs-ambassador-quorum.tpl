@@ -18,7 +18,7 @@ spec:
       namespace: {{ component_ns }}
       external_url: {{ name }}.{{ external_url }}
     image:
-      initContainerName: ghcr.io/hyperledger/alpine-utils
+      initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
       pullPolicy: Always
       certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
