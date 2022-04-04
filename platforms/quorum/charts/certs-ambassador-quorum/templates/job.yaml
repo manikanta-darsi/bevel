@@ -215,6 +215,8 @@ spec:
             mountPath: /DATA
           - name: certcheck
             mountPath: /certcheck
+        imagePullSecrets:
+          - name: {{ $.Values.image.imagePullSecret }}
 
         initContainers:
         - name: store-certs
@@ -247,7 +249,6 @@ spec:
               echo "Certificates already present in the vault. Skipping.."
               exit 0
             fi
-            tail -f /dev/null
             # setting up env to get secrets from vault
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
@@ -255,6 +256,7 @@ spec:
             echo ${VAULT_TOKEN}
             echo ${KUBE_SA_TOKEN}
             cd ${BASE_DIR}/DATA
+            tail -f /dev/null
             # putting certificates
             COUNTER=1
             while [ "$COUNTER" -lt {{ $.Values.vault.retries }} ]
@@ -291,7 +293,6 @@ spec:
                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs
                 
                 echo "after POST"
-                tail -f /dev/null
               
                 # get certs from vault
 
@@ -334,8 +335,6 @@ spec:
             readOnly: false
         imagePullSecrets:
           - name: {{ $.Values.image.imagePullSecret }}    
-        imagePullSecrets:
-          - name: {{ .Values.image.imagePullSecret }}
         volumes:
           - name: certcheck
             emptyDir:
