@@ -210,7 +210,7 @@ spec:
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
             touch ${BASE_DIR}/DATA/done.txt
-        containers:
+        initContainers:
         - name: store-certs
           image: {{ .Values.image.initContainerName }}
           imagePullPolicy: IfNotPresent
@@ -224,7 +224,7 @@ spec:
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: CERTS_SECRET_PREFIX
-               value: {{ .Values.vault.certSecretPrefix }}
+               value: {{ $.Values.vault.certSecretPrefix }}
              - name: MOUNT_PATH
                value: "/certcheck"
           command: ["sh", "-c"]
@@ -252,6 +252,7 @@ spec:
             echo ${VAULT_TOKEN}
             echo ${VAULT_ADDR}
             echo ${CERTS_SECRET_PREFIX}
+            tail -f /dev/null
             cd ${BASE_DIR}/DATA
             # putting certificates
             COUNTER=1
@@ -269,7 +270,6 @@ spec:
                 AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootkeys.pkcs12 | base64 -w0)
-                tail -f /dev/null
                 echo "{\"data\": {
                     \"{{ $.Values.vars.node_name }}.jks\",
                     \"rootcakey\": \"${ROOT_CA}\",
