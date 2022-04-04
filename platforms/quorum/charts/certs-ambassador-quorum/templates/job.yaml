@@ -209,7 +209,7 @@ spec:
             cat ${node_name}.pem > ${node_name}-certchain.pem
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
-            touch ${BASE_DIR}/DATA/done.txt
+            touch ${MOUNT_PATH}/DATA/done.txt
           volumeMounts:
           - name: credentials
             mountPath: /DATA
@@ -233,7 +233,7 @@ spec:
                value: {{ $.Values.vault.certSecretPrefix }}
              - name: MOUNT_PATH
                value: "/certcheck"
-          command: ["/bin/bash", "-c"]
+          command: ["sh", "-c"]
           args:
           - |-
             #!/usr/bin/env sh
@@ -254,7 +254,6 @@ spec:
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
-            echo ${KUBE_SA_TOKEN}
             cd ${BASE_DIR}/DATA
             # putting certificates
             COUNTER=1
@@ -263,6 +262,7 @@ spec:
               if [ -e done.txt ]
               then
                 cd ${BASE_DIR}/DATA
+                tail -f /dev/null
                 echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
@@ -272,7 +272,6 @@ spec:
                 AMBASSODOR_CERTS=$(cat ./ambassadortls/$${node_name}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootkeys.pkcs12 | base64 -w0)
-                tail -f /dev/null
                 echo "{\"data\": {
                     \"${node_name}.jks\",
                     \"rootcakey\": \"${ROOT_CA}\",
@@ -304,7 +303,6 @@ spec:
                 AMBASSODOR_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}.pem" ]' 2>&1)
                 ROOTCACERTPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcacerts" ]' 2>&1)
                 ROOTCACAKEYPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootkeys" ]' 2>&1)
-                tail -f /dev/null
                 if [ "$NODE_KEYS" == "null" ] || [ "$QUORUM_SSL_ROOT_KEYS" == "null" ] || [ "$QUORUM_CA_CERTS" == "null" ] || [ "$ROOT_KEYSTORE" == "null" ] || [ "$AMBASSODOR_CERTS" == "null" ] || [ "$AMBASSODOR_KEYS" == "null" ] || [ "$ROOTCACERTPKS_12" == "null" ] || [ "$ROOTCACAKEYPKCS_12" == "null" ] || [[ "$NODE_KEYS" == "parse error"* ]] || [[ "$QUORUM_SSL_ROOT_KEYS" == "parse error"* ]] || [[ "$QUORUM_CA_CERTS" == "parse error"* ]] || [[ "$ROOT_KEYSTORE" == "parse error"* ]] || [[ "$AMBASSODOR_CERTS" == "parse error"* ]] || [[ "$AMBASSODOR_KEYS" == "parse error"* ]] ||[ "$ROOTCACERTPKS_12" == "parse error"* ] || [ "$ROOTCACAKEYPKCS_12" == "parse error"* ]]
                 then
                   echo "certificates write or read fail"
