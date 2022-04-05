@@ -258,6 +258,7 @@ spec:
             # putting certificates
             COUNTER=1
             while [ "$COUNTER" -lt {{ $.Values.vault.retries }} ]
+            echo test
             do
               if [ -e done.txt ]
               then
@@ -293,7 +294,6 @@ spec:
               fi
             done
             echo jobdone
-            tail -f /dev/null
             if [ "$COUNTER" -gt {{ $.Values.vault.retries }} ]
             then
               echo "Retry attempted $COUNTER times, no files found. Giving up!"
