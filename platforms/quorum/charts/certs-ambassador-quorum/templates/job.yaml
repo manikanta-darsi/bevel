@@ -276,7 +276,7 @@ spec:
                     \"rootcakey\": \"${ROOT_CA}\",
                     \"cacerts\": \"${CA_CERTS}\",
                     \"ambassadortls${node_name}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
-                    \"ambassadortls${node_name}.key": \"${AMBASSODOR_KEYS}\"
+                    \"ambassadortls${node_name}.key": \"${AMBASSODOR_KEYS}\",
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
                   }}" > payload.json                  
