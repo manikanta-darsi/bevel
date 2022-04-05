@@ -254,9 +254,8 @@ spec:
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
-            tail -f /dev/null
             cd ${MOUNT_PATH}/DATA
-            while ! [ -f ${MOUNT_PATH}/done.txt ]
+            while ! [ -f ${MOUNT_PATH}/DATA/done.txt ]
             do
               echo 'Waiting for generation of certificates'
               sleep 2s
@@ -268,7 +267,6 @@ spec:
               if [ -e done.txt ]
               then
                 cd ${MOUNT_PATH}/DATA
-                tail -f /dev/null
                 echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
@@ -288,7 +286,7 @@ spec:
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
                   }}" > payload.json
-                   
+                  tail -f /dev/null                   
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
