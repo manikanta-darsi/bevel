@@ -255,6 +255,7 @@ spec:
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
             cd ${MOUNT_PATH}/DATA
+            tail -f /dev/null
             # putting certificates
             COUNTER=1
             while [ "$COUNTER" -lt {{ $.Values.vault.retries }} ]
