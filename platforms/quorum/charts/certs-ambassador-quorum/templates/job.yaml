@@ -147,9 +147,9 @@ spec:
               exit 0
             fi            
             # create directories
-            mkdir -p ${BASE_DIR}/DATA/rootca
-            mkdir -p ${BASE_DIR}/DATA/ambassadortls
-            cd ${BASE_DIR}/DATA/rootca
+            mkdir -p ${MOUNT_PATH}/DATA/rootca
+            mkdir -p ${MOUNT_PATH}/DATA/ambassadortls
+            cd ${MOUNT_PATH}/DATA/rootca
             set -x
             cat <<EOF >openssl.conf
             [req]
@@ -178,7 +178,7 @@ spec:
             keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
             keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
             pwd
-            cd ${BASE_DIR}/DATA/ambassadortls
+            cd ${MOUNT_PATH}/DATA/ambassadortls
             cat <<EOF >openssl${node_name}.conf
             [dn]
             CN=cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
@@ -202,14 +202,14 @@ spec:
             DNS.4 = ${domain_name_tessera}
             EOF
             cat openssl${node_name}.conf
-            cd ${BASE_DIR}/DATA/ambassadortls
+            cd ${MOUNT_PATH}/DATA/ambassadortls
             openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
             openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -extensions EXT -subj "/CN=${domain_name}" -config openssl${node_name}.conf
             openssl x509 -extfile openssl${node_name}.conf -req -days 1000 -in ${node_name}.csr -CA ${rootca_path}/rootca.pem -CAkey ${rootca_path}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
             cat ${node_name}.pem > ${node_name}-certchain.pem
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
-            touch ${MOUNT_PATH}/done.txt
+            touch ${MOUNT_PATH}/DATA/done.txt
           volumeMounts:
           - name: credentials
             mountPath: /DATA
@@ -254,8 +254,8 @@ spec:
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
-            cd ${BASE_DIR}/DATA
-            while ! [ -f ${MOUNT_PATH}/DATA/done.txt ]
+            cd ${MOUNT_PATH}/DATA
+            while ! [ -f ${MOUNT_PATH}/done.txt ]
             do
               echo 'Waiting for generation of certificates'
               sleep 2s
@@ -266,9 +266,8 @@ spec:
             do
               if [ -e done.txt ]
               then
-                cd ${BASE_DIR}/DATA
+                cd ${MOUNT_PATH}/DATA
                 echo "found certificates, performing vault put"
-                tail -f /dev/null
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
                 CA_CERTS=$(cat ./rootca/rootca.pem | base64 -w0)
@@ -287,7 +286,7 @@ spec:
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
                   }}" > payload.json
-                   
+                  tail -f /dev/null                   
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
