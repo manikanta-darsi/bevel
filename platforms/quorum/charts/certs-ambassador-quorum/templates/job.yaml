@@ -255,11 +255,8 @@ spec:
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
             cd ${MOUNT_PATH}/DATA
-            while ! [ -f ${MOUNT_PATH}/DATA/done.txt ]
-            do
-              echo 'Waiting for generation of certificates'
-              sleep 2s
             done
+            tail -f /dev/null
             # putting certificates
             COUNTER=1
             while [ "$COUNTER" -lt {{ $.Values.vault.retries }} ]
@@ -285,8 +282,7 @@ spec:
                     \"ambassadortls${node_name}.key": \"${AMBASSODOR_KEYS}\"
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
-                  }}" > payload.json
-                  tail -f /dev/null                   
+                  }}" > payload.json                  
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
