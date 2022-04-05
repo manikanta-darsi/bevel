@@ -275,24 +275,24 @@ spec:
                     \"${node_name}.jks\",
                     \"rootcakey\": \"${ROOT_CA}\",
                     \"cacerts\": \"${CA_CERTS}\",
-                    \"keystore\": \"${KEYSTORE}\",
                     \"ambassadortls${node_name}-certchain.pem\": \"${AMBASSODOR_CERTS}\",
                     \"ambassadortls${node_name}.key": \"${AMBASSODOR_KEYS}\"
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
-                  }}" > payload.json                  
+                    }
+                  }" > payload.json                  
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
                  --request POST \
                  --data @payload.json \
-                ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs
+                ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs
                 
                 echo "after POST"
               
                 # get certs from vault
 
-                LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs | jq -r 'if .errors then . else . end')
+                LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
                 NODE_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "${node_name}.jks" ]' 2>&1)
                 QUORUM_SSL_ROOT_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcakey" ]' 2>&1)
                 QUORUM_CA_CERTS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "cacerts" ]' 2>&1)
