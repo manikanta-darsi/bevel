@@ -205,9 +205,9 @@ spec:
             cd ${MOUNT_PATH}/DATA/ambassadortls
             openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
             openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -extensions EXT -subj "/CN=${domain_name}" -config openssl${node_name}.conf
-            openssl x509 -extfile openssl${node_name}.conf -req -days 1000 -in ${node_name}.csr -CA ${rootca_path}/rootca.pem -CAkey ${rootca_path}/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
+            openssl x509 -extfile openssl${node_name}.conf -req -days 1000 -in ${node_name}.csr -CA ${MOUNT_PATH}/DATA/rootca/rootca.pem -CAkey ${MOUNT_PATH}/DATA/rootca/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
             cat ${node_name}.pem > ${node_name}-certchain.pem
-            cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
+            cat ${MOUNT_PATH}/DATA/rootca/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
             touch ${MOUNT_PATH}/DATA/done.txt
           volumeMounts:
@@ -254,6 +254,7 @@ spec:
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
+            tail -f /dev/null
             cd ${MOUNT_PATH}/DATA
             while ! [ -f ${MOUNT_PATH}/done.txt ]
             do
@@ -267,6 +268,7 @@ spec:
               if [ -e done.txt ]
               then
                 cd ${MOUNT_PATH}/DATA
+                tail -f /dev/null
                 echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
@@ -286,7 +288,7 @@ spec:
                     \"rootcacerts\": \"${ROOTCACERTPKCS_12}\",
                     \"rootcakeys\": \"${ROOTCAKEYSPKCS_12}\"
                   }}" > payload.json
-                  tail -f /dev/null                   
+                   
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
