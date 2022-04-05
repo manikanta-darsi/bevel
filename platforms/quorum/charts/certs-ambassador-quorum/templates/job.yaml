@@ -209,7 +209,7 @@ spec:
             cat ${node_name}.pem > ${node_name}-certchain.pem
             cat ${rootca_path}/rootca.pem >> ${node_name}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
-            touch ${MOUNT_PATH}/DATA/done.txt
+            touch ${MOUNT_PATH}/done.txt
           volumeMounts:
           - name: credentials
             mountPath: /DATA
@@ -254,7 +254,6 @@ spec:
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
-            tail -f /dev/null
             cd ${BASE_DIR}/DATA
             while ! [ -f ${MOUNT_PATH}/DATA/done.txt ]
             do
@@ -268,8 +267,8 @@ spec:
               if [ -e done.txt ]
               then
                 cd ${BASE_DIR}/DATA
-                tail -f /dev/null
                 echo "found certificates, performing vault put"
+                tail -f /dev/null
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/keys.jks | base64 -w0)
                 CA_CERTS=$(cat ./rootca/rootca.pem | base64 -w0)
