@@ -293,12 +293,12 @@ spec:
                 # get certs from vault
 
                 LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/certs | jq -r 'if .errors then . else . end')
-                NODE_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}.jks" ]' 2>&1)
+                NODE_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "${node_name}.jks" ]' 2>&1)
                 QUORUM_SSL_ROOT_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcakey" ]' 2>&1)
                 QUORUM_CA_CERTS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "cacerts" ]' 2>&1)
                 ROOT_KEYSTORE=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "keystore" ]' 2>&1)
-                AMBASSODOR_CERTS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}-certchain.pem "]' 2>&1)
-                AMBASSODOR_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "{{ .Values.nodeName }}.pem" ]' 2>&1)
+                AMBASSODOR_CERTS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "${node_name}-certchain.pem" ]' 2>&1)
+                AMBASSODOR_KEYS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "${node_name}.pem" ]' 2>&1)
                 ROOTCACERTPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcacerts" ]' 2>&1)
                 ROOTCACAKEYPKCS_12=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootkeys" ]' 2>&1)
                 if [ "$NODE_KEYS" == "null" ] || [ "$QUORUM_SSL_ROOT_KEYS" == "null" ] || [ "$QUORUM_CA_CERTS" == "null" ] || [ "$ROOT_KEYSTORE" == "null" ] || [ "$AMBASSODOR_CERTS" == "null" ] || [ "$AMBASSODOR_KEYS" == "null" ] || [ "$ROOTCACERTPKS_12" == "null" ] || [ "$ROOTCACAKEYPKCS_12" == "null" ] || [[ "$NODE_KEYS" == "parse error"* ]] || [[ "$QUORUM_SSL_ROOT_KEYS" == "parse error"* ]] || [[ "$QUORUM_CA_CERTS" == "parse error"* ]] || [[ "$ROOT_KEYSTORE" == "parse error"* ]] || [[ "$AMBASSODOR_CERTS" == "parse error"* ]] || [[ "$AMBASSODOR_KEYS" == "parse error"* ]] ||[ "$ROOTCACERTPKS_12" == "parse error"* ] || [ "$ROOTCACAKEYPKCS_12" == "parse error"* ]]
