@@ -259,6 +259,7 @@ spec:
             do
               if [ -e done.txt ]
               then
+                echo test
                 cd ${MOUNT_PATH}/DATA
                 echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0
