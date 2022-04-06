@@ -263,7 +263,7 @@ spec:
               if [ -e done.txt ]
               then
                 cd ${MOUNT_PATH}/DATA
-	                echo "found certificates, performing vault put"
+                echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/rootca.jks | base64 -w0)
                 ROOTCAPEM=$(cat ./rootca/rootca.pem | base64 -w0)
