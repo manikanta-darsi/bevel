@@ -211,8 +211,6 @@ spec:
             #creating a dummy file to perform check if last line is executed or not.
             touch ${MOUNT_PATH}/DATA/done.txt
           volumeMounts:
-          - name: credentials
-            mountPath: /DATA
           - name: certcheck
             mountPath: /certcheck
         - name: store-certs
@@ -257,8 +255,7 @@ spec:
             cd ${MOUNT_PATH}/DATA
             # putting certificates
             COUNTER=1
-            while [ "$COUNTER" -lt 30 ]
-            echo test
+            while [ "$COUNTER" -lt 20 ]
             do
               if [ -e done.txt ]
               then
@@ -288,25 +285,41 @@ spec:
                  --data @payload.json \
                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs               
                 echo "after POST"
+
+                # get certs from vault
+                LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
+                R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootca.jks" ]' 2>&1)
+				        R_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcakey" ]' 2>&1)
+				        R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcapem" ]' 2>&1)
+                A_CERT=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "ambassadorcrt" ]' 2>&1)
+                A_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "ambassadorkey" ]' 2>&1)
+                R_CERT_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcacert.pkcs12" ]' 2>&1)
+                R_KEY_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcakey.pkcs12" ]' 2>&1)
+                
+                if [ "$R_CA" == "null" ] || [ "$R_KEY" == "null" ] || [ "$R_PEM" == "null" ] || [ "$A_CERT" == "null" ] || [ "$A_KEY" == "null" ] || [ "$R_CERT_PKCS" == "null" ] || [ "$R_KEY_PKCS" == "null" ] ||  [[ "$R_CA" == "parse error"* ]] || [[ "$R_KEY" == "parse error"* ]] || [[ "$R_PEM" == "parse error"* ]] || [[ "$A_CERT" == "parse error"* ]] || [[ "$A_KEY" == "parse error"* ]] || [[ "$R_CERT_PKCS" == "parse error"* ]] ||[ "$R_KEY_PKCS" == "parse error"* ]
+                then
+                  echo "certificates write or read fail"
+                  sleep {{ $.Values.vault.sleepTimeAfterError  }}
+                  if [ "$COUNTER" -ge 20 ]
+                  then
+                    echo "Retry attempted $COUNTER times, certificates have not been saved"
+                    exit 1
+                  fi
+                fi
                 break
                 COUNTER=`expr "$COUNTER" + 1`
               fi
             done
-            echo jobdone
-            if [ "$COUNTER" -gt 30 ]
+            if [ "$COUNTER" -gt 20 ]
             then
               echo "Retry attempted $COUNTER times, no files found. Giving up!"
               exit 1
               break
             fi
             echo "completed"
-            tail -f /dev/null
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
-          - name: certs-keys
-            mountPath: {{ $.Values.volume.baseDir }}/DATA
-            readOnly: false
         imagePullSecrets:
           - name: {{ $.Values.image.imagePullSecret }}    
         volumes:
@@ -320,8 +333,4 @@ spec:
             emptyDir:
               medium: Memory
           - name: certs-etc
-            emptyDir:
-              medium: Memory
-          - name: openssl-config
-            configMap:
-              name: {{ .Values.vars.node_name }}-conf
+
