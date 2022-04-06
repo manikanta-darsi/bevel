@@ -299,7 +299,7 @@ spec:
                 if [ "$R_CA" == "null" ] || [ "$R_KEY" == "null" ] || [ "$R_PEM" == "null" ] || [ "$A_CERT" == "null" ] || [ "$A_KEY" == "null" ] || [ "$R_CERT_PKCS" == "null" ] || [ "$R_KEY_PKCS" == "null" ] ||  [[ "$R_CA" == "parse error"* ]] || [[ "$R_KEY" == "parse error"* ]] || [[ "$R_PEM" == "parse error"* ]] || [[ "$A_CERT" == "parse error"* ]] || [[ "$A_KEY" == "parse error"* ]] || [[ "$R_CERT_PKCS" == "parse error"* ]] ||[ "$R_KEY_PKCS" == "parse error"* ]
                 then
                   echo "certificates write or read fail"
-                  sleep {{ $.Values.vault.sleepTimeAfterError  }}
+                  sleep 20
                   if [ "$COUNTER" -ge 20 ]
                   then
                     echo "Retry attempted $COUNTER times, certificates have not been saved"
