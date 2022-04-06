@@ -288,7 +288,7 @@ spec:
                 echo "after POST"
 
                 # get certs from vault
-                LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
+                LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
                 R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootca.jks" ]' 2>&1)
                 R_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcakey" ]' 2>&1)
                 R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data[ "rootcapem" ]' 2>&1)
