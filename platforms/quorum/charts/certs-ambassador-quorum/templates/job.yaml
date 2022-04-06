@@ -300,6 +300,7 @@ spec:
               break
             fi
             echo "completed"
+            tail -f /dev/null
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
