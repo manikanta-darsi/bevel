@@ -291,7 +291,7 @@ spec:
                 LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
                 R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootca.jks"]' 2>&1)
                 R_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey"]' 2>&1)
-                R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["hello"]' 2>&1)
+                R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcapem"]' 2>&1)
                 A_CERT=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ambassadorcrt"]' 2>&1)
                 A_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ambassadorkey"]' 2>&1)
                 R_CERT_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcacert.pkcs12"]' 2>&1)
