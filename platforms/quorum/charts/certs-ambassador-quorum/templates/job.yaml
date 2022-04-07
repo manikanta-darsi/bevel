@@ -302,18 +302,18 @@ spec:
                   if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
                   then
                    echo "certificates write or read fail"
-                   break
-                   else
-                   echo "certificates write or read success"
-                   done
+                    break
+                    else
+                    echo "certificates write or read success"
+                  fi
+                  done
                    sleep 20
                   if [ "$COUNTER" -ge 20 ]
                   then
                     echo "Retry attempted $COUNTER times, certificates have not been saved"
-                    exit 1
+                    exit 1                  
+                    break
                   fi
-                  fi
-                  break
                 COUNTER=`expr "$COUNTER" + 1`
               fi
             done
