@@ -312,8 +312,8 @@ spec:
                     echo "Retry attempted $COUNTER times, certificates have not been saved"
                     exit 1
                   fi
-                fi
-                break
+                  fi
+                  break
                 COUNTER=`expr "$COUNTER" + 1`
               fi
             done
