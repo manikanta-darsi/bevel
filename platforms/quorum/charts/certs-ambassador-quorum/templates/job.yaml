@@ -270,6 +270,7 @@ spec:
                 AMBASSODOR_KEYS=$(cat ./ambassadortls/${node_name}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
+
                 echo "{\"data\": {
                 \"rootca\":\"${ROOT_CA}\",
                 \"rootcakey\": \"${ROOTCAKEY}\",
@@ -279,6 +280,7 @@ spec:
                 \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
                 \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
                 }}" > payload.json
+
                 echo "before curl"
                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
@@ -305,25 +307,24 @@ spec:
                     break
                     else
                     echo "certificates write or read success"
+                     sleep 10
+                      if [ "$COUNTER" -ge 10 ]
+                      then
+                      echo "Retry attempted $COUNTER times, certificates have not been saved"
+                    exit 1
                   fi
-                  done
-                   sleep 20
-                  if [ "$COUNTER" -ge 20 ]
-                  then
-                    echo "Retry attempted $COUNTER times, certificates have not been saved"
-                    exit 1                  
-                    break
-                  fi
+                fi
+                break
                 COUNTER=`expr "$COUNTER" + 1`
-                done
-               if [ "$COUNTER" -gt 20 ]
-               then
-                 echo "Retry attempted $COUNTER times, no files found. Giving up!"
-                 exit 1
-                 break
-               fi
               fi
-            tail -f /dev/null
+            done
+
+            if [ "$COUNTER" -gt 10 ]
+            then
+              echo "Retry attempted $COUNTER times, no files found. Giving up!"
+              exit 1
+              break
+            fi
             echo "completed"
           volumeMounts:
           - name: certcheck
@@ -341,4 +342,3 @@ spec:
             emptyDir:
               medium: Memory
           - name: certs-etc
-
