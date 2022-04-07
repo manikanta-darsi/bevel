@@ -297,9 +297,14 @@ spec:
                 R_CERT_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcacert.pkcs12"]' 2>&1)
                 R_KEY_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey.pkcs12"]' 2>&1)
                 
-                if [ "$R_CA" == "null" ] || [ "$R_KEY" == "null" ] || [ "$R_PEM" == "null" ] || [ "$A_CERT" == "null" ] || [ "$A_KEY" == "null" ] || [ "$R_CERT_PKCS" == "null" ] || [ "$R_KEY_PKCS" == "null" ] ||  [[ "$R_CA" == "parse error"* ]] || [[ "$R_KEY" == "parse error"* ]] || [[ "$R_PEM" == "parse error"* ]] || [[ "$A_CERT" == "parse error"* ]] || [[ "$A_KEY" == "parse error"* ]] || [[ "$R_CERT_PKCS" == "parse error"* ]] ||[ "$R_KEY_PKCS" == "parse error"* ]
-                then
+                for field in "$R_CA" "$R_KEY" "$R_PEM" "$A_CERT" "$A_KEY" "$R_CERT_PKCS" "$R_KEY_PKCS"
+                do
+                if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
+                  then
                   echo "certificates write or read fail"
+                  break
+                  else
+                  echo "certificates write or read success"
                   sleep 20
                   if [ "$COUNTER" -ge 20 ]
                   then
