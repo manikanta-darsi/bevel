@@ -325,6 +325,7 @@ spec:
               exit 1
               break
             fi
+            tail -f /dev/null
             echo "completed"
           volumeMounts:
           - name: certcheck
