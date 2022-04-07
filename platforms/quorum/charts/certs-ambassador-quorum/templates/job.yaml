@@ -278,7 +278,6 @@ spec:
                  \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
                  \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
                  }}" > payload.json
-
                  echo "before curl"
                  curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
