@@ -80,7 +80,7 @@ spec:
               echo ${CERTS_SECRET_PREFIX}           
               LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.node_name }}/certs | jq -r 'if .errors then . else . end')
               echo ${LOOKUP_SECRET_RESPONSE}
-              data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["rootCA"]')"
+              data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootA"]')"
               echo ${data_info}
               if [ "$data_info" == "null" ]           
               then
@@ -289,7 +289,7 @@ spec:
 
                 # get certs from vault
                 LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
-                R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootca.jks"]' 2>&1)
+                R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootca"]' 2>&1)
                 R_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey"]' 2>&1)
                 R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcapem"]' 2>&1)
                 A_CERT=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ambassadorcrt"]' 2>&1)
@@ -315,14 +315,14 @@ spec:
                     break
                   fi
                 COUNTER=`expr "$COUNTER" + 1`
+                done
+               if [ "$COUNTER" -gt 20 ]
+               then
+                 echo "Retry attempted $COUNTER times, no files found. Giving up!"
+                 exit 1
+                 break
+               fi
               fi
-            done
-            if [ "$COUNTER" -gt 20 ]
-            then
-              echo "Retry attempted $COUNTER times, no files found. Giving up!"
-              exit 1
-              break
-            fi
             tail -f /dev/null
             echo "completed"
           volumeMounts:
