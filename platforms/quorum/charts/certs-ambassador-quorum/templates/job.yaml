@@ -252,9 +252,8 @@ spec:
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             echo ${VAULT_TOKEN}
-            cd ${MOUNT_PATH}/DATA
-            tail -f /dev/null
             COUNTER=1
+            cd ${MOUNT_PATH}/DATA
             while [ "$COUNTER" -lt 10 ]
             do
               if [ -e done.txt ]
@@ -270,63 +269,56 @@ spec:
                 AMBASSODOR_KEYS=$(cat ./ambassadortls/${node_name}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
-
                 echo "{\"data\": {
-                \"rootca\":\"${ROOT_CA}\",
-                \"rootcakey\": \"${ROOTCAKEY}\",
-                \"rootcapem\": \"${ROOTCAPEM}\",
-                \"ambassadorcrt\": \"${AMBASSODOR_CERTS}\",
-                \"ambassadorkey\": \"${AMBASSODOR_KEYS}\",
-                \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
-                \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
-                }}" > payload.json
+                 \"rootca\":\"${ROOT_CA}\",
+                 \"rootcakey\": \"${ROOTCAKEY}\",
+                 \"rootcapem\": \"${ROOTCAPEM}\",
+                 \"ambassadorcrt\": \"${AMBASSODOR_CERTS}\",
+                 \"ambassadorkey\": \"${AMBASSODOR_KEYS}\",
+                 \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
+                 \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
+                 }}" > payload.json
 
-                echo "before curl"
-                curl \
+                 echo "before curl"
+                 curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
                  --request POST \
                  --data @payload.json \
-                ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs               
-                echo "after POST"
-
-                # get certs from vault
-                LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
-                R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootca"]' 2>&1)
-                R_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey"]' 2>&1)
-                R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcapem"]' 2>&1)
-                A_CERT=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ambassadorcrt"]' 2>&1)
-                A_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ambassadorkey"]' 2>&1)
-                R_CERT_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcacert.pkcs12"]' 2>&1)
-                R_KEY_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey.pkcs12"]' 2>&1)
-                
-                for field in "$R_CA" "$R_KEY" "$R_PEM" "$A_CERT" "$A_KEY" "$R_CERT_PKCS" "$R_KEY_PKCS"
-                do
-                  if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
-                  then
-                   echo "certificates write or read fail"
-                    break
-                    else
+                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs              
+                 echo "after POST"
+                 rm payload.json
+                 # get certs from vault
+                 LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
+                 R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootca"]' 2>&1)
+                 R_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey"]' 2>&1)
+                 R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcapem"]' 2>&1)
+                 A_CERT=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ambassadorcrt"]' 2>&1)
+                 A_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ambassadorkey"]' 2>&1)
+                 R_CERT_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcacert.pkcs12"]' 2>&1)
+                 R_KEY_PKCS=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey.pkcs12"]' 2>&1)
+                 for field in "$R_CA" "$R_KEY" "$R_PEM" "$A_CERT" "$A_KEY" "$R_CERT_PKCS" "$R_KEY_PKCS"
+                 do
+                 if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
+                 then
+                    echo "certificates write or read fail"
+                     break
+                     else
                     echo "certificates write or read success"
-                     sleep 10
-                      if [ "$COUNTER" -ge 10 ]
-                      then
-                       echo "Retry attempted $COUNTER times, certificates have not been saved"
-                    exit 1
-                  fi
+                    sleep 20
+                   COUNTER=`expr "$COUNTER" + 1`
+                 fi
+                done
+                if [ "$COUNTER" -gt 30 ]
+                  then
+                  echo "Retry attempted `expr $COUNTER - 1` times, Certificates have not been saved."
+                  break
+                  else
+                  echo "Certificates have  been saved"
+                  exit 1
                 fi
-                break
-                COUNTER=`expr "$COUNTER" + 1`
-              fi
+               echo "completed"
+             fi
             done
-
-            if [ "$COUNTER" -gt 10 ]
-            then
-              echo "Retry attempted $COUNTER times, no files found. Giving up!"
-              exit 1
-              break
-            fi
-            tail -f /dev/null
-            echo "completed"
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
