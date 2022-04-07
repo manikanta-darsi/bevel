@@ -299,13 +299,14 @@ spec:
                 
                 for field in "$R_CA" "$R_KEY" "$R_PEM" "$A_CERT" "$A_KEY" "$R_CERT_PKCS" "$R_KEY_PKCS"
                 do
-                if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
+                  if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
                   then
-                  echo "certificates write or read fail"
-                  break
-                  else
-                  echo "certificates write or read success"
-                  sleep 20
+                   echo "certificates write or read fail"
+                   break
+                   else
+                   echo "certificates write or read success"
+                   done
+                   sleep 20
                   if [ "$COUNTER" -ge 20 ]
                   then
                     echo "Retry attempted $COUNTER times, certificates have not been saved"
