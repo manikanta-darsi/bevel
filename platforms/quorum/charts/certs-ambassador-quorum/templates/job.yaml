@@ -255,7 +255,7 @@ spec:
             cd ${MOUNT_PATH}/DATA
             # putting certificates
             COUNTER=1
-            while [ "$COUNTER" -lt 20 ]
+            while [ "$COUNTER" -lt 10 ]
             do
               if [ -e done.txt ]
               then
@@ -310,7 +310,7 @@ spec:
                      sleep 10
                       if [ "$COUNTER" -ge 10 ]
                       then
-                      echo "Retry attempted $COUNTER times, certificates have not been saved"
+                       echo "Retry attempted $COUNTER times, certificates have not been saved"
                     exit 1
                   fi
                 fi
