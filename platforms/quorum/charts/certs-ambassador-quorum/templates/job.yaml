@@ -318,7 +318,6 @@ spec:
                echo "completed"
              fi
             done
-            tail -f /dev/null
           volumeMounts:
           - name: certcheck
             mountPath: /certcheck
