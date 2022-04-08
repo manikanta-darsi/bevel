@@ -38,15 +38,15 @@
   loop_control:
     loop_var: peer
 
-# This task creates the Ambassador tls credentials
-- name: "Create the Ambassador credentials"
-  include_role:
-    name: create/k8s_secrets
-  vars: 
-    namespace: "{{ component_ns }}"
-    vault: "{{ item.vault }}"
-    kubernetes: "{{ item.k8s }}"
-    check: "ambassador_creds"
+# # This task creates the Ambassador tls credentials
+# - name: "Create the Ambassador credentials"
+#   include_role:
+#     name: create/k8s_secrets
+#   vars: 
+#     namespace: "{{ component_ns }}"
+#     vault: "{{ item.vault }}"
+#     kubernetes: "{{ item.k8s }}"
+#     check: "ambassador_creds"
 
     
 # Git Push : Pushes the above generated files to git directory 
