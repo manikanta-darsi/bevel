@@ -38,15 +38,24 @@
   loop_control:
     loop_var: peer
 
-# # This task creates the Ambassador tls credentials
-# - name: "Create the Ambassador credentials"
-#   include_role:
-#     name: create/k8s_secrets
-#   vars: 
-#     namespace: "{{ component_ns }}"
-#     vault: "{{ item.vault }}"
-#     kubernetes: "{{ item.k8s }}"
-#     check: "ambassador_creds"
+# Check if ambassador certs job is completed
+- name: Check if ambassador certs job is completed
+  include_role:
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
+  vars:
+    component_name: "{{ name }}{{ peer.name }}quorum"
+    component_type: Job
+    namespace: "{{ component_ns }}"
+
+# This task creates the Ambassador tls credentials
+- name: "Create the Ambassador credentials"
+  include_role:
+    name: create/k8s_secrets
+  vars: 
+    namespace: "{{ component_ns }}"
+    vault: "{{ item.vault }}"
+    kubernetes: "{{ item.k8s }}"
+    check: "ambassador_creds"
 
     
 # Git Push : Pushes the above generated files to git directory 

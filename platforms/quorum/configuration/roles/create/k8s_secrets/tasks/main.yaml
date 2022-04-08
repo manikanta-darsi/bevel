@@ -13,7 +13,7 @@
   k8s_info:
     kind: Secret
     namespace: "{{ component_ns }}"
-    name: "{{ node_name }}-ambassador-certs"
+    name: "{{ name }}{{ peer.name }}quorum"
     kubeconfig: "{{ kubernetes.config_file }}"
     context: "{{ kubernetes.context }}"
   register: get_ambassador_secret
