@@ -22,7 +22,7 @@
 # Checks if certificates are already created and stored in vault.
 - name: Check if ambassador and tls certs already created
   shell: |
-    vault kv get -field=rootcapem {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ node_name }}/certs
+    vault kv get -field=rootcapem {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ peer.name }}/certs
   environment:
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"
@@ -33,7 +33,7 @@
 # Gets the existing ambassador tls certs
 - name: Get ambassador and tls certs from Vault
   shell: |
-    vault kv get -format=yaml {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ node_name }}/certs
+    vault kv get -format=yaml {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ peer.name }}/certs
   environment:
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"

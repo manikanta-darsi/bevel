@@ -46,6 +46,9 @@
     component_name: "{{ name }}{{ peer.name }}quorum"
     component_type: Job
     namespace: "{{ component_ns }}"
+  loop: "{{ peers }}"
+  loop_control:
+    loop_var: peer
 
 # This task creates the Ambassador tls credentials
 - name: "Create the Ambassador credentials"
@@ -56,6 +59,9 @@
     vault: "{{ item.vault }}"
     kubernetes: "{{ item.k8s }}"
     check: "ambassador_creds"
+  loop: "{{ peers }}"
+  loop_control:
+    loop_var: peer
 
     
 # Git Push : Pushes the above generated files to git directory 
