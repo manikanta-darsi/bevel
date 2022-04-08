@@ -24,15 +24,6 @@
     path: "{{ ambassadortls }}"
     check: "ensure_dir"
 
-# Check if Ambassador credentials exist already
-- name: Check Ambassador cred exists
-  k8s_info:
-    kind: Secret
-    namespace: "{{ component_ns }}"
-    name: "{{ node_name }}-ambassador-certs"
-    kubeconfig: "{{ kubernetes.config_file }}"
-    context: "{{ kubernetes.context }}"
-  register: get_ambassador_secret
     
 # This task creates the Quorum value files for each node of organization
 - name: Create value file for ambassador job

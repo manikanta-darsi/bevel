@@ -311,7 +311,7 @@ spec:
                   then
                   echo "Retry attempted `expr $COUNTER - 1` times, Certificates have not been saved."
                   break
-                  else
+                else
                   echo "Certificates have  been saved"
                   exit 1
                 fi
