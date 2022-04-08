@@ -310,10 +310,9 @@ spec:
                 if [ "$COUNTER" -gt 30 ]
                   then
                   echo "Retry attempted `expr $COUNTER - 1` times, Certificates have not been saved."
-                  break
+                  exit 1
                 else
                   echo "Certificates have  been saved"
-                  exit 1
                 fi
                echo "completed"
              fi
