@@ -303,7 +303,7 @@ spec:
                      break
                      else
                     echo "certificates write or read success"
-                    sleep 20
+                    sleep 5
                    COUNTER=`expr "$COUNTER" + 1`
                  fi
                 done
