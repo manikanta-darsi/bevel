@@ -7,7 +7,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.vars.node_name }}-generate-ambassador-certs
+  name: {{ .Values.vars.node_name }}
   namespace: {{ .Values.metadata.namespace }}
   labels:
     app: {{ .Values.vars.node_name }}-generate-ambassador-certs
