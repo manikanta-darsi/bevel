@@ -12,7 +12,6 @@ spec:
     ref: dev-ansible
     path: platforms/quorum/charts/certs-ambassador-quorum
   values:
-    nodeName: cmani
     metadata:
       name: cmaniambassador-quorum-job
       namespace: cmani-quo
@@ -46,9 +45,6 @@ spec:
       node_name: "cmani"
       root_subject: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
       cert_subject: "CN=DLT Root CA/OU=DLT/O=DLT/L=London/C=GB"
-    peer:
-      name: cmani
-      gethPassphrase: 12345
     
     metadata:
       name: cmaniambassador-quorum-job
