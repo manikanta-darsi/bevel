@@ -59,9 +59,9 @@
     vault: "{{ item.vault }}"
     kubernetes: "{{ item.k8s }}"
     check: "ambassador_creds"
-  loop: "{{ peers }}"
-  loop_control:
-    loop_var: peer
+  # loop: "{{ peers }}"
+  # loop_control:
+  #   loop_var: peer
 
     
 # Git Push : Pushes the above generated files to git directory 
