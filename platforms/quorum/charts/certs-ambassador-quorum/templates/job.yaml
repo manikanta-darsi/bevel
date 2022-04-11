@@ -7,11 +7,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.vars.node_name }}-ambassador-certs
-  namespace: {{ .Values.metadata.namespace }}
+  name: "{{ $.Values.metadata.name }}"
+  namespace: "{{ $.Values.metadata.namespace }}"
   labels:
-    app: {{ .Values.vars.node_name }}-ambassador-certs
-    app.kubernetes.io/name: {{ .Values.vars.node_name }}-ambassador-certs
+    app.kubernetes.io/name: "{{ $.Values.metadata.name }}"
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -22,7 +21,7 @@ spec:
       metadata:
         labels:
           app: {{ .Values.vars.node_name }}-ambassador-certs
-          app.kubernetes.io/name: {{ .Values.vars.node_name }}ambassador-certs
+          app.kubernetes.io/name: {{ .Values.vars.node_name }}-ambassador-certs
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
