@@ -30,25 +30,25 @@
   include_role:
     name: helm_component
   vars:
-    component_name: "{{ name }}{{ peer.name }}quorum"
+    component_name: "{{ name }}{{ node_name }}quorum"
     type: "certs-ambassador-quorum"
     genesis: "{{ lookup('file', '{{ network.config.genesis }}') | b64encode }}"
     staticnodes: "{{ lookup('file', '{{ network.config.staticnodes }}') | from_yaml | to_nice_json }}"
-  loop: "{{ peers }}"
-  loop_control:
-    loop_var: peer
+  # loop: "{{ peers }}"
+  # loop_control:
+  #   loop_var: peer
 
 # Check if ambassador certs job is completed
 - name: Check if ambassador certs job is completed
   include_role:
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
   vars:
-    component_name: "{{ name }}{{ peer.name }}quorum"
+    component_name: "{{ name }}{{ node_name }}quorum"
     component_type: Job
     namespace: "{{ component_ns }}"
-  loop: "{{ peers }}"
-  loop_control:
-    loop_var: peer
+  # loop: "{{ peers }}"
+  # loop_control:
+  #   loop_var: peer
 
 # This task creates the Ambassador tls credentials
 - name: "Create the Ambassador credentials"
