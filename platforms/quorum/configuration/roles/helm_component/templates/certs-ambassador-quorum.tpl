@@ -46,6 +46,8 @@ spec:
       node_name: "{{ item.name | lower }}"
       root_subject: "{{ network.config.subject }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
+    peer:
+      name: {{ peer.name }}
       gethPassphrase: {{ peer.geth_passphrase }}
     
     metadata:
