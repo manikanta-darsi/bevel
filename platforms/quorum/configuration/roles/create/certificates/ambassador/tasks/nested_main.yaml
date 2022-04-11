@@ -30,7 +30,7 @@
   include_role:
     name: helm_component
   vars:
-    component_name: "{{ name }}{{ peer.name }}quorum"
+    component_name: "{{ node_name }}quorum"
     type: "certs-ambassador-quorum"
     genesis: "{{ lookup('file', '{{ network.config.genesis }}') | b64encode }}"
     staticnodes: "{{ lookup('file', '{{ network.config.staticnodes }}') | from_yaml | to_nice_json }}"
