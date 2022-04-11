@@ -10,8 +10,8 @@ metadata:
   name: {{ .Values.vars.node_name }}
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app: {{ .Values.vars.node_name }}-generate-ambassador-certs
-    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs
+    app: {{ .Values.vars.node_name }}
+    app.kubernetes.io/name: {{ .Values.vars.node_name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
