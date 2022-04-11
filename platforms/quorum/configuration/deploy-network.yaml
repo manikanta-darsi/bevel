@@ -77,7 +77,7 @@
       component_type: "organization"
       component_ns: "{{ item.name | lower }}-quo"
       charts_dir: "{{ item.gitops.chart_source }}"
-      component_name: "{{ item.name | lower }}"
+      component_name: "{{ item.name | lower }}-generate-ambassador-certs"
       kubernetes: "{{ item.k8s }}"
       external_url: "{{ item.external_url_suffix }}"
       values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"    
