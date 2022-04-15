@@ -38,14 +38,14 @@
   # loop_control:
   #   loop_var: peer
 
-# Check if ambassador certs job is completed
-- name: Check if ambassador certs job is completed
-  include_role:
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
-  vars:
-    component_name: "{{ node_name }}-generate-ambassador-certs-job"
-    component_type: Job
-    namespace: "{{ component_ns }}"
+# # Check if ambassador certs job is completed
+# - name: Check if ambassador certs job is completed
+#   include_role:
+#     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
+#   vars:
+#     component_name: "{{ node_name }}-generate-ambassador-certs-job"
+#     component_type: Job
+#     namespace: "{{ component_ns }}"
 
 #   loop: "{{ peers }}"
 #   loop_control:
