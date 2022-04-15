@@ -38,14 +38,26 @@
   # loop_control:
   #   loop_var: peer
 
-# # Check if ambassador certs job is completed
-# - name: Check if ambassador certs job is completed
-#   include_role:
-#     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
-#   vars:
-#     component_name: "{{ node_name }}-generate-ambassador-certs-job"
-#     component_type: Job
-#     namespace: "{{ component_ns }}"
+# Git Push : Pushes the above generated files to git directory 
+- name: Git Push
+  include_role: 
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/git_push"
+  vars:
+    GIT_DIR: "{{ playbook_dir }}/../../../"
+    gitops: "{{ item.gitops }}"
+    GIT_RESET_PATH: "platforms/quorum/configuration"
+    msg: "[ci skip] Pushing Peer files"
+  tags:
+    - notest
+
+# Check if ambassador certs job is completed
+- name: Check if ambassador certs job is completed
+  include_role:
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
+  vars:
+    component_name: "{{ node_name }}-generate-ambassador-certs-job"
+    component_type: Job
+    namespace: "{{ component_ns }}"
 
 #   loop: "{{ peers }}"
 #   loop_control:
@@ -65,14 +77,14 @@
 #   #   loop_var: peer
 
     
-# Git Push : Pushes the above generated files to git directory 
-- name: Git Push
-  include_role: 
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/git_push"
-  vars:
-    GIT_DIR: "{{ playbook_dir }}/../../../"
-    gitops: "{{ item.gitops }}"
-    GIT_RESET_PATH: "platforms/quorum/configuration"
-    msg: "[ci skip] Pushing Peer files"
-  tags:
-    - notest
+# # Git Push : Pushes the above generated files to git directory 
+# - name: Git Push
+#   include_role: 
+#     name: "{{ playbook_dir }}/../../shared/configuration/roles/git_push"
+#   vars:
+#     GIT_DIR: "{{ playbook_dir }}/../../../"
+#     gitops: "{{ item.gitops }}"
+#     GIT_RESET_PATH: "platforms/quorum/configuration"
+#     msg: "[ci skip] Pushing Peer files"
+#   tags:
+#     - notest
