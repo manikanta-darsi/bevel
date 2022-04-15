@@ -8,10 +8,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.nodeName }}-conf
+  name: {{ .Values.node_name }}-conf
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app.kubernetes.io/name: {{ .Values.nodeName }}
+    app.kubernetes.io/name: {{ .Values.node_name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- include "labels.custom" . | nindent 2 }}
