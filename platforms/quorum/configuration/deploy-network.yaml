@@ -74,7 +74,7 @@
       org_name: "{{ item.name }}"
       gitops: "{{ item.gitops }}"
       component_auth: "quorum{{ item.name | lower }}"
-      component_type: "organization"
+      # component_type: "organization"
       component_ns: "{{ item.name | lower }}-quo"
       charts_dir: "{{ item.gitops.chart_source }}"
       component_name: "{{ item.name | lower }}-ambassador-certs"
