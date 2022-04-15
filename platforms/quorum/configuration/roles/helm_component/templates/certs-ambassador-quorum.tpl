@@ -12,7 +12,6 @@ spec:
     ref: {{ org.gitops.branch }}
     path: {{ charts_dir }}/certs-ambassador-quorum
   values:
-    nodeName: {{ peer.name }}
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
@@ -46,9 +45,6 @@ spec:
       node_name: "{{ item.name | lower }}"
       root_subject: "{{ network.config.subject }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
-    peer:
-      name: {{ peer.name }}
-      gethPassphrase: {{ peer.geth_passphrase }}
     
     metadata:
       name: {{ component_name }}
