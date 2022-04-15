@@ -48,14 +48,14 @@
   tags:
     - notest
 
-# # Check if ambassador certs job is completed
-# - name: Check if ambassador certs job is completed
-#   include_role:
-#     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
-#   vars:
-#     component_name: "{{ node_name }}-generate-ambassador-certs-job"
-#     component_type: Job
-#     namespace: "{{ component_ns }}"
+# Check if ambassador certs pod is completed
+- name: Check if ambassador certs pod is completed
+  include_role:
+    name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
+  vars:
+    component_name: "{{ node_name }}-generate-ambassador-certs-job"
+    component_type: "Job"
+    namespace: "{{ component_ns }}"
 
 # This task creates the Ambassador tls credentials
 - name: "Create the Ambassador credentials"
@@ -67,11 +67,11 @@
     kubernetes: "{{ item.k8s }}"
     check: "ambassador_creds"
 
-# Check if ambassador certs job is completed
-- name: Check if ambassador certs job is completed
+# Check if ambassador certs pods is completed
+- name: Check if ambassador  pods is completed
   include_role:
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
   vars:
     component_name: "{{ node_name }}-generate-ambassador-certs-job"
-    component_type: "Job"
+    component_type: "pod"
     namespace: "{{ component_ns }}"
