@@ -1,0 +1,82 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cmanicmanitessera
+  namespace: cmani-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: cmanicmanitessera
+  helmVersion: v3
+  chart:
+    git: https://github.com/manikanta-darsi/bevel.git
+    ref: dev-test
+    path: platforms/quorum/charts/node_tessera  
+  values:
+    replicaCount: 1
+    metadata:
+      namespace: cmani-quo
+      labels:
+    images:
+      node: quorumengineering/quorum:21.4.2
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      tessera: quorumengineering/tessera:hashicorp-21.7.3
+      busybox: busybox
+      mysql: mysql/mysql-server:5.7
+      pullPolicy: IfNotPresent
+    node:
+      name: cmani
+      status: default
+      consensus: raft
+      subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
+      mountPath: /etc/quorum/qdata
+      imagePullSecret: regcred
+      keystore: keystore_1
+      
+      servicetype: ClusterIP
+      lock: false
+      ports:
+        rpc: 8546
+        tm: 443
+        quorum: 21000
+        db: 3306
+      dbname: demodb
+      mysqluser: demouser
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretengine: secretsv2
+      tmsecretpath: cmani-quo/crypto/cmani/tm      
+      secretprefix: secretsv2/data/cmani-quo/crypto/cmani
+      serviceaccountname: vault-auth
+      keyname: quorum
+      role: vault-role
+      authpath: quorumcmani
+    tessera:
+      dburl: "jdbc:mysql://cmani-tessera:3306/demodb"
+      dbusername: demouser
+      url: "https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:443"
+      clienturl: "http://cmani-tessera:8888" #TODO: Enable tls strict for q2t
+      othernodes:
+        - url: https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://mmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      tls: "STRICT"
+      trust: "TOFU"
+    genesis: ewogICAgImFsbG9jIjogewogICAgICAgICIxNGVkNDZmYzk2YzM4YmEzNmRmZWMxOTlkZGY1NTUzMjUzNjIxMTUxIjogewogICAgICAgICAgICAiYmFsYW5jZSI6ICIxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgIjczOGY1Nzc2N2FlOTVmNGFmZmQyNmMzMzlmYjBkNzQzOGNhZDgyMjIiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiCiAgICAgICAgfSwKICAgICAgICAiN2I3YmUwYWZlM2NiZjk1YWU0MGMzYWI1OGI4MTBlMjQxZTkwODQ3NiI6IHsKICAgICAgICAgICAgImJhbGFuY2UiOiAiMTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIKICAgICAgICB9LAogICAgICAgICJmOGI2OGI0YzU4OWQ5MWM5YTRjNGQzMmYxYTNmMDMyYzdlNmE1OWI1IjogewogICAgICAgICAgICAiYmFsYW5jZSI6ICIxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIgogICAgICAgIH0KICAgIH0sCiAgICAiY29pbmJhc2UiOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwKICAgICJjb25maWciOiB7CiAgICAgICAgImJ5emFudGl1bUJsb2NrIjogMCwKICAgICAgICAiY2hhaW5JZCI6IDEwLAogICAgICAgICJjb25zdGFudGlub3BsZUJsb2NrIjogMCwKICAgICAgICAiZWlwMTUwQmxvY2siOiAwLAogICAgICAgICJlaXAxNTBIYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAgICAgImVpcDE1NUJsb2NrIjogMCwKICAgICAgICAiZWlwMTU4QmxvY2siOiAwLAogICAgICAgICJob21lc3RlYWRCbG9jayI6IDAsCiAgICAgICAgImlzUXVvcnVtIjogdHJ1ZSwKICAgICAgICAicGV0ZXJzYnVyZ0Jsb2NrIjogMCwKICAgICAgICAicmFmdFNlY29uZHMiOiB0cnVlLAogICAgICAgICJ0eG5TaXplTGltaXQiOiAxMjgKICAgIH0sCiAgICAiZGlmZmljdWx0eSI6ICIweDAiLAogICAgImV4dHJhRGF0YSI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgImdhc0xpbWl0IjogIjB4RTAwMDAwMDAwMCIsCiAgICAibWl4aGFzaCI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwNjQ3NTcyNjE2YzY1Nzg3MzY1NjQ2YzY1NzgiLAogICAgIm5vbmNlIjogIjB4MCIsCiAgICAicGFyZW50SGFzaCI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgInRpbWVzdGFtcCI6ICIweDAwIgp9
+    staticnodes: 
+      [
+    "enode://dc3d5207a5e75fcef45297136b0e7af18b13762bc6a668e939628b94f93f020647fc29add2551e8d7a4ab4eff9c4498b75cf93087f1346a336af4936316cbe3d@cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15010?discport=0&raftport=15012",
+    "enode://35377cd8bd52824389471baa7d929b8c54e13245c3749ac1c2acc06124492a8eb08f10ecdf7fbe70fc2da26c42fab26c67fff19d8774c9b2c3dd8f0691ce4698@mmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15013?discport=0&raftport=15015",
+    "enode://d8c0974da37c87cd206e7a5cda71946b5301e6879ff091951234f506e1bf8b4c3f7aa97ca44158b2747b22fe01d2ede2c74bfcbde5d46382de3d6a38d622d7a1@smani.rc.dev2.aws.blockchaincloudpoc-develop.com:15016?discport=0&raftport=15018",
+    "enode://5bd7c406a9b6db61d18828c9e211cb17fef9a84352bfac5623c659787180c84410ca3418dc40679b46bb3a20c054de538843d4b1b89bf91a64e226c6ceea7799@wmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15019?discport=0&raftport=15031"
+]
+    proxy:
+      provider: "ambassador"
+      external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      portTM: 443
+      rpcport: 15011
+      quorumport: 15010
+      clientport: 8888
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+      dbstorage: 1Gi
