@@ -16,6 +16,7 @@
     context: "{{ kubernetes.context }}"
     label_selectors:
       - "app = {{ component_name }}"
+      - "app.kubernetes.io/name = {{ component_name }}"
     field_selectors:
       - status.phase=Succeeded
   register: component_data
