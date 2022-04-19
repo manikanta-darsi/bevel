@@ -20,8 +20,8 @@ spec:
     template:
       metadata:
         labels:
-          app: {{ $.Values.vars.node_name }}-generate-certs-job
-          app.kubernetes.io/name: {{ $.Values.vars.node_name }}-generate-certs-job
+          app: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+          app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
