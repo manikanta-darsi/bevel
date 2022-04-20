@@ -1,0 +1,30 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: mmani-tessera-job
+  namespace: mmani-quo
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: mmani-tessera-job
+  chart:
+    path: platforms/quorum/charts/tessera_key_mgmt
+    git: https://github.com/manikanta-darsi/bevel.git
+    ref: dev-test
+  values:
+    peer:
+      name: mmani  
+    metadata:
+      name: mmani-tessera-job
+      namespace: mmani-quo    
+    image:      
+      repository: quorumengineering/tessera:hashicorp-21.7.3
+      pullSecret: regcred
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretengine: secretsv2      
+      authpath: quorummmani
+      keyprefix: mmani-quo/crypto
+      role: vault-role
+      serviceaccountname: vault-auth
+      tmprefix: secretsv2/data/mmani-quo/crypto
