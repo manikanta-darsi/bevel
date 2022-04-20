@@ -84,7 +84,6 @@
       org: "{{ item }}"
       vault: "{{ item.vault }}"
       peers: "{{ item.services.peers }}"
-      values_dir: "{{ playbook_dir }}/../../../{{ item.gitops.release_dir }}"
     loop: "{{ network['organizations']}}"
 
  # This role generates the crypto material for quorum network based on RAFT consensus and store it in vault
