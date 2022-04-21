@@ -14,14 +14,14 @@ on:
   push:
     branches:
       - dev-ansible
-  # pull_request:
+     # pull_request:
   #   branches: [ develop ]
-  #   types: [opened, edited, synchronize, reopened]
+    # types: [opened, edited, synchronize, reopened]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
+    # runs-on: ubuntu-latest
+    # steps:
     # - uses: deepakputhraya/action-pr-title@master
     #   with:
     #     regex: '\[.*\].*' # Regex the title should match.
@@ -32,6 +32,9 @@ jobs:
     #     max_length: 100 # Max length of the title.
     #     github_token: ${{ github.token }} # Default: ${{ github.token }}
     - uses: actions/checkout@v2
+      with:
+         allowed_prefixes: '[shared],[docs],[indy],[fabric],[corda],[besu],[quorum],[corda-ent],[chore]'
+         github_token: ${{ github.token }}
     - name: Set up Python 3.6
       uses: actions/setup-python@v2
       with:
@@ -55,7 +58,7 @@ jobs:
         contains(github.event.pull_request.title, 'shared') ||
         contains(github.event.pull_request.title, 'corda') ||
         contains(github.event.pull_request.title, 'fabric') ||
-        contains(github.event.pull_request.title, 'quorum')
+        contains(github.event.push.title, 'quorum')
 #######################################################################################
   #the below test within the /shared folder
     - name: Test Stage Shared default
@@ -159,34 +162,34 @@ jobs:
       run: | 
         cd ./platforms/quorum/configuration
         molecule test -s default
-      if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.push.title, 'quorum')
    
     - name: Test Stage Quorum ambassador-certs
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s ambassador-certs
-      if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.push.title, 'quorum')
 
     - name: Test Stage Quorum crypto-ibft
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s crypto-ibft
-      if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.push.title, 'quorum')
 
     - name: Test Stage Quorum crypto-tessera
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s crypto-tessera
-      if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.push.title, 'quorum')
       
     - name: Test Stage Quorum crypto-raft
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s crypto-raft
-      if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.push.title, 'quorum')
 
     - name: Test Stage Quorum tessera
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s tessera
-      if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.push.title, 'quorum')
