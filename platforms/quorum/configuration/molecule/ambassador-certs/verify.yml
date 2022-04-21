@@ -12,8 +12,8 @@
   - name: Check if the {{ node_name }}-generate-ambassador-certs-job value file has been created
     stat:
       path: "{{ playbook_dir }}/build/platforms/quorum/releases/dev/store/{{ node_name }}-generate-ambassador-certs-job.yaml"
-    register: {{ node_name }}-generate-ambassador-certs-job_file_check
+    register: generate-ambassador-certs-job_file_check
 
   - name: Assert if the value file has been created
     assert:
-      that: {{ node_name }}-generate-ambassador-certs-job.stat.exists
+      that: generate-ambassador-certs-job.stat.exists
