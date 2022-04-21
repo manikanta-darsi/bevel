@@ -129,7 +129,7 @@
         values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
         external_url: "{{ item.external_url_suffix }}"
         component_auth: "quorum{{ item.name | lower }}"
-
+        charts_dir: "{{ item.gitops.chart_source }}"
 
         kubernetes:
           config_file: "/tmp/molecule/kind-default/kubeconfig"
