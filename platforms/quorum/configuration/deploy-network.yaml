@@ -80,7 +80,7 @@
       component_name: "{{ item.name | lower }}-ambassador-certs"
       kubernetes: "{{ item.k8s }}"
       external_url: "{{ item.external_url_suffix }}"
-      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}/{{ item.name | lower }}"    
+      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
       org: "{{ item }}"
       vault: "{{ item.vault }}"
       peers: "{{ item.services.peers }}"
@@ -142,7 +142,7 @@
       peers: "{{ org.services.peers }}"
       gitops: "{{ org.gitops }}"
       charts_dir: "{{ org.gitops.chart_source }}"
-      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"    
+      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
     loop: "{{ network['organizations'] }}"
     loop_control:
       loop_var: org
