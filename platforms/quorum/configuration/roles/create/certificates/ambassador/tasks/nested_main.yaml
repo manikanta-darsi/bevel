@@ -23,8 +23,7 @@
   vars:
     path: "{{ ambassadortls }}"
     check: "ensure_dir"
-
-    
+   
 # This task creates the Quorum value files for each node of organization
 - name: Create value file for ambassador job
   include_role:
