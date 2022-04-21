@@ -104,7 +104,6 @@
         certs_results:
           failed: True
         peers: "{{ org.services.peers }}"
-        org: "{{ item }}"
         organisation: "{{ org.name | lower }}"
         org_name: "{{ org.name | lower }}"
         component_ns: "{{ org.name | lower }}-quo"
