@@ -51,10 +51,10 @@ jobs:
         
         # export the bin path
         export PATH=~/bin:$PATH
-      if: |
-        contains(github.event.pull_request.title, 'shared') ||
-        contains(github.event.pull_request.title, 'corda') ||
-        contains(github.event.pull_request.title, 'fabric')
+      # if: |
+      #   contains(github.event.pull_request.title, 'shared') ||
+      #   contains(github.event.pull_request.title, 'corda') ||
+      #   contains(github.event.pull_request.title, 'fabric')
 #######################################################################################
   #the below test within the /shared folder
     - name: Test Stage Shared default
