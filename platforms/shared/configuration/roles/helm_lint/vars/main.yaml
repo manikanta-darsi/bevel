@@ -62,8 +62,5 @@ charts:
   operations_console: operations_console
   auth: auth
   vault_k8s_mgmt: vault-k8s-mgmt
-<<<<<<< HEAD
   certs-ambassador-quorum: certs-ambassador-quorum
-=======
-  ambassador_besu: generate_ambassador_certs
->>>>>>> upstream/develop
+  ambassador_besu: generate_ambassador_cert
