@@ -158,7 +158,7 @@ jobs:
       run: | 
         cd ./platforms/quorum/configuration
         molecule test -s default
-      if: contains(github.event.pull_request.title, 'quorum')
+      # if: contains(github.event.pull_request.title, 'quorum')
    
     - name: Test Stage Quorum ambassador-certs
       run: |
