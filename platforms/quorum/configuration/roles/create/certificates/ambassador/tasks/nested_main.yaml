@@ -36,7 +36,6 @@
   tags: 
     - molecule-idempotence-notest
 
-
 # Git Push : Pushes the above generated files to git directory 
 - name: Git Push
   include_role: 
