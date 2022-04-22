@@ -126,7 +126,7 @@
         component_ns: "{{ item.name | lower }}-quo"
         component_name: "{{ item.name | lower }}"
         node_name: "{{ node.name | lower }}"
-        values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
+        values_dir: "./build/{{org.gitops.release_dir}}"
         external_url: "{{ item.external_url_suffix }}"
         component_auth: "quorum{{ item.name | lower }}"
         charts_dir: "{{ item.gitops.chart_source }}"
