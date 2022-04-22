@@ -68,3 +68,4 @@
     vault: "{{ item.vault }}"
     kubernetes: "{{ item.k8s }}"
     check: "ambassador_creds"
+  tags: notest
