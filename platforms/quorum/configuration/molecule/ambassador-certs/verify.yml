@@ -8,11 +8,10 @@
 - name: Verify
   hosts: localhost
   tasks:
-  # - debug:
-  #      var: node_name
-  - name: Check if the {{ node.name | lower }}-generate-ambassador-certs-job value file has been created
+
+  - name: Check if the testns-generate-ambassador-certs-job value file has been created
     stat:
-      path: "{{ playbook_dir }}/build/platforms/quorum/releases/dev/store/{{ node.name | lower }}-generate-ambassador-certs-job.yaml"
+      path: "{{ playbook_dir }}/build/platforms/quorum/releases/dev/store/testns-generate-ambassador-certs-job.yaml"
     register: generate-ambassador-certs-job_file_check
 
   - name: Assert if the value file has been created
