@@ -99,7 +99,7 @@
         
     - name: Copy the roles
       copy:
-        src: "{{ playbook_dir }}/../../../shared/configuration/roles"
+        src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
         dest: "{{ playbook_dir }}/../../shared/configuration"
 
   tasks:
