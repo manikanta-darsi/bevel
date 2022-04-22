@@ -33,6 +33,8 @@
     type: "certs-ambassador-quorum"
     genesis: "{{ lookup('file', '{{ network.config.genesis }}') | b64encode }}"
     staticnodes: "{{ lookup('file', '{{ network.config.staticnodes }}') | from_yaml | to_nice_json }}"
+  tags: 
+    - molecule-idempotence-notest
 
 
 # Git Push : Pushes the above generated files to git directory 
@@ -44,6 +46,8 @@
     gitops: "{{ item.gitops }}"
     GIT_RESET_PATH: "platforms/quorum/configuration"
     msg: "[ci skip] Pushing ambassador job files"
+  tags: notest
+
 
 # Check if ambassador certs job is completed
 - name: Check if ambassador certs job is completed
@@ -53,6 +57,7 @@
     component_name: "{{ node_name }}-generate-ambassador-certs-job"
     component_type: Job
     namespace: "{{ component_ns }}"
+  tags: notest
 
 # This task creates the Ambassador tls credentials
 - name: "Create the Ambassador credentials"
