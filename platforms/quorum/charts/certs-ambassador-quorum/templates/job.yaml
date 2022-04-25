@@ -77,7 +77,7 @@ spec:
               echo ${VAULT_TOKEN}
               echo ${VAULT_ADDR}
               echo ${CERTS_SECRET_PREFIX}
-              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.NODE_NAME }}/certs | jq -r 'if .errors then . else . end')
+              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.node_name }}/certs | jq -r 'if .errors then . else . end')
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data')"
               if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
               then
@@ -113,7 +113,7 @@ spec:
             - name: ROOTCA
               value: "{{ .Values.subjects.rootca }}"
             - name: NODE_NAME
-              value: "{{ $.Values.vars.node_name }}"
+              value: "{{ .Values.vars.node_name }}"
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: VAULT_ADDR
