@@ -13,7 +13,7 @@
 #############################################################
 # Provide the name of the node
 # Eg. nodeName: cert-generation
-nodeName: 
+nodeName:
 
 # This section contains the quorum metadata.
 metadata:
@@ -34,7 +34,7 @@ image:
   certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
   # Provide the docker-registry secret created and stored in kubernetes cluster as a secret.
   # Eg. imagePullSecret: regcred
-  imagePullSecret: 
+  imagePullSecret:
   # Pull policy to be used for the Docker image
   # Eg. pullPolicy: Always
   pullPolicy: IfNotPresent
@@ -42,14 +42,14 @@ image:
 #############################################################
 #               HashiCorp Vault Configuration               #
 #############################################################
-# NOTE: Make sure that the vault is already unsealed, intialized and configured to 
-# use Kubernetes service account token based authentication. 
+# NOTE: Make sure that the vault is already unsealed, intialized and configured to
+# use Kubernetes service account token based authentication.
 # For more info, see https://www.vaultproject.io/docs/auth/kubernetes
 
 vault:
   # Provide the vault address
   # Eg. address: http://vault.example.com:8200
-  address: 
+  address:
   # Provide the vault role used.
   # Eg. role: vault-role
   role:
@@ -62,7 +62,7 @@ vault:
   # Provide the vault path where the certificates are stored
   # Eg. certsecretprefix: secret/cenm-org-name
   certSecretPrefix:
-  # Number of retries to check contents from vault 
+  # Number of retries to check contents from vault
   retries:
 
 #############################################################
@@ -70,29 +70,27 @@ vault:
 #############################################################
 # This section details the X509 subjects
 
-subjects:  
+subjects:
   # Mention the subject for rootca
   # Eg. rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
   rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
   # Mention the subject for ambassadortls
   # Eg. ambassadortls: "CN=Test Subordinate CA Certificate, OU=HQ, O=HoldCo LLC, L=New York, C=US"
   ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN=DLT ambassadortls CA "
-
-opensslVars: 
-  domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
-  domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
-  domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
-  domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
-vars:
-  ambassadortls: "/home/bevel/DATA/ambassadortls"
-  rootca: "/home/bevel/DATA/rootca"
-  kubernetes: "{{ item.k8s }}"
-  node_name: "{{ item.name | lower }}"
   root_subject: "{{ network.config.subject }}"
   cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
+
+opensslVars:
+  Domain_Name: "{{ node_name }}.{{ item.external_url_suffix }}"
+  Domain_Name_Api: "{{ node_name }}api.{{ item.external_url_suffix }}"
+  Domain_Name_Web: "{{ node_name }}web.{{ item.external_url_suffix }}"
+  Domain_Name_Tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+vars:
+  kubernetes: "{{ item.k8s }}"
+  node_name: "{{ item.name | lower }}"
 #############################################################
 #                       Settings                            #
-############################################################# 
+#############################################################
 # sleep time in seconds when error while registration
 # Ex. sleepTimeAfterError: 120
 sleepTimeAfterError: 120

@@ -7,10 +7,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+  name: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+    app.kubernetes.io/name: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -20,12 +20,12 @@ spec:
     template:
       metadata:
         labels:
-          app: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
-          app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+          app: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
+          app.kubernetes.io/name: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
-        serviceAccountName: {{ $.Values.vault.serviceaccountname }}        
+        serviceAccountName: {{ $.Values.vault.serviceaccountname }}
         securityContext:
           fsGroup: 1000
         initContainers:
@@ -76,12 +76,10 @@ spec:
               mkdir -p ${MOUNT_PATH}
               echo ${VAULT_TOKEN}
               echo ${VAULT_ADDR}
-              echo ${CERTS_SECRET_PREFIX}           
-              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.node_name }}/certs | jq -r 'if .errors then . else . end')
-              echo ${LOOKUP_SECRET_RESPONSE}
+              echo ${CERTS_SECRET_PREFIX}
+              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.NODE_NAME }}/certs | jq -r 'if .errors then . else . end')
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data')"
-              echo ${data_info}
-              if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]         
+              if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
               then
                 echo "Certficates absent in vault. Ignore error warning"
                 touch ${MOUNT_PATH}/absent.txt
@@ -89,7 +87,7 @@ spec:
                 validateVaultResponse "${CERTS_SECRET_PREFIX}/certs" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
                 echo "Certificates present in vault"
                 touch ${MOUNT_PATH}/present.txt
-              fi 
+              fi
               echo "Done checking for certificates in vault"
           volumeMounts:
           - name: credentials
@@ -102,19 +100,19 @@ spec:
           env:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
-            - name: domain_name
-              value: "{{ .Values.opensslVars.domain_name }}"
-            - name: domain_name_api
-              value: "{{ .Values.opensslVars.domain_name_api }}" 
-            - name: domain_name_web
-              value: "{{ .Values.opensslVars.domain_name_web }}"
-            - name: domain_name_tessera
-              value: "{{ .Values.opensslVars.domain_name_tessera }}" 
-            - name: ambassadortls
+            - name: DOMAIN_NAME
+              value: "{{ .Values.opensslVars.Domain_Name }}"
+            - name: DOMAIN_NAME_API
+              value: "{{ .Values.opensslVars.Domain_Name_api }}"
+            - name: DOMAIN_NAME_WEB
+              value: "{{ .Values.opensslVars.Domain_Name_web }}"
+            - name: DOMAIN_NAME_TESSERA
+              value: "{{ .Values.opensslVars.Domain_Name_tessera }}"
+            - name: AMBASSADORTLS
               value: "{{ $.Values.subjects.ambassadortls }}"
-            - name: rootca
+            - name: ROOTCA
               value: "{{ .Values.subjects.rootca }}"
-            - name: node_name
+            - name: NODE_NAME
               value: "{{ $.Values.vars.node_name }}"
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
@@ -126,14 +124,10 @@ spec:
               value: {{ $.Values.vault.authpath }}
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
-            - name: root_subject
-              value: "{{ .Values.vars.root_subject }}"
-            - name: cert_subject
-              value: "{{ .Values.vars.cert_subject }}"
-            - name: ambassadortls_path
-              value: "{{ $.Values.vars.ambassadortls }}"
-            - name: rootca_path
-              value: "{{ $.Values.vars.rootca }}"             
+            - name: ROOT_SUBJECT
+              value: "{{ .Values.subjects.root_subject }}"
+            - name: CERT_SUBJECT
+              value: "{{ .Values.subjects.cert_subject }}"
             - name: MOUNT_PATH
               value: "/certcheck"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -144,7 +138,7 @@ spec:
             then
               echo "Certificates already present in the vault. Skipping.."
               exit 0
-            fi            
+            fi
             # create directories
             mkdir -p ${MOUNT_PATH}/DATA/rootca
             mkdir -p ${MOUNT_PATH}/DATA/ambassadortls
@@ -169,16 +163,16 @@ spec:
             subjectKeyIdentifier = hash
             authorityKeyIdentifier = keyid:always
             EOF
-            keytool -genkey -alias rootca -dname "${root_subject}" -keystore rootca.jks -storepass quorum -keypass quorum
+            keytool -genkey -alias rootca -dname "${ROOT_SUBJECT}" -keystore rootca.jks -storepass quorum -keypass quorum
             openssl ecparam -name prime256v1 -genkey -noout -out rootca.key
-            openssl req -x509 -config openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj "/${root_subject}"
+            openssl req -x509 -config openssl.conf -new -nodes -key rootca.key -days 1024 -out rootca.pem -extensions v3_ca -subj "/${ROOT_SUBJECT}"
             openssl pkcs12 -export -name cert -inkey rootca.key -in rootca.pem -out rootcacert.pkcs12 -cacerts -passin pass:'quorum' -passout pass:'quorum'
             openssl pkcs12 -export -name key -inkey rootca.key -in rootca.pem -out rootcakey.pkcs12 -passin pass:'quorum' -passout pass:'quorum'
             keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
             keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
             pwd
             cd ${MOUNT_PATH}/DATA/ambassadortls
-            cat <<EOF >openssl${node_name}.conf
+            cat <<EOF >openssl${NODE_NAME}.conf
             [dn]
             CN=cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
             [req]
@@ -195,18 +189,18 @@ spec:
             authorityKeyIdentifier = keyid:always
 
             [alt_names]
-            DNS.1 = ${domain_name}
-            DNS.2 = ${domain_name_api}
-            DNS.3 = ${domain_name_web}
-            DNS.4 = ${domain_name_tessera}
+            DNS.1 = ${DOMAIN_NAME}
+            DNS.2 = ${DOMAIN_NAME_API}
+            DNS.3 = ${DOMAIN_NAME_WEB}
+            DNS.4 = ${DOMAIN_NAME_TESSERA}
             EOF
-            cat openssl${node_name}.conf
+            cat openssl${NODE_NAME}.conf
             cd ${MOUNT_PATH}/DATA/ambassadortls
-            openssl ecparam -name prime256v1 -genkey -noout -out ${node_name}.key
-            openssl req -new -nodes -key ${node_name}.key -days 1000 -out ${node_name}.csr -extensions EXT -subj "/CN=${domain_name}" -config openssl${node_name}.conf
-            openssl x509 -extfile openssl${node_name}.conf -req -days 1000 -in ${node_name}.csr -CA ${MOUNT_PATH}/DATA/rootca/rootca.pem -CAkey ${MOUNT_PATH}/DATA/rootca/rootca.key -out ${node_name}.pem -set_serial 01 -extensions v3_nonca
-            cat ${node_name}.pem > ${node_name}-certchain.pem
-            cat ${MOUNT_PATH}/DATA/rootca/rootca.pem >> ${node_name}-certchain.pem
+            openssl ecparam -name prime256v1 -genkey -noout -out ${NODE_NAME}.key
+            openssl req -new -nodes -key ${NODE_NAME}.key -days 1000 -out ${NODE_NAME}.csr -extensions EXT -subj "/CN=${DOMAIN_NAME}" -config openssl${NODE_NAME}.conf
+            openssl x509 -extfile openssl${NODE_NAME}.conf -req -days 1000 -in ${NODE_NAME}.csr -CA ${MOUNT_PATH}/DATA/rootca/rootca.pem -CAkey ${MOUNT_PATH}/DATA/rootca/rootca.key -out ${NODE_NAME}.pem -set_serial 01 -extensions v3_nonca
+            cat ${NODE_NAME}.pem > ${NODE_NAME}-certchain.pem
+            cat ${MOUNT_PATH}/DATA/rootca/rootca.pem >> ${NODE_NAME}-certchain.pem
             #creating a dummy file to perform check if last line is executed or not.
             touch ${MOUNT_PATH}/DATA/done.txt
           volumeMounts:
@@ -222,7 +216,7 @@ spec:
                value: {{.Values.vault.role}}
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
-             - name: node_name
+             - name: NODE_NAME
                value: "{{ $.Values.vars.node_name }}"
              - name: KUBERNETES_AUTH_PATH
                value: {{ $.Values.vault.authpath }}
@@ -240,7 +234,7 @@ spec:
                  exit 1
               fi
             }
-            
+
             if [ -e /certcheck/present.txt ]
             then
               echo "Certificates already present in the vault. Skipping.."
@@ -250,25 +244,23 @@ spec:
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
-            echo ${VAULT_TOKEN}
             COUNTER=1
             cd ${MOUNT_PATH}/DATA
             while [ "$COUNTER" -lt 10 ]
             do
               if [ -e done.txt ]
               then
-                echo test
                 cd ${MOUNT_PATH}/DATA
                 echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/rootca.jks | base64 -w0)
                 ROOTCAPEM=$(cat ./rootca/rootca.pem | base64 -w0)
                 ROOTCAKEY=$(cat ./rootca/rootca.key | base64 -w0)
-                AMBASSODOR_CERTS=$(cat ./ambassadortls/${node_name}-certchain.pem | base64 -w0)
-                AMBASSODOR_KEYS=$(cat ./ambassadortls/${node_name}.key | base64 -w0)
+                AMBASSODOR_CERTS=$(cat ./ambassodortls/${NODE_NAME}-certchain.pem | base64 -w0)
+                AMBASSODOR_KEYS=$(cat ./ambassodortls/${NODE_NAME}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
-                echo "{\"data\": {
+                echo '{\"data\": {
                  \"rootca\":\"${ROOT_CA}\",
                  \"rootcakey\": \"${ROOTCAKEY}\",
                  \"rootcapem\": \"${ROOTCAPEM}\",
@@ -276,17 +268,15 @@ spec:
                  \"ambassadorkey\": \"${AMBASSODOR_KEYS}\",
                  \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
                  \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
-                 }}" > payload.json
-                 echo "before curl"
+                 }}' > payload.json
                  curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
                  --request POST \
                  --data @payload.json \
-                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs              
-                 echo "after POST"
+                 ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${NODE_NAME}/certs
                  rm payload.json
                  # get certs from vault
-                 LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${node_name}/certs | jq -r 'if .errors then . else . end')
+                 LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${NODE_NAME}/certs | jq -r 'if .errors then . else . end')
                  R_CA=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootca"]' 2>&1)
                  R_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcakey"]' 2>&1)
                  R_PEM=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["rootcapem"]' 2>&1)
@@ -320,7 +310,7 @@ spec:
           - name: certcheck
             mountPath: /certcheck
         imagePullSecrets:
-          - name: {{ $.Values.image.imagePullSecret }}    
+          - name: {{ $.Values.image.imagePullSecret }}
         volumes:
           - name: certcheck
             emptyDir:
