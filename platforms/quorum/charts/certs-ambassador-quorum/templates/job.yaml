@@ -217,7 +217,7 @@ spec:
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: NODE_NAME
-               value: "{{ $.Values.vars.node_name }}"
+               value: "{{ .Values.vars.node_name }}"
              - name: KUBERNETES_AUTH_PATH
                value: {{ $.Values.vault.authpath }}
              - name: CERTS_SECRET_PREFIX
