@@ -10,7 +10,7 @@ metadata:
   name: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app.kubernetes.io/name: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
+    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -21,7 +21,7 @@ spec:
       metadata:
         labels:
           app: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
-          app.kubernetes.io/name: {{ .Values.vars.NODE_NAME }}-generate-ambassador-certs-job
+          app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
@@ -101,13 +101,13 @@ spec:
             - name: BASE_DIR
               value: "{{ .Values.volume.baseDir }}"
             - name: DOMAIN_NAME
-              value: "{{ .Values.opensslVars.Domain_Name }}"
+              value: "{{ .Values.opensslVars.domain_name }}"
             - name: DOMAIN_NAME_API
-              value: "{{ .Values.opensslVars.Domain_Name_api }}"
+              value: "{{ .Values.opensslVars.domain_name_api }}"
             - name: DOMAIN_NAME_WEB
-              value: "{{ .Values.opensslVars.Domain_Name_web }}"
+              value: "{{ .Values.opensslVars.domain_name_web }}"
             - name: DOMAIN_NAME_TESSERA
-              value: "{{ .Values.opensslVars.Domain_Name_tessera }}"
+              value: "{{ .Values.opensslVars.domain_name_tessera }}"
             - name: AMBASSADORTLS
               value: "{{ $.Values.subjects.ambassadortls }}"
             - name: ROOTCA
