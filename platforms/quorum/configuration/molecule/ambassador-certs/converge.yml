@@ -117,7 +117,7 @@
         services:
           peers: "{{ item.services.peers }}"
         organisation: "{{ item.name | lower }}"
-        # org: "{{ item }}"
+        org: "{{ item }}"
         name: "{{ item.name | lower }}"
         component_ns: "{{ item.name | lower }}-quo"
         component_name: "{{ item.name | lower }}"
