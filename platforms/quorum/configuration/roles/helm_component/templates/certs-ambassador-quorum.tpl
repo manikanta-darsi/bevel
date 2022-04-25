@@ -36,16 +36,13 @@ spec:
       root_subject: "{{ network.config.subject }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
     opensslVars:
-      Domain_Name: "{{ node_name }}.{{ external_url }}"
-      Domain_Name_Api: "{{ node_name }}api.{{ external_url }}"
-      Domain_Name_Web: "{{ node_name }}web.{{ external_url }}"
-      Domain_Name_Tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+      domain_name: "{{ node_name }}.{{ external_url }}"
+      domain_name_api: "{{ node_name }}api.{{ external_url }}"
+      domain_name_web: "{{ node_name }}web.{{ external_url }}"
+      domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
     vars:
       kubernetes: "{{ item.k8s }}"
       node_name: "{{ item.name | lower }}"
-      root_subject: "{{ network.config.subject }}"
-      cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
-
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
