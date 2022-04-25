@@ -19,10 +19,10 @@ spec:
     image:
       initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
       imagePullSecret: regcred
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     vault:
       address: {{ vault.url }}
       role: vault-role
@@ -43,6 +43,9 @@ spec:
     vars:
       kubernetes: "{{ item.k8s }}"
       node_name: "{{ item.name | lower }}"
+      root_subject: "{{ network.config.subject }}"
+      cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
+
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}

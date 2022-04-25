@@ -67,11 +67,11 @@
       name: create/certificates/ambassador
     vars:
       root_subject: "{{ network.config.subject }}"
-      name: "{{ item.name }}"
-      node_name: "{{ item.name }}"
+      name: "{{ item.name | lower }}"
+      node_name: "{{ item.name | lower }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
       services: "{{ item.services }}"
-      organisation: "{{ item.name }}"
+      organisation: "{{ item.name | lower }}"
       org_name: "{{ item.name }}"
       gitops: "{{ item.gitops }}"
       component_auth: "quorum{{ item.name | lower }}"
