@@ -81,10 +81,10 @@ subjects:
   cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
 
 opensslVars:
-  Domain_Name: "{{ node_name }}.{{ item.external_url_suffix }}"
-  Domain_Name_Api: "{{ node_name }}api.{{ item.external_url_suffix }}"
-  Domain_Name_Web: "{{ node_name }}web.{{ item.external_url_suffix }}"
-  Domain_Name_Tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+  domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
+  domain_name_Api: "{{ node_name }}api.{{ item.external_url_suffix }}"
+  domain_name_Web: "{{ node_name }}web.{{ item.external_url_suffix }}"
+  domain_name_Tessera: "{{ node_name }}-tessera.{{ component_ns }}"
 vars:
   kubernetes: "{{ item.k8s }}"
   node_name: "{{ item.name | lower }}"
