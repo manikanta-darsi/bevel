@@ -75,7 +75,7 @@ subjects:
   # Eg. rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
   root_subject: "{{ network.config.subject }}"
   cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
-
+# Mention the vars for openssl
 opensslVars:
   domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
   domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
