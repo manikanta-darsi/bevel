@@ -124,7 +124,7 @@ spec:
             - name: ROOT_SUBJECT
               value: "{{ .Values.subjects.root_subject }}"
             - name: CERT_SUBJECT
-              value: "{{ .Values..cert_subject }}"
+              value: "{{ .Values.subjects.cert_subject }}"
             - name: MOUNT_PATH
               value: "/certcheck"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
