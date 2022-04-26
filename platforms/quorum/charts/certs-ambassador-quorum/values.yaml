@@ -28,10 +28,10 @@ image:
   # Provide the alpine utils image, which is used for all init-containers of deployments/jobs.
   # NOTE: The alpine image used is the base alpine image with CURL installed.
   # Eg. initContainerName: hyperledgerlabs/alpine-utils:1.0
-  initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
+  initContainerName:
   # Provide the image for the certs container.
   # Eg. certsContainerName: ghcr.io/hyperledger/bevel-doorman:latest
-  certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
+  certsContainerName:
   # Provide the docker-registry secret created and stored in kubernetes cluster as a secret.
   # Eg. imagePullSecret: regcred
   imagePullSecret:
@@ -77,6 +77,8 @@ subjects:
   # Mention the subject for ambassadortls
   # Eg. ambassadortls: "CN=Test Subordinate CA Certificate, OU=HQ, O=HoldCo LLC, L=New York, C=US"
   ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN=DLT ambassadortls CA "
+  root_subject: "{{ network.config.subject }}"
+  cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
 
 opensslVars:
   domain_name: "{{ node_name }}.{{ item.external_url_suffix }}"
@@ -84,12 +86,9 @@ opensslVars:
   domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
   domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
 vars:
-  ambassadortls: "/home/bevel/DATA/ambassadortls"
-  rootca: "/home/bevel/DATA/rootca"
   kubernetes: "{{ item.k8s }}"
   node_name: "{{ item.name | lower }}"
-  root_subject: "{{ network.config.subject }}"
-  cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
+
 #############################################################
 #                       Settings                            #
 #############################################################
