@@ -74,9 +74,6 @@ spec:
               validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
               echo "Logged into Vault"
               mkdir -p ${MOUNT_PATH}
-              echo ${VAULT_TOKEN}
-              echo ${VAULT_ADDR}
-              echo ${CERTS_SECRET_PREFIX}
               LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.node_name }}/certs | jq -r 'if .errors then . else . end')
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data')"
               if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
@@ -113,7 +110,7 @@ spec:
             - name: ROOTCA
               value: "{{ .Values.subjects.rootca }}"
             - name: NODE_NAME
-              value: "{{ .Values.vars.node_name }}"
+              value: "{{ $.Values.vars.node_name }}"
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: VAULT_ADDR
@@ -125,9 +122,9 @@ spec:
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: ROOT_SUBJECT
-              value: "{{ .Values.subjects.root_subject }}"
+              value: "{{ .Values.vars.root_subject }}"
             - name: CERT_SUBJECT
-              value: "{{ .Values.subjects.cert_subject }}"
+              value: "{{ .Values.vars.cert_subject }}"
             - name: MOUNT_PATH
               value: "/certcheck"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -217,7 +214,7 @@ spec:
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: NODE_NAME
-               value: "{{ .Values.vars.node_name }}"
+               value: "{{ $.Values.vars.node_name }}"
              - name: KUBERNETES_AUTH_PATH
                value: {{ $.Values.vault.authpath }}
              - name: CERTS_SECRET_PREFIX
@@ -244,20 +241,22 @@ spec:
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
+            echo ${VAULT_TOKEN}
             COUNTER=1
             cd ${MOUNT_PATH}/DATA
             while [ "$COUNTER" -lt 10 ]
             do
               if [ -e done.txt ]
               then
+                echo test
                 cd ${MOUNT_PATH}/DATA
                 echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0
                 ROOT_CA=$(cat ./rootca/rootca.jks | base64 -w0)
                 ROOTCAPEM=$(cat ./rootca/rootca.pem | base64 -w0)
                 ROOTCAKEY=$(cat ./rootca/rootca.key | base64 -w0)
-                AMBASSODOR_CERTS=$(cat ./ambassodortls/${NODE_NAME}-certchain.pem | base64 -w0)
-                AMBASSODOR_KEYS=$(cat ./ambassodortls/${NODE_NAME}.key | base64 -w0)
+                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}-certchain.pem | base64 -w0)
+                AMBASSODOR_KEYS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
                 echo "{\"data\": {
