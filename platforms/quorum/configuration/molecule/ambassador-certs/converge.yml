@@ -104,7 +104,7 @@
 
     - name: Write crypto material to Vault
       shell: |
-        vault write {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ node_name }}/certs rootcapem-cert.pem="TEST CA_TEST_CERT_PEM" rootcapem-cert.key="12345"
+        vault write secret/V1/secretsv2/testns-quo/crypto/testns/certs rootcapem-cert.pem="TEST CA_TEST_CERT_PEM" rootcapem-cert.key="12345"
       environment:
         VAULT_ADDR: "http://localhost:9090"
         VAULT_TOKEN: "root"
