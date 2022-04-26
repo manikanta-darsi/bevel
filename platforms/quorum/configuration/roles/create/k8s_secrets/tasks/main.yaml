@@ -8,6 +8,17 @@
 # This role creates secrets
 #############################################################################################
 
+# This task checks if Ambassador credentials exist already
+- name: Check Ambassador cred exists
+  k8s_info:
+    kind: Secret
+    namespace: "{{ component_ns }}"
+    name: "{{ node_name }}-ambassador-certs"
+    kubeconfig: "{{ kubernetes.config_file }}"
+    context: "{{ kubernetes.context }}"
+  register: get_ambassador_secret
+  when: check == "ambassador_creds"
+
 # Checks if certificates are already created and stored in vault.
 - name: Check if ambassador and tls certs already created
   shell: |
@@ -39,17 +50,6 @@
   when: certs.failed == False and check == "ambassador_creds"
 
 
-# This task checks if Ambassador credentials exist already
-- name: Check Ambassador cred exists
-  k8s_info:
-    kind: Secret
-    namespace: "{{ component_ns }}"
-    name: "{{ node_name }}-ambassador-certs"
-    kubeconfig: "{{ kubernetes.config_file }}"
-    context: "{{ kubernetes.context }}"
-  register: get_ambassador_secret
-  when: check == "ambassador_creds"
-
   # This task creates the Ambassador TLS credentials for ambassador
 - name: Create the Ambassador credentials
   shell: |
@@ -58,5 +58,3 @@
     - check == "ambassador_creds"
     - get_ambassador_secret.resources|length == 0
     - certs.failed == False
-  tags:
-    - molecule-idempotence-notest
