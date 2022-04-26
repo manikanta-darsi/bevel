@@ -108,12 +108,14 @@
       environment:
         VAULT_ADDR: "http://localhost:9090"
         VAULT_TOKEN: "root"
+      vars:
+       component_ns: "{{ org.name | lower }}-quo"
+       node_name: "{{ org.name | lower }}"
       delegate_to: localhost
       tags:
         molecule-idempotence-notest
 
   tasks:
-
     - name: "Test ambassador-certs role"
       include_role:
         name: "configuration/roles/create/certificates/ambassador"
