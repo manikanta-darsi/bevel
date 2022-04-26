@@ -5,8 +5,6 @@ metadata:
   namespace: cmani-quo
   annotations:
     fluxcd.io/automated: "false"
-vars:
-  node_name: "cmani"
 spec:
   releaseName: cmani-generate-ambassador-certs-job
   chart:
@@ -35,6 +33,9 @@ spec:
     subjects:
       root_subject: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
       cert_subject: "CN=DLT Root CA/OU=DLT/O=DLT/L=London/C=GB"
+    vars:
+      kubernetes: "{'context': 'arn:aws:eks:eu-west-1:895052373684:cluster/dev2-CLUSTER', 'config_file': '/home/mani/.kube/config'}"
+      node_name: "cmani"
     opensslVars:
       domain_name: "cmani.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_api: "cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com"
