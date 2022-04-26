@@ -117,8 +117,7 @@
         vault_nodekey_result:
           failed: True
         services:
-        org: "{{ item }}"
-        peers: "{{ item.services.peers }}"
+         peers: "{{ item.services.peers }}"
         organisation: "{{ org.name | lower }}"
         name: "{{ org.name | lower }}"
         component_ns: "{{ org.name | lower }}-quo"
