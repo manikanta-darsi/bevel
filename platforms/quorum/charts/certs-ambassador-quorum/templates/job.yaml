@@ -7,10 +7,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.nodeName.node_name }}-generate-ambassador-certs-job
+  name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app.kubernetes.io/name: {{ .Values.nodeName.node_name }}-generate-ambassador-certs-job
+    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -20,8 +20,8 @@ spec:
     template:
       metadata:
         labels:
-          app: {{ .Values.nodeName.node_name }}-generate-ambassador-certs-job
-          app.kubernetes.io/name: {{ .Values.nodeName.node_name }}-generate-ambassador-certs-job
+          app: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+          app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
@@ -110,7 +110,7 @@ spec:
             - name: ROOTCA
               value: "{{ .Values.subjects.rootca }}"
             - name: NODE_NAME
-              value: "{{ $.Values.nodeName.node_name }}"
+              value: "{{ $.Values.vars.node_name }}"
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: VAULT_ADDR
@@ -214,7 +214,7 @@ spec:
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: NODE_NAME
-               value: "{{ $.Values.nodeName.node_name }}"
+               value: "{{ $.Values.vars.node_name }}"
              - name: KUBERNETES_AUTH_PATH
                value: {{ $.Values.vault.authpath }}
              - name: CERTS_SECRET_PREFIX

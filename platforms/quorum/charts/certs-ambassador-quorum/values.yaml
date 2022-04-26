@@ -14,8 +14,6 @@
 # Provide the name of the node
 # Eg. nodeName: cert-generation
 nodeName:
-  node_name: "{{ item.name | lower }}"
-
 # This section contains the quorum metadata.
 metadata:
   # Provide the namespace for the quorum Certs Generator.
@@ -23,16 +21,18 @@ metadata:
   namespace:
   # Provide any additional labels for the quorum Certs Generator.
   labels:
+vars:
+  node_name: "{{ item.name | lower }}"
 
 # Provide information regarding the Docker images used.
 image:
   # Provide the alpine utils image, which is used for all init-containers of deployments/jobs.
   # NOTE: The alpine image used is the base alpine image with CURL installed.
   # Eg. initContainerName: hyperledgerlabs/alpine-utils:1.0
-  initContainerName:
+  initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
   # Provide the image for the certs container.
   # Eg. certsContainerName: ghcr.io/hyperledger/bevel-doorman:latest
-  certsContainerName:
+  certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
   # Provide the docker-registry secret created and stored in kubernetes cluster as a secret.
   # Eg. imagePullSecret: regcred
   imagePullSecret:
@@ -82,7 +82,6 @@ opensslVars:
   domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
   domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
   domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
-
 #############################################################
 #                       Settings                            #
 #############################################################

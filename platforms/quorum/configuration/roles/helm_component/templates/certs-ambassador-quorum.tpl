@@ -1,12 +1,12 @@
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
-nodeName:
-  node_name: "{{ item.name | lower }}"
 metadata:
   name: {{ component_name }}
   namespace: {{ component_ns }}
   annotations:
     fluxcd.io/automated: "false"
+vars:
+  node_name: "{{ item.name | lower }}"
 spec:
   releaseName: {{ component_name }}
   chart:

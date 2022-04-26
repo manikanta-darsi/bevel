@@ -1,6 +1,7 @@
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
-nodeName: "cmani"
+nodeName:
+  node_name: "cmani"
 metadata:
   name: cmani-generate-ambassador-certs-job
   namespace: cmani-quo
