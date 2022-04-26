@@ -21,6 +21,7 @@ metadata:
   namespace:
   # Provide any additional labels for the quorum Certs Generator.
   labels:
+# Provide any additional node name
 vars:
   node_name: "{{ item.name | lower }}"
 
