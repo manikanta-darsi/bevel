@@ -50,7 +50,6 @@
   register: get_ambassador_secret
   when: check == "ambassador_creds"
 
-
   # This task creates the Ambassador TLS credentials for ambassador
 - name: Create the Ambassador credentials
   shell: |
@@ -59,3 +58,5 @@
     - check == "ambassador_creds"
     - get_ambassador_secret.resources|length == 0
     - certs.failed == False
+  tags:
+    - molecule-idempotence-notest
