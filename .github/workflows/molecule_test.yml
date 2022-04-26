@@ -170,22 +170,22 @@ jobs:
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s crypto-ibft
-      # if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.pull_request.title, 'quorum')
 
     - name: Test Stage Quorum crypto-tessera
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s crypto-tessera
-      # if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.pull_request.title, 'quorum')
 
     - name: Test Stage Quorum crypto-raft
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s crypto-raft
-      # if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.pull_request.title, 'quorum')
 
     - name: Test Stage Quorum tessera
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s tessera
-      # if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.pull_request.title, 'quorum')
