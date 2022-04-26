@@ -118,9 +118,8 @@
           failed: True
         services:
         org: "{{ item }}"
-        peers: "{{ org.services.peers }}"
+        peers: "{{ item.services.peers }}"
         organisation: "{{ org.name | lower }}"
-
         name: "{{ org.name | lower }}"
         component_ns: "{{ org.name | lower }}-quo"
         component_name: "{{ org.name | lower }}"
