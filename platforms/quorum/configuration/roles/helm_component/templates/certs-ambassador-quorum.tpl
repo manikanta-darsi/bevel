@@ -5,8 +5,6 @@ metadata:
   namespace: {{ component_ns }}
   annotations:
     fluxcd.io/automated: "false"
-vars:
-  node_name: "{{ item.name | lower }}"
 spec:
   releaseName: {{ component_name }}
   chart:
@@ -35,6 +33,9 @@ spec:
     subjects:
       root_subject: "{{ network.config.subject }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
+    vars:
+      kubernetes: "{{ item.k8s }}"
+      node_name: "{{ item.name | lower }}"
     opensslVars:
       domain_name: "{{ node_name }}.{{ external_url }}"
       domain_name_api: "{{ node_name }}api.{{ external_url }}"
