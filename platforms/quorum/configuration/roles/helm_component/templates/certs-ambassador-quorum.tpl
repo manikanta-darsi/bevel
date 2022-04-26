@@ -1,6 +1,7 @@
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
-nodeName: "{{ item.name | lower }}"
+nodeName:
+  node_name: "{{ item.name | lower }}"
 metadata:
   name: {{ component_name }}
   namespace: {{ component_ns }}

@@ -105,6 +105,10 @@ spec:
               value: "{{ .Values.opensslVars.domain_name_web }}"
             - name: DOMAIN_NAME_TESSERA
               value: "{{ .Values.opensslVars.domain_name_tessera }}"
+            - name: AMBASSADORTLS
+              value: "{{ $.Values.subjects.ambassadortls }}"
+            - name: ROOTCA
+              value: "{{ .Values.subjects.rootca }}"
             - name: NODE_NAME
               value: "{{ $.Values.nodeName.node_name }}"
             - name: CERTS_SECRET_PREFIX
@@ -118,9 +122,9 @@ spec:
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: ROOT_SUBJECT
-              value: "{{ .Values.vars.root_subject }}"
+              value: "{{ .Values.subjects.root_subject }}"
             - name: CERT_SUBJECT
-              value: "{{ .Values.vars.cert_subject }}"
+              value: "{{ .Values..cert_subject }}"
             - name: MOUNT_PATH
               value: "/certcheck"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -237,14 +241,12 @@ spec:
             KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
             VAULT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login -H "Content-Type: application/json" -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | jq -r 'if .errors then . else .auth.client_token end')
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
-            echo ${VAULT_TOKEN}
             COUNTER=1
             cd ${MOUNT_PATH}/DATA
             while [ "$COUNTER" -lt 10 ]
             do
               if [ -e done.txt ]
               then
-                echo test
                 cd ${MOUNT_PATH}/DATA
                 echo "found certificates, performing vault put"
                 # Use -w0 to get single line base64 -w0

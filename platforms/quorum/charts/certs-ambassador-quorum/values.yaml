@@ -13,7 +13,8 @@
 #############################################################
 # Provide the name of the node
 # Eg. nodeName: cert-generation
-nodeName: "{{ item.name | lower }}"
+nodeName:
+  node_name: "{{ item.name | lower }}"
 
 # This section contains the quorum metadata.
 metadata:
