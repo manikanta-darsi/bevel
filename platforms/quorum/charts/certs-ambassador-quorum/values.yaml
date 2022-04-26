@@ -13,7 +13,7 @@
 #############################################################
 # Provide the name of the node
 # Eg. nodeName: cert-generation
-nodeName:
+nodeName: "{{ item.name | lower }}"
 
 # This section contains the quorum metadata.
 metadata:
@@ -73,10 +73,6 @@ vault:
 subjects:
   # Mention the subject for rootca
   # Eg. rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
-  rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
-  # Mention the subject for ambassadortls
-  # Eg. ambassadortls: "CN=Test Subordinate CA Certificate, OU=HQ, O=HoldCo LLC, L=New York, C=US"
-  ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN=DLT ambassadortls CA "
   root_subject: "{{ network.config.subject }}"
   cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
 
@@ -85,9 +81,6 @@ opensslVars:
   domain_name_api: "{{ node_name }}api.{{ item.external_url_suffix }}"
   domain_name_web: "{{ node_name }}web.{{ item.external_url_suffix }}"
   domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
-vars:
-  kubernetes: "{{ item.k8s }}"
-  node_name: "{{ item.name | lower }}"
 
 #############################################################
 #                       Settings                            #
