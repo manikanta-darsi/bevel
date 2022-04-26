@@ -24,7 +24,6 @@
     path: "{{ ambassadortls }}"
     check: "ensure_dir"
 
-
 # This task creates the value files for each node of organization
 - name: Create value file for ambassador job
   include_role:
@@ -69,4 +68,3 @@
     vault: "{{ item.vault }}"
     kubernetes: "{{ item.k8s }}"
     check: "ambassador_creds"
-
