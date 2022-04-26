@@ -19,10 +19,10 @@ spec:
     image:
       initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
       certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
       imagePullSecret: regcred
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
     vault:
       address: {{ vault.url }}
       role: vault-role
