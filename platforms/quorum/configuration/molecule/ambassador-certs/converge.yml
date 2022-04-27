@@ -102,7 +102,7 @@
         src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
         dest: "{{ playbook_dir }}/../../shared/configuration"
 
-    - name: Write crypto material to Vault
+    - name: Write test material to Vault
       shell: |
         vault kv put secret/V1/secretsv2/testns-quo/crypto/testns/certs rootcapem-cert.pem="TEST CA_TEST_CERT_PEM" rootcapem-cert.key="12345"
       environment:
