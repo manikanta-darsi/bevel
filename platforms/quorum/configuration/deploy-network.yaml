@@ -80,7 +80,7 @@
       component_name: "{{ item.name | lower }}-ambassador-certs"
       kubernetes: "{{ item.k8s }}"
       external_url: "{{ item.external_url_suffix }}"
-      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
+      values_dir: "{{ playbook_dir }}/../../../{{ item.gitops.release_dir }}"
       org: "{{ item }}"
       vault: "{{ item.vault }}"
       peers: "{{ item.services.peers }}"
