@@ -253,15 +253,15 @@ spec:
                 AMBASSODOR_KEYS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
-                echo "{\"data\": {
-                 \"rootca\":\"${ROOT_CA}\",
-                 \"rootcakey\": \"${ROOTCAKEY}\",
-                 \"rootcapem\": \"${ROOTCAPEM}\",
-                 \"ambassadorcrt\": \"${AMBASSODOR_CERTS}\",
-                 \"ambassadorkey\": \"${AMBASSODOR_KEYS}\",
-                 \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
-                 \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
-                 }}" > payload.json
+                echo '{"data": [
+                  {"rootca":"${ROOT_CA}"},
+                  {"rootcakey":"${ROOTCAKEY}"},
+                  {"rootcapem":"${ROOTCAPEM}"},
+                  {"ambassadorcrt":"${AMBASSODOR_CERTS}"},
+                  {"ambassadorkey":"${AMBASSODOR_KEYS}"},
+                  {"rootcacert.pkcs12":"${ROOTCACERTPKCS_12}"},
+                  {"rootcakey.pkcs12":"${ROOTCAKEYSPKCS_12}"}]
+                  }' > payload.json
                  curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
                  --request POST \

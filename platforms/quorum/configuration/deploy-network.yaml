@@ -81,7 +81,7 @@
       kubernetes: "{{ item.k8s }}"
       external_url: "{{ item.external_url_suffix }}"
       values_dir: "{{ playbook_dir }}/../../../{{ item.gitops.release_dir }}"
-      org: "{{ item }}"
+      # org: "{{ item }}"
       vault: "{{ item.vault }}"
       peers: "{{ item.services.peers }}"
     loop: "{{ network['organizations']}}"

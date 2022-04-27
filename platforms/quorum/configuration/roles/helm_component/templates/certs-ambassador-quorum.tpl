@@ -8,8 +8,8 @@ metadata:
 spec:
   releaseName: {{ component_name }}
   chart:
-    git: {{ org.gitops.git_url }}
-    ref: {{ org.gitops.branch }}
+    git: {{ gitops.git_url }}
+    ref: {{ gitops.branch }}
     path: {{ charts_dir }}/certs-ambassador-quorum
   values:
     metadata:
@@ -28,7 +28,7 @@ spec:
       role: vault-role
       authpath: quorum{{ org_name }}
       serviceaccountname: vault-auth
-      certsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ org.name | lower }}-quo
+      certsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ item.name | lower }}-quo
       retries: 30
     subjects:
       root_subject: "{{ network.config.subject }}"
