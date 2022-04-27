@@ -118,9 +118,9 @@ spec:
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: ROOT_SUBJECT
-              value: "{{ .Values.vars.root_subject }}"
+              value: "{{ .Values.subjects.root_subject }}"
             - name: CERT_SUBJECT
-              value: "{{ .Values.vars.cert_subject }}"
+              value: "{{ .Values.subjects.cert_subject }}"
             - name: MOUNT_PATH
               value: "/certcheck"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -253,7 +253,7 @@ spec:
                 AMBASSODOR_KEYS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
-                echo "{\"data\": {
+                echo '{\"data\": {
                  \"rootca\":\"${ROOT_CA}\",
                  \"rootcakey\": \"${ROOTCAKEY}\",
                  \"rootcapem\": \"${ROOTCAPEM}\",
@@ -261,7 +261,7 @@ spec:
                  \"ambassadorkey\": \"${AMBASSODOR_KEYS}\",
                  \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
                  \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
-                 }}" > payload.json
+                 }}' > payload.json
                  curl \
                  --header "X-Vault-Token: ${VAULT_TOKEN}" \
                  --request POST \
