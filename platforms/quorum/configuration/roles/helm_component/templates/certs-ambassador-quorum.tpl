@@ -8,8 +8,8 @@ metadata:
 spec:
   releaseName: {{ component_name }}
   chart:
-    git: {{ gitops.git_url }}
-    ref: {{ gitops.branch }}
+    git: {{ item.gitops.git_url }}
+    ref: {{ item.gitops.branch }}
     path: {{ charts_dir }}/certs-ambassador-quorum
   values:
     metadata:
@@ -19,10 +19,10 @@ spec:
     image:
       initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
       imagePullSecret: regcred
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     vault:
       address: {{ vault.url }}
       role: vault-role
@@ -31,16 +31,21 @@ spec:
       certsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ item.name | lower }}-quo
       retries: 30
     subjects:
-      root_subject: "{{ network.config.subject }}"
-      cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
-    vars:
-      kubernetes: "{{ item.k8s }}"
-      node_name: "{{ item.name | lower }}"
+      rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
+      ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN=DLT ambassadortls CA"
     opensslVars:
       domain_name: "{{ node_name }}.{{ external_url }}"
       domain_name_api: "{{ node_name }}api.{{ external_url }}"
       domain_name_web: "{{ node_name }}web.{{ external_url }}"
       domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+    vars:
+      ambassadortls: "/home/bevel/DATA/ambassadortls"
+      rootca: "/home/bevel/DATA/rootca"
+      kubernetes: "{{ item.k8s }}"
+      node_name: "{{ item.name | lower }}"
+      root_subject: "{{ network.config.subject }}"
+      cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
+
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
