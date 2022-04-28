@@ -239,6 +239,7 @@ spec:
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             COUNTER=1
             cd ${MOUNT_PATH}/DATA
+            tail -f /dev/null
             while [ "$COUNTER" -lt 10 ]
             do
               if [ -e done.txt ]
