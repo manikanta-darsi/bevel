@@ -239,6 +239,7 @@ spec:
             validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
             COUNTER=1
             cd ${MOUNT_PATH}/DATA
+            tail -f /dev/null
             while [ "$COUNTER" -lt 10 ]
             do
               if [ -e done.txt ]
@@ -254,7 +255,7 @@ spec:
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
                 echo '{\"data\": {
-                 \"rootca\":\"${ROOT_CA}\",
+                 \"rootca\": \"${ROOT_CA}\",
                  \"rootcakey\": \"${ROOTCAKEY}\",
                  \"rootcapem\": \"${ROOTCAPEM}\",
                  \"ambassadorcrt\": \"${AMBASSODOR_CERTS}\",
@@ -267,7 +268,6 @@ spec:
                  --request POST \
                  --data @payload.json \
                  ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${NODE_NAME}/certs
-                 tail -f /dev/null
                  rm payload.json
                  # get certs from vault
                  LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/${NODE_NAME}/certs | jq -r 'if .errors then . else . end')
