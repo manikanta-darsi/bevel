@@ -12,8 +12,8 @@
 #                   Basic Configuration                     #
 #############################################################
 # Provide the name of the node
-# Eg. nodeName: cert-generation
-nodeName:
+# Eg. node_name:
+node_name:
 
 # This section contains the quorum metadata.
 metadata:
@@ -81,8 +81,7 @@ opensslVars:
   domain_name_api:
   domain_name_web:
   domain_name_tessera:
-vars:
-  kubernetes:
+
   node_name:
 
 #############################################################

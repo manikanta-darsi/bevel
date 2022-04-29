@@ -7,10 +7,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.node_name }}-generate-ambassador-certs-job
+  name: {{ $.Values.node_name }}-generate-ambassador-certs-job
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app.kubernetes.io/name: {{ .Values..node_name }}-generate-ambassador-certs-job
+    app.kubernetes.io/name: {{ $.Values.node_name }}-generate-ambassador-certs-job
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -20,8 +20,8 @@ spec:
     template:
       metadata:
         labels:
-          app: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
-          app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+          app: {{ $.Values.node_name }}-generate-ambassador-certs-job
+          app.kubernetes.io/name: {{ $.Values.node_name  }}-generate-ambassador-certs-job
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
@@ -74,7 +74,7 @@ spec:
               validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
               echo "Logged into Vault"
               mkdir -p ${MOUNT_PATH}
-              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ .Values.vars.node_name }}/certs | jq -r 'if .errors then . else . end')
+              LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_TOKEN}" ${VAULT_ADDR}/v1/${CERTS_SECRET_PREFIX}/crypto/{{ $.Values.node_name }}/certs | jq -r 'if .errors then . else . end')
               data_info="$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data')"
               if [ "$field" = "null"  ] || [[ "$field" = "parse error"* ]] || [ "$field" = "" ]
               then
@@ -106,7 +106,7 @@ spec:
             - name: DOMAIN_NAME_TESSERA
               value: "{{ .Values.opensslVars.domain_name_tessera }}"
             - name: NODE_NAME
-              value: "{{ $.Values.vars.node_name }}"
+              value: "{{ $.Values.node_name }}"
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: VAULT_ADDR
@@ -203,13 +203,13 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
              - name: VAULT_ADDR
-               value: {{ $.Values.vault.address }}
+               value: {{ $.Values.vault.address }}S
              - name: VAULT_APP_ROLE
                value: {{.Values.vault.role}}
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: NODE_NAME
-               value: "{{ $.Values.vars.node_name }}"
+               value: "{{ $.Values.node_name }}"
              - name: KUBERNETES_AUTH_PATH
                value: {{ $.Values.vault.authpath }}
              - name: CERTS_SECRET_PREFIX
