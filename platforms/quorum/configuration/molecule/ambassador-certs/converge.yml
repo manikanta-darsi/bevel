@@ -109,9 +109,8 @@
         VAULT_ADDR: "http://localhost:9090"
         VAULT_TOKEN: "root"
       vars:
-       org: "{{ item }}"
-       component_ns: "{{ org.name | lower }}-quo"
-       node_name: "{{ org.name | lower }}"
+       component_ns: "{{ item.name | lower }}-quo"
+       node_name: "{{ item.name | lower }}"
       delegate_to: localhost
       tags:
         molecule-idempotence-notest
