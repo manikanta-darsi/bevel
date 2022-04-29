@@ -205,7 +205,7 @@ spec:
              - name: VAULT_ADDR
                value: {{ $.Values.vault.address }}S
              - name: VAULT_APP_ROLE
-               value: {{ $S.Values.vault.role}}
+               value: {{ $.Values.vault.role}}
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: NODE_NAME
