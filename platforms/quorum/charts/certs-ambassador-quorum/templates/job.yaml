@@ -7,10 +7,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+  name: {{ .Values.node_name }}-generate-ambassador-certs-job
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app.kubernetes.io/name: {{ .Values.vars.node_name }}-generate-ambassador-certs-job
+    app.kubernetes.io/name: {{ .Values..node_name }}-generate-ambassador-certs-job
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -163,7 +163,6 @@ spec:
             openssl pkcs12 -export -name key -inkey rootca.key -in rootca.pem -out rootcakey.pkcs12 -passin pass:'quorum' -passout pass:'quorum'
             keytool -importkeystore -srckeystore rootcacert.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
             keytool -importkeystore -srckeystore rootcakey.pkcs12 -srcstoretype PKCS12 -srcstorepass quorum -destkeystore rootca.jks -deststorepass quorum
-            pwd
             cd ${MOUNT_PATH}/DATA/ambassadortls
             cat <<EOF >openssl${NODE_NAME}.conf
             [dn]
@@ -249,16 +248,16 @@ spec:
                 ROOT_CA=$(cat ./rootca/rootca.jks | base64 -w0)
                 ROOTCAPEM=$(cat ./rootca/rootca.pem | base64 -w0)
                 ROOTCAKEY=$(cat ./rootca/rootca.key | base64 -w0)
-                AMBASSODOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}-certchain.pem | base64 -w0)
-                AMBASSODOR_KEYS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
+                AMBASSADOR_CERTS=$(cat ./ambassadortls/${NODE_NAME}-certchain.pem | base64 -w0)
+                AMBASSADOR_KEYS=$(cat ./ambassadortls/${NODE_NAME}.key | base64 -w0)
                 ROOTCACERTPKCS_12=$(cat ./rootca/rootcacert.pkcs12 | base64 -w0)
                 ROOTCAKEYSPKCS_12=$(cat ./rootca/rootcakey.pkcs12 | base64 -w0)
                 echo "{\"data\": {
                  \"rootca\":\"${ROOT_CA}\",
                  \"rootcakey\": \"${ROOTCAKEY}\",
                  \"rootcapem\": \"${ROOTCAPEM}\",
-                 \"ambassadorcrt\": \"${AMBASSODOR_CERTS}\",
-                 \"ambassadorkey\": \"${AMBASSODOR_KEYS}\",
+                 \"ambassadorcrt\": \"${AMBASSADOR_CERTS}\",
+                 \"ambassadorkey\": \"${AMBASSADOR_KEYS}\",
                  \"rootcacert.pkcs12\": \"${ROOTCACERTPKCS_12}\",
                  \"rootcakey.pkcs12\": \"${ROOTCAKEYSPKCS_12}\"
                  }}" > payload.json
