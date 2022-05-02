@@ -32,8 +32,6 @@ spec:
       certsecretprefix: secretsv2/data/mmani-quo
       retries: 30
     subjects:
-      rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
-      ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN=DLT ambassadortls CA"
       root_subject: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
       cert_subject: "CN=DLT Root CA/OU=DLT/O=DLT/L=London/C=GB"
     opensslVars:
