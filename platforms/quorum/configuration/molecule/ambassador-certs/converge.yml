@@ -122,6 +122,7 @@
         component_ns: "{{ org.name | lower }}-quo"
         component_name: "{{ org.name | lower }}"
         node_name: "{{ org.name }}"
+        gitops: "{{ org.gitops }}"
         values_dir: "./build/{{ org.gitops.release_dir }}"
         external_url: "{{ org.external_url_suffix }}"
         component_auth: "quorum{{ org.name | lower }}"
