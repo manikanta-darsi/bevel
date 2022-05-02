@@ -96,7 +96,7 @@ healthcheck:
   #Provide the wait interval in seconds in fetching certificates from vault
   #Eg. readinesscheckinterval: 5
   readinesscheckinterval: 5
-  #Provide the threshold number of retries in fetching certificates from vault
+  #Provide the threshold number of retries in fetching certificates from vault.
   #Eg. readinessthreshold: 2
   readinessthreshold: 2
 volume:
