@@ -9,6 +9,8 @@
 - name: Create Ambassador certificates
   include_tasks: nested_main.yaml
   vars:
+    name: "{{ org.name }}"
+    services: "{{ org.services }}"
     node_name: "{{ node.name | lower }}"
   loop: "{{ services.peers }}"
   loop_control:
