@@ -32,8 +32,6 @@ spec:
       certsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ org.name | lower }}-quo
       retries: 30
     subjects:
-      rootca: "CN=DLT Root CA,OU=DLT,O=DLT,L=New York,C=US"
-      ambassadortls: "C=US,L=New York,O=Lite,OU=DLT/CN=DLT ambassadortls CA"
       root_subject: "{{ network.config.subject }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
     opensslVars:

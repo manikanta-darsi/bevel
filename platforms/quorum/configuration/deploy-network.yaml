@@ -66,11 +66,6 @@
     include_role:
       name: create/certificates/ambassador
     vars:
-        #  root_subject: "{{ network.config.subject }}"
-        #   name: "{{ org.name }}"
-        #   node_name: "{{ org.name }}"
-        #   cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
-      # services: "{{ org.services }}"
       organisation: "{{ org.name }}"
       org_name: "{{ org.name }}"
       gitops: "{{ org.gitops }}"
@@ -79,7 +74,6 @@
       charts_dir: "{{ org.gitops.chart_source }}"
       component_name: "{{ org.name | lower }}-ambassador-certs"
       kubernetes: "{{ org.k8s }}"
-        #  external_url: "{{ org.external_url_suffix }}"
       values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
       vault: "{{ org.vault }}"
       peers: "{{ org.services.peers }}"

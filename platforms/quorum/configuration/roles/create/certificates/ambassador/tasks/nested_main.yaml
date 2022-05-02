@@ -29,6 +29,7 @@
   include_role:
     name: helm_component
   vars:
+    node_name: "{{ org.name }}"
     component_name: "{{ node_name }}-generate-ambassador-certs-job"
     type: "certs-ambassador-quorum"
     genesis: "{{ lookup('file', '{{ network.config.genesis }}') | b64encode }}"
@@ -54,6 +55,7 @@
   include_role:
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
   vars:
+    node_name: "{{ org.name }}"
     component_name: "{{ node_name }}-generate-ambassador-certs-job"
     component_type: Job
     namespace: "{{ component_ns }}"
