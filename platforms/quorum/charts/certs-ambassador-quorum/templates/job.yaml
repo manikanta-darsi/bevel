@@ -203,7 +203,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
              - name: VAULT_ADDR
-               value: {{ $.Values.vault.address }}S
+               value: {{ $.Values.vault.address }}
              - name: VAULT_APP_ROLE
                value: {{ $.Values.vault.role}}
              - name: BASE_DIR
