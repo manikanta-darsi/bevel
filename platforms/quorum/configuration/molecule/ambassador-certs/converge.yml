@@ -102,19 +102,6 @@
         src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
         dest: "{{ playbook_dir }}/../../shared/configuration"
 
-    - name: Write test material to Vault
-      shell: |
-        vault kv put secret/V1/secretsv2/testns-quo/crypto/testns/certs rootcapem-cert.pem="TEST CA_TEST_CERT_PEM" rootcapem-cert.key="12345"
-      environment:
-        VAULT_ADDR: "http://localhost:9090"
-        VAULT_TOKEN: "root"
-      vars:
-       component_ns: "{{ org.name | lower }}-quo"
-       node_name: "{{ org.name | lower }}"
-      delegate_to: localhost
-      tags:
-        molecule-idempotence-notest
-
   tasks:
     - name: "Test ambassador-certs role"
       include_role:
@@ -152,3 +139,5 @@
         root_subject: "{{ network.config.subject }}"
         cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
       loop: "{{ network['organizations'] }}"
+      loop_control:
+        loop_var: org

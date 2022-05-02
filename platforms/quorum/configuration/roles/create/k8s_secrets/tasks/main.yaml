@@ -18,6 +18,14 @@
   when: check == "ambassador_creds"
   ignore_errors: yes
 
+# Checks if secrets are already created.
+- name: Check if ambassador secrets already created
+  shell: |
+    KUBECONFIG={{ kubernetes.config_file }} kubectl get secret {{ node_name }}-ambassador-certs  -n {{ component_ns }}
+  register: secrets
+  when: check == "ambassador_creds"
+  ignore_errors: yes
+
 # Gets the existing ambassador tls certs
 - name: Get ambassador and tls certs from Vault
   shell: |
@@ -26,7 +34,10 @@
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"
   register: certs_yaml
-  when: certs.failed == False and check == "ambassador_creds"
+  when:
+    - certs.failed == False and check == "ambassador_creds"
+    - secrets.failed == True
+  ignore_errors: yes
 
 - name: Get ambassador tls certs
   include_role:
@@ -35,8 +46,10 @@
     vault_output: "{{ certs_yaml.stdout | from_yaml }}"
     type: "ambassador"
     cert_path: "{{ ambassadortls }}"
-  when: certs.failed == False and check == "ambassador_creds"
-
+  when:
+    - certs.failed == False and check == "ambassador_creds"
+    - secrets.failed == True
+  ignore_errors: yes
 # This task checks if Ambassador credentials exist already
 - name: Check Ambassador cred exists
   k8s_info:
@@ -57,3 +70,4 @@
     - get_ambassador_secret.resources|length == 0
     - certs.failed == False
     - get_ambassador_secret.failed == False
+    - secrets.failed == True

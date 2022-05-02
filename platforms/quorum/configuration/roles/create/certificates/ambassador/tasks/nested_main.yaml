@@ -65,8 +65,8 @@
     name: create/k8s_secrets
   vars:
     namespace: "{{ component_ns }}"
-    vault: "{{ item.vault }}"
-    kubernetes: "{{ item.k8s }}"
+    vault: "{{ org.vault }}"
+    kubernetes: "{{ org.k8s }}"
     check: "ambassador_creds"
   tags:
     - molecule-idempotence-notest
