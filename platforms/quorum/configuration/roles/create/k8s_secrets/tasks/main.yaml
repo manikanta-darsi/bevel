@@ -18,17 +18,6 @@
   register: get_ambassador_secret
   when: check == "ambassador_creds"
 
-# Checks if certificates are already created and stored in vault.
-- name: Check if ambassador and tls certs already created
-  shell: |
-    vault kv get -field=rootcapem {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ name }}/certs
-  environment:
-    VAULT_ADDR: "{{ vault.url }}"
-    VAULT_TOKEN: "{{ vault.root_token }}"
-  register: certs
-  when: check == "ambassador_creds"
-  ignore_errors: yes
-
 # Gets the existing ambassador tls certs
 - name: Get ambassador and tls certs from Vault
   shell: |
