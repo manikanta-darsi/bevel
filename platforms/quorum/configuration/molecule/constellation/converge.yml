@@ -9,86 +9,90 @@
   hosts: localhost
   connection: local
   vars:
+    bin_install_dir:  "~/bin"
+    install_os: "linux"
+    install_arch:  "amd64"
     network:
       type: quorum
       version: 2.5.0
       frontend: enabled
       docker:
-        url: "test_url"
-        username: "test_username"
-        password: "test_password"
+        url: "index.docker.io/hyperledgerlabs"
+        username: "docker_username"
+        password: "docker_password"
       config:
+        consensus: "raft"
         subject: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
+        transaction_manager: "constellation"
+        tm_version: "0.3.2"
+        tm_tls: "strict"                  # Options are "strict" and "off"
+        tm_trust: "tofu"
+        tm_nodes: "http://carrier.test.quorum.blockchaincloudpoc.com:15012/"
+        staticnodes: "./build/quorum_staticnodes"
+        genesis: "./build/quorum_genesis.json"
+        bootnode:
+          name: store
+          url: store.test.quorum.blockchaincloudpoc.com
+          rpcport: 15031
+          nodeid: 1
       env:
         type: "dev"
         proxy: ambassador
         ambassadorPorts:
           portRange:
             from: 15010
-            to: 15020
+            to: 15043
         retry_count: 20
         external_dns: enabled
 
       organizations:
         - organization:
-          name: testns
-          unit: Carrier
+          name: store
+          unit: Store
           external_url_suffix: test.quorum.blockchaincloudpoc.com
           cloud_provider: aws
           aws:
             access_key: "aws_access_key"
             secret_key: "aws_secret_key"
           k8s:
-            context: "kind"
-            config_file: "/tmp/molecule/kind-default/kubeconfig"
+            context: "cluster_context"
+            config_file: "cluster_config"
           vault:
             url: http://localhost:9090
-            root_token: "vault_root_token"
-            secret_path: "secretsv2"
-
+            root_token: root
+            secret_path: secretsv2
           gitops:
             git_protocol: "https"
             git_url: "https://github.com/<username>/bevel.git"
             branch: "develop"
             release_dir: "platforms/quorum/releases/dev"
-            chart_source: "platforms/quorum/charts"
+            chart_source: "charts"
             git_repo: "github.com/<username>/bevel.git"
             username: "git_username"
             password: "git_access_token"
             email: "git_email"
             private_key: "path_to_private_key"
 
-          app:
-            google_maps_api: "api_key"
           services:
             peers:
             - peer:
-              name: testns
-              subject: "O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB"
+              name: store
+              subject: "O=Store,OU=Store,L=40.73/-74/New York,C=US"
               type: validator
-              consortium_role: admin
               geth_passphrase: 12345
+              lock: false
               p2p:
                 port: 21000
-                ambassador: 15010
+                ambassador: 15030
               rpc:
                 port: 8546
-                ambassador: 15011
+                ambassador: 15031
               transaction_manager:
-                port: 8443
-                ambassador: 8443
-              raft:
+                port: 9001          # use port: 9001 when transaction_manager = "constellation"
+                ambassador: 15032    # use ambassador: 15032 when transaction_manager = "constellation"
+              raft:                     # Only used if consensus = 'raft'
                 port: 50401
-                ambassador: 15013
-              db:
-                port: 3306
-              expressapi:
-                port: 3000
-                targetPort: 3000
-              frontend:
-                targetPort: 80
-                port: 8080
-              geth_url: "http://testns.test.corda.blockchaincloudpoc.com:15011"
+                ambassador: 15033
 
   pre_tasks:
     - name: Create temp roles dir folder
@@ -101,11 +105,50 @@
         src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
         dest: "{{ playbook_dir }}/../../shared/configuration"
 
+    - name: Create temp ./build/store/store folder
+      file:
+        path: "{{ playbook_dir }}/build/store/store"
+        state: directory
+
+    - name: Generate crypto for raft consensus
+      shell: |
+        bootnode -genkey ./build/store/store/nodekey
+        bootnode --nodekey=build/store/store/nodekey --writeaddress > build/store/store/enode
+        echo 12345 >> build/store/store/password
+        geth account new --datadir build/store/store --password build/store/store/password
+        cp build/store/store/keystore/* build/store/store/keystore.json
+      tags:
+        molecule-idempotence-notest
+
+    - name: Copy the crypto material to Vault
+      shell: |
+        vault kv put secretsv2/store-quo/crypto/store/quorum nodekey="$(cat build/store/store/nodekey)" keystore="$(cat build/store/store/keystore.json)" db_user="demouser" db_password="password" geth_password="$(cat build/store/store/password)"
+      environment:
+        VAULT_ADDR: "http://localhost:9090/"
+        VAULT_TOKEN: "root"
+      tags:
+        molecule-idempotence-notest
+
+    - name: Delete temporary store directory
+      file:
+        path: "./build/store"
+        state: absent
+      changed_when: false
+
   tasks:
-    - name: "Test ambassador-certs role"
+    - name: "Copy openssl.conf to molecule directory"
+      copy:
+        src: "{{ playbook_dir }}/../../openssl.conf"
+        dest: "{{ playbook_dir }}"
+
+    ####################################################################################
+    # Testing create/constellation role when add_new_org: False
+    - name: "Test create/constellation role when add_new_org: False"
       include_role:
-        name: "configuration/roles/create/certificates/ambassador"
+        name: "configuration/roles/create/constellation"
       vars:
+        name: "{{ item.name | lower }}-t1"
+        add_new_org: False
         root_certs:
           failed: True
         ambassador_tls_certs:
@@ -114,26 +157,70 @@
           failed: True
         vault_nodekey_result:
           failed: True
-        services:
-         peers: "{{ org.services.peers }}"
-        component_ns: "{{ org.name | lower }}-quo"
-        component_name: "{{ org.name | lower }}"
-        gitops: "{{ org.gitops }}"
-        values_dir: "./build/{{ org.gitops.release_dir }}"
-        component_auth: "quorum{{ org.name | lower }}"
-        charts_dir: "../../{{ org.gitops.chart_source }}"
-        org_name: "{{ org.name }}"
-        build_path: "{{ playbook_dir }}/build"
+        peers: "{{ item.services.peers }}"
+        organisation: "{{ item.name | lower }}"
+        component_ns: "{{ item.name | lower }}-quo"
+        component_name: "{{ item.name | lower }}"
+        git_url: "{{ item.gitops.git_url }}"
+        git_branch: "{{ item.gitops.branch }}"
+        docker_url: "{{ network.docker.url }}"
+        charts_dir: "{{ item.gitops.chart_source }}"
+        values_dir: "./build/{{item.gitops.release_dir}}"
+        consensus: "{{ network.config.consensus }}"
+        external_url: "{{ item.external_url_suffix }}"
+        storageclass_name: awsstorageclass
+        node_name: "{{ node.name | lower }}"
         kubernetes:
           config_file: "/tmp/molecule/kind-default/kubeconfig"
           context: "kind"
         vault:
-          vault: "{{ org.vault }}"
+          vault: "{{ item.vault }}"
           url: http://localhost:9090/
           root_token: root
           secret_path: "secretsv2"
         root_subject: "{{ network.config.subject }}"
         cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
       loop: "{{ network['organizations'] }}"
-      loop_control:
-        loop_var: org
+
+    ####################################################################################
+    # Testing create/constellation role when add_new_org: True
+    - name: "Test create/constellation role when add_new_org: True"
+      include_role:
+        name: "configuration/roles/create/constellation"
+      vars:
+        name: "{{ item.name | lower }}-t2"
+        add_new_org: True
+        root_certs:
+          failed: True
+        ambassador_tls_certs:
+          failed: True
+        certs_result:
+          failed: True
+        vault_nodekey_result:
+          failed: True
+        peers: "{{ item.services.peers }}"
+        organisation: "{{ item.name | lower }}"
+        component_ns: "{{ item.name | lower }}-quo"
+        component_name: "{{ item.name | lower }}"
+        git_url: "{{ item.gitops.git_url }}"
+        git_branch: "{{ item.gitops.branch }}"
+        docker_url: "{{ network.docker.url }}"
+        charts_dir: "{{ item.gitops.chart_source }}"
+        values_dir: "./build/{{item.gitops.release_dir}}"
+        consensus: "{{ network.config.consensus }}"
+        external_url: "{{ item.external_url_suffix }}"
+        storageclass_name: awsstorageclass
+        node_name: "{{ node.name | lower }}"
+        geth_data: "{{ network.config.bootnode }}"
+        peer_id: 0
+        kubernetes:
+          config_file: "/tmp/molecule/kind-default/kubeconfig"
+          context: "kind"
+        vault:
+          vault: "{{ item.vault }}"
+          url: http://localhost:9090/
+          root_token: root
+          secret_path: "secretsv2"
+        root_subject: "{{ network.config.subject }}"
+        cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
+      loop: "{{ network['organizations'] }}"
