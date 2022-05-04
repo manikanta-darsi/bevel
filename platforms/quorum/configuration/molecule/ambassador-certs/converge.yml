@@ -40,7 +40,7 @@
             secret_key: "aws_secret_key"
           k8s:
             context: "cluster_context"
-            config_file: "cluster_config"
+            config_file: "/tmp/molecule/kind-default/kubeconfig"
           vault:
             url: "vault_addr"
             root_token: "vault_root_token"
