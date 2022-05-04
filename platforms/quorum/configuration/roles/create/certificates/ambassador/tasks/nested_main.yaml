@@ -58,8 +58,8 @@
     component_name: "{{ name }}-generate-ambassador-certs-job"
     component_type: Job
     namespace: "{{ component_ns }}"
-  # tags:
-  #   - notest
+  tags:
+    - notest
 
 # This task creates the Ambassador tls credentials
 - name: "Create the Ambassador credentials"
