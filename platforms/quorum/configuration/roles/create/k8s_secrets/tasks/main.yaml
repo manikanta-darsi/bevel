@@ -26,8 +26,7 @@
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"
   register: certs_yaml
-  when:
-     - check == "ambassador_creds"
+  when: check == "ambassador_creds"
 
 - name: Get ambassador tls certs
   include_role:
@@ -36,8 +35,7 @@
     vault_output: "{{ certs_yaml.stdout | from_yaml }}"
     type: "ambassador"
     cert_path: "{{ ambassadortls }}"
-  when:
-     - check == "ambassador_creds"
+  when: check == "ambassador_creds"
 
   # This task creates the Ambassador TLS credentials for ambassador
 - name: Create the Ambassador credentials
@@ -45,4 +43,4 @@
     KUBECONFIG={{ kubernetes.config_file }} kubectl create secret tls {{ name }}-ambassador-certs --cert={{ ambassadortls }}/ambassador.crt --key={{ ambassadortls }}/ambassador.key -n {{ component_ns }}
   when:
     - check == "ambassador_creds"
-    - get_ambassador_secret.resources|length == 0
+    - get_ambassador_secret.resources|length == 0-
