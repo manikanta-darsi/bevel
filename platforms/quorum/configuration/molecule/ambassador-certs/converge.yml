@@ -39,10 +39,10 @@
             access_key: "aws_access_key"
             secret_key: "aws_secret_key"
           k8s:
-            context: "kind"
+            context: "cluster_context"
             config_file: "/tmp/molecule/kind-default/kubeconfig"
           vault:
-            url: "vault_addr"
+            url: http://localhost:9090
             root_token: "vault_root_token"
             secret_path: "secretsv2"
 
@@ -60,7 +60,6 @@
 
           app:
             google_maps_api: "api_key"
-
           services:
             peers:
             - peer:
@@ -101,6 +100,7 @@
       copy:
         src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
         dest: "{{ playbook_dir }}/../../shared/configuration"
+
   tasks:
     - name: "Test ambassador-certs role"
       include_role:
