@@ -44,4 +44,4 @@
     KUBECONFIG={{ kubernetes.config_file }} kubectl create secret tls {{ name }}-ambassador-certs --cert={{ ambassadortls }}/ambassador.crt --key={{ ambassadortls }}/ambassador.key -n {{ component_ns }}
   when:
     - check == "ambassador_creds"
-    - get_ambassador_secret.resources|length == 0-
+    - get_ambassador_secret.resources|length == 0
