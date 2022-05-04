@@ -29,6 +29,7 @@
   include_role:
     name: helm_component
   vars:
+    org_name: "{{ org.name }}"
     component_name: "{{ name }}-generate-ambassador-certs-job"
     type: "certs-ambassador-quorum"
     genesis: "{{ lookup('file', '{{ network.config.genesis }}') | b64encode }}"
