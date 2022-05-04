@@ -12,11 +12,11 @@ spec:
     ref: {{ gitops.branch }}
     path: {{ charts_dir }}/certs-ambassador-quorum
   values:
-    node_name: "{{ org.name }}"
+    name: "{{ org.name }}"
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
-      external_url: {{ name }}.{{ external_url }}
+      external_url: {{ component_name }}.{{ external_url }}
     image:
       initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
@@ -35,15 +35,15 @@ spec:
       root_subject: "{{ network.config.subject }}"
       cert_subject: "{{ network.config.subject | regex_replace(',', '/') }}"
     opensslVars:
-      domain_name: "{{ node_name }}.{{ external_url }}"
-      domain_name_api: "{{ node_name }}api.{{ external_url }}"
-      domain_name_web: "{{ node_name }}web.{{ external_url }}"
-      domain_name_tessera: "{{ node_name }}-tessera.{{ component_ns }}"
+      domain_name: "{{ name }}.{{ external_url }}"
+      domain_name_api: "{{ name }}api.{{ external_url }}"
+      domain_name_web: "{{ name }}web.{{ external_url }}"
+      domain_name_tessera: "{{ name }}-tessera.{{ component_ns }}"
 
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
-      external_url: {{ name }}.{{ external_url }}
+      external_url: {{ component_name }}.{{ external_url }}
     acceptLicense: YES
     healthCheckNodePort: 0
     sleepTimeAfterError: 60

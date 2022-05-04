@@ -29,8 +29,8 @@
   include_role:
     name: helm_component
   vars:
-    node_name: "{{ org.name }}"
-    component_name: "{{ node_name }}-generate-ambassador-certs-job"
+    name: "{{ org.name }}"
+    component_name: "{{ name }}-generate-ambassador-certs-job"
     type: "certs-ambassador-quorum"
     genesis: "{{ lookup('file', '{{ network.config.genesis }}') | b64encode }}"
     staticnodes: "{{ lookup('file', '{{ network.config.staticnodes }}') | from_yaml | to_nice_json }}"
@@ -55,8 +55,8 @@
   include_role:
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/helm_component"
   vars:
-    node_name: "{{ org.name }}"
-    component_name: "{{ node_name }}-generate-ambassador-certs-job"
+    name: "{{ org.name }}"
+    component_name: "{{ name }}-generate-ambassador-certs-job"
     component_type: Job
     namespace: "{{ component_ns }}"
   tags:
@@ -67,6 +67,7 @@
   include_role:
     name: create/k8s_secrets
   vars:
+    name: "{{ org.name }}"
     namespace: "{{ component_ns }}"
     vault: "{{ org.vault }}"
     kubernetes: "{{ org.k8s }}"

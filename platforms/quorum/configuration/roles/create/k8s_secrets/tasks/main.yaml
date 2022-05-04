@@ -12,7 +12,7 @@
   k8s_info:
     kind: Secret
     namespace: "{{ component_ns }}"
-    name: "{{ node_name }}-ambassador-certs"
+    name: "{{ name }}-ambassador-certs"
     kubeconfig: "{{ kubernetes.config_file }}"
     context: "{{ kubernetes.context }}"
   register: get_ambassador_secret
@@ -21,7 +21,7 @@
 # Checks if certificates are already created and stored in vault.
 - name: Check if ambassador and tls certs already created
   shell: |
-    vault kv get -field=rootcapem {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ node_name }}/certs
+    vault kv get -field=rootcapem {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ name }}/certs
   environment:
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"
@@ -32,7 +32,7 @@
 # Gets the existing ambassador tls certs
 - name: Get ambassador and tls certs from Vault
   shell: |
-    vault kv get -format=yaml {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ node_name }}/certs
+    vault kv get -format=yaml {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ name }}/certs
   environment:
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"
@@ -52,9 +52,8 @@
   # This task creates the Ambassador TLS credentials for ambassador
 - name: Create the Ambassador credentials
   shell: |
-    KUBECONFIG={{ kubernetes.config_file }} kubectl create secret tls {{ node_name }}-ambassador-certs --cert={{ ambassadortls }}/ambassador.crt --key={{ ambassadortls }}/ambassador.key -n {{ component_ns }}
+    KUBECONFIG={{ kubernetes.config_file }} kubectl create secret tls {{ name }}-ambassador-certs --cert={{ ambassadortls }}/ambassador.crt --key={{ ambassadortls }}/ambassador.key -n {{ component_ns }}
   when:
     - check == "ambassador_creds"
     - get_ambassador_secret.resources|length == 0
     - certs.failed == False
-    - get_ambassador_secret.failed == False
