@@ -65,6 +65,7 @@
   include_role:
     name: create/k8s_secrets
   vars:
+    org_name: "{{ org.name }}"
     namespace: "{{ component_ns }}"
     vault: "{{ org.vault }}"
     kubernetes: "{{ org.k8s }}"

@@ -26,7 +26,8 @@
     VAULT_ADDR: "{{ vault.url }}"
     VAULT_TOKEN: "{{ vault.root_token }}"
   register: certs_yaml
-  when: certs.failed == False and check == "ambassador_creds"
+  when:
+     - check == "ambassador_creds"
 
 - name: Get ambassador tls certs
   include_role:
@@ -36,7 +37,7 @@
     type: "ambassador"
     cert_path: "{{ ambassadortls }}"
   when:
-    - certs.failed == False and check == "ambassador_creds"
+     - check == "ambassador_creds"
 
   # This task creates the Ambassador TLS credentials for ambassador
 - name: Create the Ambassador credentials
@@ -45,4 +46,3 @@
   when:
     - check == "ambassador_creds"
     - get_ambassador_secret.resources|length == 0
-    - certs.failed == False

@@ -39,10 +39,10 @@
             access_key: "aws_access_key"
             secret_key: "aws_secret_key"
           k8s:
-            context: "kind"
-            config_file: "/tmp/molecule/kind-default/kubeconfig"
+            context: "cluster_context"
+            config_file: "cluster_config"
           vault:
-            url: http://localhost:9090
+            url: "vault_addr"
             root_token: "vault_root_token"
             secret_path: "secretsv2"
 
@@ -60,6 +60,7 @@
 
           app:
             google_maps_api: "api_key"
+
           services:
             peers:
             - peer:
@@ -100,7 +101,6 @@
       copy:
         src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
         dest: "{{ playbook_dir }}/../../shared/configuration"
-
   tasks:
     - name: "Test ambassador-certs role"
       include_role:
@@ -116,14 +116,12 @@
           failed: True
         services:
          peers: "{{ org.services.peers }}"
-        organisation: "{{ org.name }}"
         component_ns: "{{ org.name | lower }}-quo"
         component_name: "{{ org.name | lower }}"
         gitops: "{{ org.gitops }}"
         values_dir: "./build/{{ org.gitops.release_dir }}"
         component_auth: "quorum{{ org.name | lower }}"
         charts_dir: "../../{{ org.gitops.chart_source }}"
-        org_name: "{{ org.name }}"
         build_path: "{{ playbook_dir }}/build"
         kubernetes:
           config_file: "/tmp/molecule/kind-default/kubeconfig"

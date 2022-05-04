@@ -17,17 +17,3 @@
   - name: Assert if the value file has been created
     assert:
       that: job_file_check.stat.exists
-
-  - name: Check if certs exists in the vault
-    shell: |
-       vault kv get -field=rootcapem {{ vault.secret_path | default('secretsv2') }}/{{ component_ns }}/crypto/{{ name }}/certs
-    environment:
-      VAULT_ADDR: "http://localhost:9090"
-      VAULT_TOKEN: "root"
-    register: vault_certs
-    delegate_to: localhost
-    ignore_errors: yes
-
-  - name: Assert that the certs exists in the vault
-  assert:
-    that: vault_certs.stdout
