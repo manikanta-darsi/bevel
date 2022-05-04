@@ -7,10 +7,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ $.Values.node_name }}-generate-ambassador-certs-job
+  name: {{ $.Values.name }}-generate-ambassador-certs-job
   namespace: {{ .Values.metadata.namespace }}
   labels:
-    app.kubernetes.io/name: {{ $.Values.node_name }}-generate-ambassador-certs-job
+    app.kubernetes.io/name: {{ $.Values.name }}-generate-ambassador-certs-job
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -20,8 +20,8 @@ spec:
     template:
       metadata:
         labels:
-          app: {{ $.Values.node_name }}-generate-ambassador-certs-job
-          app.kubernetes.io/name: {{ $.Values.node_name  }}-generate-ambassador-certs-job
+          app: {{ $.Values.name }}-generate-ambassador-certs-job
+          app.kubernetes.io/name: {{ $.Values.name  }}-generate-ambassador-certs-job
           app.kubernetes.io/instance: {{ .Release.Name }}
       spec:
         restartPolicy: "OnFailure"
@@ -106,7 +106,7 @@ spec:
             - name: DOMAIN_NAME_TESSERA
               value: "{{ .Values.opensslVars.domain_name_tessera }}"
             - name: NODE_NAME
-              value: "{{ $.Values.node_name }}"
+              value: "{{ $.Values.name }}"
             - name: CERTS_SECRET_PREFIX
               value: {{ $.Values.vault.certsecretprefix }}
             - name: VAULT_ADDR
@@ -209,7 +209,7 @@ spec:
              - name: BASE_DIR
                value: {{ $.Values.volume.baseDir }}
              - name: NODE_NAME
-               value: "{{ $.Values.node_name }}"
+               value: "{{ $.Values.name }}"
              - name: KUBERNETES_AUTH_PATH
                value: {{ $.Values.vault.authpath }}
              - name: CERTS_SECRET_PREFIX

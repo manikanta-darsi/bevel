@@ -12,11 +12,11 @@ spec:
     ref: dev-ansible
     path: platforms/quorum/charts/certs-ambassador-quorum
   values:
-    node_name: "cmani"
+    name: "cmani"
     metadata:
       name: cmani-generate-ambassador-certs-job
       namespace: cmani-quo
-      external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      external_url: cmani-generate-ambassador-certs-job.rc.dev2.aws.blockchaincloudpoc-develop.com
     image:
       initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       node: quorumengineering/quorum:21.4.2
@@ -43,7 +43,7 @@ spec:
     metadata:
       name: cmani-generate-ambassador-certs-job
       namespace: cmani-quo
-      external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      external_url: cmani-generate-ambassador-certs-job.rc.dev2.aws.blockchaincloudpoc-develop.com
     acceptLicense: YES
     healthCheckNodePort: 0
     sleepTimeAfterError: 60
