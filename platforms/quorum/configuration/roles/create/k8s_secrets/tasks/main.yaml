@@ -27,6 +27,7 @@
     VAULT_TOKEN: "{{ vault.root_token }}"
   register: certs_yaml
   when: check == "ambassador_creds"
+  ignore_errors: yes
 
 - name: Get ambassador tls certs
   include_role:
