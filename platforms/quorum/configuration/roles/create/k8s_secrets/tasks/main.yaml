@@ -37,7 +37,6 @@
     type: "ambassador"
     cert_path: "{{ ambassadortls }}"
   when: check == "ambassador_creds"
-  ignore_errors: yes
 
   # This task creates the Ambassador TLS credentials for ambassador
 - name: Create the Ambassador credentials
