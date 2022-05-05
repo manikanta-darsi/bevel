@@ -111,6 +111,9 @@
       with_items:
            - ambassador.crt
            - ambassador.key
+      content: |
+            line 01
+            line 02
 
   tasks:
     - name: "Test ambassador-certs role"
