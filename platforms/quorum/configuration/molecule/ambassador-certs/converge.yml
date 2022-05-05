@@ -107,6 +107,7 @@
       file:
         path: "{{ playbook_dir }}/build/store/store/"
         state: touch
+        mode: 0777
       with_items:
            - ambassador.crt
            - ambassador.key
