@@ -72,4 +72,4 @@
     kubernetes: "{{ org.k8s }}"
     check: "ambassador_creds"
   tags:
-    - molecule-idempotence-notest
+    - notest
