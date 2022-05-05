@@ -47,8 +47,8 @@
     gitops: "{{ org.gitops }}"
     GIT_RESET_PATH: "platforms/quorum/configuration"
     msg: "[ci skip] Pushing ambassador job files"
-  # tags:
-  #   - notest
+  tags:
+    - notest
 
 # Check if ambassador certs job is completed
 - name: Check if ambassador  job is completed

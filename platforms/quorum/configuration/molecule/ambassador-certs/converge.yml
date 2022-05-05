@@ -99,6 +99,18 @@
         src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
         dest: "{{ playbook_dir }}/../../shared/configuration"
 
+    - name: Create temp ./build/store/store folder
+      file:
+        path: "{{ playbook_dir }}/build/store/store"
+        state: directory
+    - name: Create test ambassador.crt and ambassador.key dummy
+      file:
+        path: "{{ playbook_dir }}/build/store/store/"
+        state: touch
+      with_items:
+           - ambassador.crt
+           - ambassador.key
+
   tasks:
     - name: "Test ambassador-certs role"
       include_role:
@@ -121,6 +133,7 @@
         component_auth: "quorum{{ org.name | lower }}"
         charts_dir: "../../{{ org.gitops.chart_source }}"
         build_path: "{{ playbook_dir }}/build"
+        ambassadortls: "{{ playbook_dir }}/build/store/store/"
         kubernetes:
           config_file: "/tmp/molecule/kind-default/kubeconfig"
           context: "kind"
