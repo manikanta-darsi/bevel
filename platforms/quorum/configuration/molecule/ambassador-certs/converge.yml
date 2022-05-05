@@ -105,7 +105,7 @@
         state: directory
     - name: Create test ambassador.crt and ambassador.key dummy
       file:
-        path: "{{ playbook_dir }}/build/store/store/"
+        path: "{{ playbook_dir }}/build/store/store"
         state: touch
       with_items:
            - ambassador.crt
