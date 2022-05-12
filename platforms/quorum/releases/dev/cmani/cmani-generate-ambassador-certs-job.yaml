@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: cmani-generate-ambassador-certs-job
@@ -8,11 +8,14 @@ metadata:
 spec:
   releaseName: cmani-generate-ambassador-certs-job
   chart:
-    version: '4.0.x'
-    sourceRef:
-     kind: GitRepository
-     name: cmani-generate-ambassador-certs-job
-     namespace: cmani-quo
+    spec:
+      chart: cmani-generate-ambassador-certs-job
+      version: '4.0.x'
+      sourceRef:
+        kind: GitRepository
+        name: cmani-generate-ambassador-certs-job
+        namespace: cmani-quo
+      interval: 1m
     git: https://github.com/manikanta-darsi/bevel.git
     ref: flux
     path: platforms/quorum/charts/certs-ambassador-quorum
