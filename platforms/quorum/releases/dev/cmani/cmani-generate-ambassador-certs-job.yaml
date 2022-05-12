@@ -9,6 +9,10 @@ spec:
   releaseName: cmani-generate-ambassador-certs-job
   chart:
     version: '4.0.x'
+    sourceRef:
+     kind: GitRepository
+     name: cmani-generate-ambassador-certs-job
+     namespace: cmani-quo
     git: https://github.com/manikanta-darsi/bevel.git
     ref: flux
     path: platforms/quorum/charts/certs-ambassador-quorum
