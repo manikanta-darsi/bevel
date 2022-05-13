@@ -39,6 +39,7 @@ spec:
       domain_name_api: "{{ name }}api.{{ external_url }}"
       domain_name_web: "{{ name }}web.{{ external_url }}"
       domain_name_tessera: "{{ name }}-tessera.{{ component_ns }}"
+
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
