@@ -1,19 +1,3 @@
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: GitRepository
-metadata:
-  name: {{ component_name }}
-  namespace: {{ component_ns }}
-spec:
-  interval: 1m
-  url: https://github.com/manikanta-darsi/bevel.git
-  ref:
-    branch: {{ gitops.branch }}
-  ignore: |
-    # exclude all
-    /*
-    # include charts directory
-    !/charts/{{ component_name }}
-
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
