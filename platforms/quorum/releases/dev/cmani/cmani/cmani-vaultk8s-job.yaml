@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: cmani-vaultk8s-job
@@ -7,14 +7,23 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: cmani-vaultk8s-job
+  interval: 5m
   chart:
+   spec:
+    chart: cmani-vaultk8s-job
+    version: '4.0.x'
+    sourceRef:
+      kind: GitRepository
+      name: cmani-vaultk8s-job
+      namespace: cmani-quo
+      interval: 1m
     git: https://github.com/manikanta-darsi/bevel.git
     ref: flux
     path: platforms/shared/charts/vault-k8s-mgmt
   values:
     metadata:
       name: cmani-vaultk8s-job
-      namespace: cmani-quo    
+      namespace: cmani-quo
       images:
         alpineutils: hyperledgerlabs/alpine-utils:1.0
 
@@ -28,6 +37,6 @@ spec:
       secret_path: secretsv2
       serviceaccountname: vault-auth
       imagesecretname: regcred
-    
+
     k8s:
       kubernetes_url: https://C8FA1454BFC54EBEAC7D6A70501769F2.sk1.eu-west-1.eks.amazonaws.com
