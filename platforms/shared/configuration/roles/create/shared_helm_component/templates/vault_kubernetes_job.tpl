@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: {{ component_name }}
@@ -7,14 +7,23 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ component_name }}
+  interval: 5m
   chart:
+   spec:
+    chart: {{ component_name }}
+    version: '4.0.x'
+    sourceRef:
+      kind: GitRepository
+      name: {{ component_name }}
+      namespace: {{ component_ns }}
+      interval: 1m
     git: {{ git_url }}
     ref: {{ git_branch }}
     path: {{ charts_dir }}/vault-k8s-mgmt
   values:
     metadata:
       name: {{ component_name }}
-      namespace: {{ component_ns }}    
+      namespace: {{ component_ns }}
       images:
         alpineutils: {{ alpine_image }}
 
@@ -28,6 +37,6 @@ spec:
       secret_path: {{ vault.secret_path }}
       serviceaccountname: vault-auth
       imagesecretname: regcred
-    
+
     k8s:
       kubernetes_url: {{ kubernetes_url }}
