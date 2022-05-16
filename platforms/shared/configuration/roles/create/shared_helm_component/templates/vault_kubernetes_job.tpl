@@ -17,9 +17,9 @@ spec:
       name: {{ component_name }}
       namespace: {{ component_ns }}
       interval: 1m
-    git: {{ git_url }}
-    ref: {{ git_branch }}
-    path: {{ charts_dir }}/vault-k8s-mgmt
+  git: {{ git_url }}
+  ref: {{ git_branch }}
+  path: {{ charts_dir }}/vault-k8s-mgmt
   values:
     metadata:
       name: {{ component_name }}
