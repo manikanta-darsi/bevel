@@ -17,6 +17,11 @@
 
 - name: Delete release files
   file:
+    path: "{{ flux_mainfest_dir }}/"
+    state: absent
+
+- name: Delete release files
+  file:
     path: "{{ release_dir_ns }}/"
     state: absent
 

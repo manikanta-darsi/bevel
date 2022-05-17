@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: {{ component_name }}
@@ -8,10 +8,14 @@ metadata:
 spec:
   releaseName: {{ component_name }}
   helmVersion: v3
+  interval: 1m
   chart:
-    git: {{ git_url }}
-    ref: {{ git_branch }}
-    path: {{ charts_dir }}/node_quorum  
+   spec:
+    chart: {{ charts_dir }}/node_quorum
+    sourceRef:
+      kind: GitRepository
+      name: flux-{{ network.env.type }}
+      namespace: flux-{{ network.env.type }}
   values:
     replicaCount: 1
     metadata:
@@ -36,9 +40,9 @@ spec:
       mountPath: /etc/quorum/qdata
       imagePullSecret: regcred
       keystore: keystore_1
-{% if item.cloud_provider == 'minikube' %}     
+{% if item.cloud_provider == 'minikube' %}
       servicetype: NodePort
-{% else %}      
+{% else %}
       servicetype: ClusterIP
 {% endif %}
       lock: {{ peer.lock | lower }}
@@ -76,7 +80,7 @@ spec:
       tls: "{{ network.config.tm_tls | upper }}"
       trust: "{{ network.config.tm_trust | upper }}"
     genesis: {{ genesis }}
-    staticnodes: 
+    staticnodes:
       {{ staticnodes }}
     proxy:
       provider: "ambassador"
@@ -84,7 +88,7 @@ spec:
       portTM: {{ peer.transaction_manager.ambassador }}
       rpcport: {{ peer.rpc.ambassador }}
       quorumport: {{ peer.p2p.ambassador }}
-{% if network.config.consensus == 'raft' %}  
+{% if network.config.consensus == 'raft' %}
       portRaft: {{ peer.raft.ambassador }}
 {% endif %}
     storage:
