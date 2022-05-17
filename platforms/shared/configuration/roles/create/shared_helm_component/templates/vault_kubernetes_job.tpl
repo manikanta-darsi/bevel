@@ -7,19 +7,14 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ component_name }}
-  interval: 5m
+  interval: 1m
   chart:
    spec:
-    chart: {{ component_name }}
-    version: '4.0.x'
+    chart: {{ charts_dir }}/vault-k8s-mgmt
     sourceRef:
       kind: GitRepository
-      name: {{ component_name }}
-      namespace: {{ component_ns }}
-      interval: 1m
-  git: {{ git_url }}
-  ref: {{ git_branch }}
-  path: {{ charts_dir }}/vault-k8s-mgmt
+      name: flux-{{ network.env.type }}
+      namespace: flux-{{ network.env.type }}
   values:
     metadata:
       name: {{ component_name }}
