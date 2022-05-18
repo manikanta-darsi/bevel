@@ -70,7 +70,7 @@
       component_auth: "quorum{{ org.name | lower }}"
       component_ns: "{{ org.name | lower }}-quo"
       charts_dir: "{{ org.gitops.chart_source }}"
-      component_name: "{{ org.name | lower }}-ambassador-certs"
+      component_name: "{{ org.name | lower }}-ambassador-certs-job"
       kubernetes: "{{ org.k8s }}"
       values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
       vault: "{{ org.vault }}"
@@ -79,17 +79,17 @@
     loop_control:
       loop_var: org
 
-#  # This role generates the crypto material for quorum network based on RAFT consensus and store it in vault
-#   - name: "Generate crypto material for RAFT consensus"
-#     include_role:
-#       name: create/crypto/raft
-#     vars:
-#       component_name: "{{ item.name | lower }}"
-#       component_ns: "{{ item.name | lower }}-quo"
-#       vault: "{{ item.vault }}"
-#       peers: "{{ item.services.peers }}"
-#     loop: "{{ network['organizations'] }}"
-#     when: network.config.consensus == 'raft'
+ # This role generates the crypto material for quorum network based on RAFT consensus and store it in vault
+  - name: "Generate crypto material for RAFT consensus"
+    include_role:
+      name: create/crypto/raft
+    vars:
+      component_name: "{{ item.name | lower }}"
+      component_ns: "{{ item.name | lower }}-quo"
+      vault: "{{ item.vault }}"
+      peers: "{{ item.services.peers }}"
+    loop: "{{ network['organizations'] }}"
+    when: network.config.consensus == 'raft'
 
 #   # This role makes up the istanbul binary and place it in the bin directory
 #   - name: "Setup istanbul-tools"
