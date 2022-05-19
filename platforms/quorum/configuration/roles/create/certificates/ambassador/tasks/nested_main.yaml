@@ -41,7 +41,7 @@
 # Git Push : Pushes the above generated files to git directory
 - name: Git Push
   include_role:
-    name: "{{ playbook_dir }}/../../shared/configuration/roles/git_push"
+    name: "/../../shared/configuration/roles/git_push"
   vars:
     GIT_DIR: "{{ playbook_dir }}/../../../"
     gitops: "{{ org.gitops }}"
