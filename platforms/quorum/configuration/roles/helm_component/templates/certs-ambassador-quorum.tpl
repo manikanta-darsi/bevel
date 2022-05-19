@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: {{ component_name }}
@@ -7,10 +7,14 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ component_name }}
+  interval: 1m
   chart:
-    git: {{ gitops.git_url }}
-    ref: {{ gitops.branch }}
-    path: {{ charts_dir }}/certs-ambassador-quorum
+   spec:
+    chart: {{ charts_dir }}/certs-ambassador-quorum
+    sourceRef:
+      kind: GitRepository
+      name: flux-{{ network.env.type }}
+      namespace: flux-{{ network.env.type }}
   values:
     name: "{{ org.name }}"
     metadata:
@@ -39,6 +43,7 @@ spec:
       domain_name_api: "{{ name }}api.{{ external_url }}"
       domain_name_web: "{{ name }}web.{{ external_url }}"
       domain_name_tessera: "{{ name }}-tessera.{{ component_ns }}"
+
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
