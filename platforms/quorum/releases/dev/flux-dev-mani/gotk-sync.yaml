@@ -20,7 +20,7 @@ metadata:
   namespace: flux-dev-mani
 spec:
   interval: 10m0s
-  path: ./platforms/quorum/releases/dev
+  path: ./platforms/quorum/releases/dev/
   prune: true
   sourceRef:
     kind: GitRepository
