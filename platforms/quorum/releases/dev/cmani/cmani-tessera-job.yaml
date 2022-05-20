@@ -1,0 +1,34 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cmani-tessera-job
+  namespace: cmani-quo
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: cmani-tessera-job
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/quorum/charts/tessera_key_mgmt
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
+  values:
+    peer:
+      name: cmani
+    metadata:
+      name: cmani-tessera-job
+      namespace: cmani-quo
+    image:
+      repository: quorumengineering/tessera:hashicorp-21.7.3
+      pullSecret: regcred
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretengine: secretsv2
+      authpath: quorumcmani
+      keyprefix: cmani-quo/crypto
+      role: vault-role
+      serviceaccountname: vault-auth
+      tmprefix: secretsv2/data/cmani-quo/crypto
