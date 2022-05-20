@@ -16,7 +16,7 @@ spec:
       name: flux-{{ network.env.type }}
       namespace: flux-{{ network.env.type }}
   values:
-    name: {{ org.name }}
+    name: "{{ org.name }}"
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}
@@ -24,10 +24,9 @@ spec:
     image:
       initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
-      pullPolicy: Always
       certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
       imagePullSecret: regcred
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
     vault:
       address: {{ vault.url }}
       role: vault-role
@@ -43,10 +42,6 @@ spec:
       domain_name_api: "{{ name }}api.{{ external_url }}"
       domain_name_web: "{{ name }}web.{{ external_url }}"
       domain_name_tessera: "{{ name }}-tessera.{{ component_ns }}"
-    metadata:
-      name: {{ component_name }}
-      namespace: {{ component_ns }}
-      external_url: {{ component_name }}.{{ external_url }}
     acceptLicense: YES
     healthCheckNodePort: 0
     sleepTimeAfterError: 60
