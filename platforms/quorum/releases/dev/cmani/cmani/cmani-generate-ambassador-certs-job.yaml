@@ -43,10 +43,6 @@ spec:
       domain_name_api: "cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_web: "cmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com"
       domain_name_tessera: "cmani-tessera.cmani-quo"
-    metadata:
-      name: cmani-generate-ambassador-certs-job
-      namespace: cmani-quo
-      external_url: cmani-generate-ambassador-certs-job.rc.dev2.aws.blockchaincloudpoc-develop.com
     acceptLicense: YES
     healthCheckNodePort: 0
     sleepTimeAfterError: 60
