@@ -16,7 +16,7 @@ spec:
       name: flux-{{ network.env.type }}
       namespace: flux-{{ network.env.type }}
   values:
-    name: "{{ org.name }}"
+    name: {{ org.name }}
     metadata:
       name: {{ component_name }}
       namespace: {{ component_ns }}

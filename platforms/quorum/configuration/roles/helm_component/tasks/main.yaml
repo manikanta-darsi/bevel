@@ -11,11 +11,11 @@
 
 ############################################################################################
 # This task ensures that the directory exists, and creates it, if it does not exist
-- name: "Ensures {{ values_dir }}/{{ name }} dir exists"
+- name: "Ensures {{ values_dir }}/{{ name }}/{{ name }} dir exists"
   include_role:
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/setup"
   vars:
-    path: "{{ values_dir }}/{{ name }}"
+    path: "{{ values_dir }}/{{ name }}/{{ name }}"
     check: "ensure_dir"
 
 ############################################################################################
@@ -25,7 +25,7 @@
 - name: "create value file for {{ component_name }}"
   template:
     src: "{{ helm_templates[type] | default('helm_component.tpl') }}"
-    dest: "{{ values_dir }}/{{ name }}/{{ component_name }}.yaml"
+    dest: "{{ values_dir }}/{{ name }}/{{ name }}/{{ component_name }}.yaml"
   changed_when: false
 
 ############################################################################################
@@ -38,4 +38,4 @@
   vars:
     helmtemplate_type: "{{ type }}"
     chart_path: "{{ charts_dir }}"
-    value_file: "{{ values_dir }}/{{ name }}/{{ component_name }}.yaml"
+    value_file: "{{ values_dir }}/{{ name }}/{{ name }}/{{ component_name }}.yaml"
