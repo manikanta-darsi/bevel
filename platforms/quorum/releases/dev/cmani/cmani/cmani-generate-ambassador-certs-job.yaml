@@ -1,0 +1,56 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cmani-generate-ambassador-certs-job
+  namespace: cmani-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: cmani-generate-ambassador-certs-job
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/quorum/charts/certs-ambassador-quorum
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
+  values:
+    name: cmani
+    metadata:
+      name: cmani-generate-ambassador-certs-job
+      namespace: cmani-quo
+      external_url: cmani-generate-ambassador-certs-job.rc.dev2.aws.blockchaincloudpoc-develop.com
+    image:
+      initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
+      node: quorumengineering/quorum:21.4.2
+      pullPolicy: Always
+      certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
+      imagePullSecret: regcred
+      pullPolicy: Always
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      role: vault-role
+      authpath: quorumcmani
+      serviceaccountname: vault-auth
+      certsecretprefix: secretsv2/data/cmani-quo
+      retries: 30
+    subjects:
+      root_subject: "CN=DLT Root CA,OU=DLT,O=DLT,L=London,C=GB"
+      cert_subject: "CN=DLT Root CA/OU=DLT/O=DLT/L=London/C=GB"
+    opensslVars:
+      domain_name: "cmani.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_api: "cmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_web: "cmaniweb.rc.dev2.aws.blockchaincloudpoc-develop.com"
+      domain_name_tessera: "cmani-tessera.cmani-quo"
+    metadata:
+      name: cmani-generate-ambassador-certs-job
+      namespace: cmani-quo
+      external_url: cmani-generate-ambassador-certs-job.rc.dev2.aws.blockchaincloudpoc-develop.com
+    acceptLicense: YES
+    healthCheckNodePort: 0
+    sleepTimeAfterError: 60
+    sleepTime: 10
+    healthcheck:
+      readinesscheckinterval: 10
+      readinessthreshold: 1
