@@ -15,7 +15,6 @@ spec:
       kind: GitRepository
       name: flux-dev-mani
       namespace: flux-dev-mani
-  helmVersion: v3
   values:
     replicaCount: 1
     metadata:
