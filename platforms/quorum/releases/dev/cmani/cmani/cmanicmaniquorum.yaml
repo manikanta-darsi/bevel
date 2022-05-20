@@ -1,0 +1,81 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cmanicmaniquorum
+  namespace: cmani-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: cmanicmaniquorum
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/quorum/charts/node_quorum_member
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
+  values:
+    replicaCount: 1
+    metadata:
+      namespace: cmani-quo
+      labels:
+    images:
+      node: quorumengineering/quorum:21.4.2
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      tessera: quorumengineering/tessera:21.7.3
+      busybox: busybox
+      mysql: mysql/mysql-server:5.7
+    node:
+      name: cmani
+      status: default
+      consensus: raft
+      subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
+      mountPath: /etc/quorum/qdata
+      imagePullSecret: regcred
+      keystore: keystore_1
+      servicetype: ClusterIP
+      lock: false
+      ports:
+        rpc: 8546
+        raft: 50401
+        tm: 443
+        quorum: 21000
+        db: 3306
+      dbname: demodb
+      mysqluser: demouser
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretprefix: secretsv2/data/cmani-quo/crypto/cmani
+      serviceaccountname: vault-auth
+      keyname: quorum
+      tm_keyname: tm
+      role: vault-role
+      authpath: quorumcmani
+    tessera:
+      dburl: "jdbc:mysql://cmani-tessera:3306/demodb"
+      dbusername: demouser
+      url: "https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:443"
+      clienturl: "http://cmani-tessera:8888" #TODO: Enable tls strict for q2t
+      othernodes:
+        - url: https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://mmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      tls: "STRICT"
+      trust: "TOFU"
+    genesis: ewogICAgImFsbG9jIjogewogICAgICAgICI0MjhjMWZlMmYyMTBiNzk0NGY4ZmI0MWYxNDI4MTFhOTU5YmQ0ZjEyIjogewogICAgICAgICAgICAiYmFsYW5jZSI6ICIxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgImRhZjNhMzdiN2VjOTVjYThhNzFlYWJkOGZkYzI1ZDE5NmUxZGU5NmYiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiCiAgICAgICAgfQogICAgfSwKICAgICJjb2luYmFzZSI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgImNvbmZpZyI6IHsKICAgICAgICAiYnl6YW50aXVtQmxvY2siOiAwLAogICAgICAgICJjaGFpbklkIjogMTAsCiAgICAgICAgImNvbnN0YW50aW5vcGxlQmxvY2siOiAwLAogICAgICAgICJlaXAxNTBCbG9jayI6IDAsCiAgICAgICAgImVpcDE1MEhhc2giOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwKICAgICAgICAiZWlwMTU1QmxvY2siOiAwLAogICAgICAgICJlaXAxNThCbG9jayI6IDAsCiAgICAgICAgImhvbWVzdGVhZEJsb2NrIjogMCwKICAgICAgICAiaXNRdW9ydW0iOiB0cnVlLAogICAgICAgICJwZXRlcnNidXJnQmxvY2siOiAwLAogICAgICAgICJyYWZ0U2Vjb25kcyI6IHRydWUsCiAgICAgICAgInR4blNpemVMaW1pdCI6IDEyOAogICAgfSwKICAgICJkaWZmaWN1bHR5IjogIjB4MCIsCiAgICAiZXh0cmFEYXRhIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAiZ2FzTGltaXQiOiAiMHhFMDAwMDAwMDAwIiwKICAgICJtaXhoYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA2NDc1NzI2MTZjNjU3ODczNjU2NDZjNjU3OCIsCiAgICAibm9uY2UiOiAiMHgwIiwKICAgICJwYXJlbnRIYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAidGltZXN0YW1wIjogIjB4MDAiCn0=
+    staticnodes:
+      [
+    "enode://cd48cc3e95b2ef7892fb36caea9c92aa56c813e045fc727c269cc7263cbe5710f3528d9047faec0a2b64ec8112184ac22a3298239cdb0bff341a92ce580bddbe@cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15010?discport=0&raftport=15012",
+    "enode://d17526e5e095b4b441ed8a6c85568bb473c17da80203a39dfd02f78c1b6a57671d46a6b64d432d093b1010cdd2971206d63859e4a0b9f5146afb0e6095478de8@mmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15013?discport=0&raftport=15015"
+]
+    proxy:
+      provider: "ambassador"
+      external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      portTM: 443
+      rpcport: 15011
+      quorumport: 15010
+      portRaft: 15012
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+      dbstorage: 1Gi
