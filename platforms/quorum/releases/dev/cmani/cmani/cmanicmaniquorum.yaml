@@ -16,6 +16,7 @@ spec:
       name: flux-dev-mani
       namespace: flux-dev-mani
   values:
+    helmVersion: v3
     replicaCount: 1
     metadata:
       namespace: cmani-quo
