@@ -26,43 +26,6 @@ spec:
       tessera: quorumengineering/tessera:21.7.3
       busybox: busybox
       mysql: mysql/mysql-server:5.7
-    node:
-      name: cmani
-      status: default
-      consensus: raft
-      subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
-      mountPath: /etc/quorum/qdata
-      imagePullSecret: regcred
-      keystore: keystore_1
-      servicetype: ClusterIP
-      lock: false
-      ports:
-        rpc: 8546
-        raft: 50401
-        tm: 443
-        quorum: 21000
-        db: 3306
-      dbname: demodb
-      mysqluser: demouser
-    vault:
-      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
-      secretprefix: secretsv2/data/cmani-quo/crypto/cmani
-      serviceaccountname: vault-auth
-      keyname: quorum
-      tm_keyname: tm
-      role: vault-role
-      authpath: quorumcmani
-    tessera:
-      dburl: "jdbc:mysql://cmani-tessera:3306/demodb"
-      dbusername: demouser
-      url: "https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:443"
-      clienturl: "http://cmani-tessera:8888" #TODO: Enable tls strict for q2t
-      othernodes:
-        - url: https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
-        - url: https://mmani.rc.dev2.aws.blockchaincloudpoc-develop.com
-      tls: "STRICT"
-      trust: "TOFU"
-    genesis: ewogICAgImFsbG9jIjogewogICAgICAgICI0MDcxMDJkNjRhZjNkYjc4NGEzYmRkOGFiYjI0M2UxZGE5Mzc0OTM5IjogewogICAgICAgICAgICAiYmFsYW5jZSI6ICIxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgImZmNWVmOGQ3N2U3NjEyZjhiMWMzZTIyYzMyYjk5NzUwYzY3OGM2NjEiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiCiAgICAgICAgfQogICAgfSwKICAgICJjb2luYmFzZSI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgImNvbmZpZyI6IHsKICAgICAgICAiYnl6YW50aXVtQmxvY2siOiAwLAogICAgICAgICJjaGFpbklkIjogMTAsCiAgICAgICAgImNvbnN0YW50aW5vcGxlQmxvY2siOiAwLAogICAgICAgICJlaXAxNTBCbG9jayI6IDAsCiAgICAgICAgImVpcDE1MEhhc2giOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwKICAgICAgICAiZWlwMTU1QmxvY2siOiAwLAogICAgICAgICJlaXAxNThCbG9jayI6IDAsCiAgICAgICAgImhvbWVzdGVhZEJsb2NrIjogMCwKICAgICAgICAiaXNRdW9ydW0iOiB0cnVlLAogICAgICAgICJwZXRlcnNidXJnQmxvY2siOiAwLAogICAgICAgICJyYWZ0U2Vjb25kcyI6IHRydWUsCiAgICAgICAgInR4blNpemVMaW1pdCI6IDEyOAogICAgfSwKICAgICJkaWZmaWN1bHR5IjogIjB4MCIsCiAgICAiZXh0cmFEYXRhIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAiZ2FzTGltaXQiOiAiMHhFMDAwMDAwMDAwIiwKICAgICJtaXhoYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA2NDc1NzI2MTZjNjU3ODczNjU2NDZjNjU3OCIsCiAgICAibm9uY2UiOiAiMHgwIiwKICAgICJwYXJlbnRIYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAidGltZXN0YW1wIjogIjB4MDAiCn0=
     proxy:
       provider: "ambassador"
       external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
