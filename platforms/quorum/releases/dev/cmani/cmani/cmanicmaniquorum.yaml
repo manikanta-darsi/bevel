@@ -11,7 +11,7 @@ spec:
   chart:
    spec:
     chart: platforms/quorum/charts/node_quorum_member
-    version: ">=1.0.0"
+    version: ">=2.0.0"
     sourceRef:
       kind: GitRepository
       name: flux-dev-mani
