@@ -28,7 +28,7 @@ spec:
       busybox: busybox
       mysql: mysql/mysql-server:5.7
     node:
-      name: {{ peer.name }}
+      Name: {{ peer.name }}
 {% if add_new_org %}
 {% if network.config.consensus == 'raft' %}
       peer_id: {{ peer_id | int }}
