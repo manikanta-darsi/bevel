@@ -10,39 +10,39 @@ metadata:
   namespace: {{ .Values.metadata.namespace }}
   creationTimestamp: null
   labels:
-    app.kubernetes.io/name: {{ .Values.node.Name }}
+    app.kubernetes.io/name: {{ .Values.node.name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
-  name: {{ .Values.node.Name }}
+  name: {{ .Values.node.name }}
 spec:
-  serviceName: {{ .Values.node.Name }}
+  serviceName: {{ .Values.node.name }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: consortiumchain
-      service.rpc: {{ .Values.node.Name }}
-      app.kubernetes.io/name: {{ .Values.node.Name }}
+      service.rpc: {{ .Values.node.name }}
+      app.kubernetes.io/name: {{ .Values.node.name }}
       helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       app.kubernetes.io/managed-by: {{ .Release.Service }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }} 
       {{- include "labels.custom" . | nindent 2 }}
   template:
     metadata:
       creationTimestamp: null
       labels:
         app: consortiumchain
-        name: {{ .Values.node.Name }}
-        service.rpc: {{ .Values.node.Name }}
-        app.kubernetes.io/name: {{ .Values.node.Name }}
+        name: {{ .Values.node.name }}
+        service.rpc: {{ .Values.node.name }}
+        app.kubernetes.io/name: {{ .Values.node.name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }} 
         {{- include "labels.custom" . | nindent 2 }}
     spec:
       serviceAccountName: {{ .Values.vault.serviceaccountname }}
-      hostname: {{ .Values.node.Name }}
+      hostname: {{ .Values.node.name }}
       imagePullSecrets:
           - name: {{ .Values.node.imagePullSecret }}
       volumes:
@@ -52,9 +52,9 @@ spec:
         - name: mysql
           emptyDir:
             medium: Memory
-        - name: {{ .Values.node.Name }}-genesis-volume
+        - name: {{ .Values.node.name }}-genesis-volume
           configMap:
-            name: genesis-{{ .Values.node.Name }}
+            name: genesis-{{ .Values.node.name }}
             items:
               - key: genesis.json.base64
                 path: genesis.json.base64
@@ -77,7 +77,7 @@ spec:
         args:
         - |-
           #!/bin/bash
-
+          
           validateVaultResponse () {
             if echo ${2} | grep "errors"; then
               echo "ERROR: unable to retrieve ${1}: ${2}"
@@ -108,7 +108,7 @@ spec:
           validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
 
           vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
-          echo "Getting 5 keys from $vault_secret_key"
+          echo "Getting 5 keys from $vault_secret_key"          
           LOOKUP_SECRET_RESPONSE=$(curl -sS \
             --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
             ${VAULT_ADDR}/v1/${vault_secret_key} | \
@@ -119,10 +119,10 @@ spec:
           gethpassword=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["geth_password"]')
           username=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["db_user"]')
           password=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["db_password"]')
-
+          
           OUTPUT_PATH="${MOUNT_PATH}/keys"
           mkdir -p ${OUTPUT_PATH}
-
+          
           echo -n "${gethpassword}" > ${OUTPUT_PATH}/passwords.txt
           echo -n "${nodekey}" > ${OUTPUT_PATH}/nodekey
           echo -n "${keystore}" > ${OUTPUT_PATH}/{{ .Values.node.keystore }}
@@ -130,18 +130,18 @@ spec:
           echo "${password}" > ${OUTPUT_PATH}/password
 
           vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tm_keyname }}"
-          echo "Getting 2 keys from $vault_secret_key"
+          echo "Getting 2 keys from $vault_secret_key"          
           LOOKUP_SECRET_RESPONSE=$(curl -sS \
             --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
             ${VAULT_ADDR}/v1/${vault_secret_key} | \
             jq -r 'if .errors then . else . end')
-          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
+          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE" 
 
           tmpub=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["publicKey"]')
           tmkey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["privateKey"]')
           echo -n "${tmpub}" > ${OUTPUT_PATH}/tm.pub
           echo -n "${tmkey}" > ${OUTPUT_PATH}/tm.key
-
+         
         volumeMounts:
         - name: certificates
           mountPath: /secret
@@ -165,9 +165,9 @@ spec:
           - name: QHOME
             value: {{ .Values.node.mountPath }}
         volumeMounts:
-        - name: {{ .Values.node.Name }}-pv
+        - name: {{ .Values.node.name }}-pv
           mountPath: {{ .Values.node.mountPath }}
-        - name: {{ .Values.node.Name }}-genesis-volume
+        - name: {{ .Values.node.name }}-genesis-volume
           mountPath: {{ .Values.node.mountPath }}/genesis
       containers:
       - name: quorum
@@ -181,7 +181,7 @@ spec:
           apk add curl;
           echo -n {{ .Values.staticnodes | toRawJson  | quote }} > $QUORUM_DATA_DIR/static-nodes.json
           mkdir -p $QUORUM_DATA_DIR/geth
-          mkdir -p $QUORUM_DATA_DIR/keystore
+          mkdir -p $QUORUM_DATA_DIR/keystore          
           # touch $qd/passwords.txt
           cp $QUORUM_HOME/crypto/keys/{{ .Values.node.keystore }} $QUORUM_DATA_DIR/keystore/
           cp $QUORUM_HOME/crypto/keys/nodekey $QUORUM_DATA_DIR/geth/
@@ -253,12 +253,12 @@ spec:
         volumeMounts:
         - name: certificates
           mountPath: {{ .Values.node.mountPath }}/crypto/
-        - name: {{ .Values.node.Name }}-pv
+        - name: {{ .Values.node.name }}-pv
           mountPath: {{ .Values.node.mountPath }}
       restartPolicy: Always
   volumeClaimTemplates:
     - metadata:
-        name: {{ .Values.node.Name }}-pv
+        name: {{ .Values.node.name }}-pv
       spec:
         storageClassName: {{ .Values.storage.storageclassname }}
         accessModes: [ "ReadWriteOnce" ]

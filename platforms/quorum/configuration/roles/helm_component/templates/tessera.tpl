@@ -16,6 +16,7 @@ spec:
       name: flux-{{ network.env.type }}
       namespace: flux-{{ network.env.type }}
   values:
+    node_name: {{ peer.name }}
     replicaCount: 1
     metadata:
       namespace: {{ component_ns }}
@@ -28,7 +29,6 @@ spec:
       mysql: mysql/mysql-server:5.7
       pullPolicy: IfNotPresent
     node:
-      name: {{ peer.name }}
 {% if add_new_org %}
 {% if network.config.consensus == 'raft' %}
       peer_id: {{ peer_id | int }}

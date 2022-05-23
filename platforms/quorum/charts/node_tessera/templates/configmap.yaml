@@ -8,7 +8,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tessera-config-{{ .Values.node.name }}
+  name: tessera-config-{{ .Values.node_name }}
   namespace: {{ .Values.metadata.namespace }}
   labels:
     app.kubernetes.io/name: tessera-config
@@ -28,7 +28,7 @@ data:
         {
           "app": "ThirdParty",
           "enabled": true,
-          "serverAddress": "http://{{ .Values.node.name }}-tessera:9080",
+          "serverAddress": "http://{{ .Values.node_name }}-tessera:9080",
           "communicationType": "REST"
         },
         {

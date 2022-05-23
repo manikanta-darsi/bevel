@@ -16,47 +16,47 @@ metadata:
       ---
       apiVersion: ambassador/v2
       kind: TCPMapping
-      name: {{ .Values.node.Name }}-tcp
+      name: {{ .Values.node.name }}-tcp
       port: {{ .Values.proxy.quorumport }}
-      service: {{ .Values.node.Name }}.{{ .Values.metadata.namespace }}:{{ .Values.node.ports.quorum }}
+      service: {{ .Values.node.name }}.{{ .Values.metadata.namespace }}:{{ .Values.node.ports.quorum }}
       ---
       apiVersion: ambassador/v2
       kind: TCPMapping
-      name: {{ .Values.node.Name }}-rpc
+      name: {{ .Values.node.name }}-rpc
       port: {{ .Values.proxy.rpcport }}
-      service: {{ .Values.node.Name }}.{{ .Values.metadata.namespace }}:{{ .Values.node.ports.rpc }}
+      service: {{ .Values.node.name }}.{{ .Values.metadata.namespace }}:{{ .Values.node.ports.rpc }}
       ---
       apiVersion: ambassador/v2
       kind: TLSContext
-      name: {{ .Values.node.Name }}_mapping_tlscontext
+      name: {{ .Values.node.name }}_mapping_tlscontext
       hosts:
       - {{ .Values.proxy.external_url }}
-      secret: {{ .Values.node.Name }}-ambassador-certs.{{ .Values.metadata.namespace }}
+      secret: {{ .Values.node.name }}-ambassador-certs.{{ .Values.metadata.namespace }}
       secret_namespacing: true
       min_tls_version: v1.2
       {{- if eq $.Values.node.consensus "raft" }}
       ---
       apiVersion: ambassador/v2
       kind: TCPMapping
-      name: {{ .Values.node.Name }}-raft
+      name: {{ .Values.node.name }}-raft
       port: {{ .Values.proxy.portRaft }}
-      service: {{ .Values.node.Name }}.{{ .Values.metadata.namespace }}:{{ .Values.node.ports.raft }}
+      service: {{ .Values.node.name }}.{{ .Values.metadata.namespace }}:{{ .Values.node.ports.raft }}
       {{- end }}
     {{- end }}
   creationTimestamp: null
   labels:
-    app.kubernetes.io/name: {{ .Values.node.Name }}
+    app.kubernetes.io/name: {{ .Values.node.name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
-  name: {{ .Values.node.Name }}
+  name: {{ .Values.node.name }}
 spec:
   selector:
-    app.kubernetes.io/name: {{ .Values.node.Name }}
+    app.kubernetes.io/name: {{ .Values.node.name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
   type: {{ .Values.node.servicetype }}
   ports:
@@ -75,4 +75,4 @@ spec:
     port: {{ .Values.node.ports.quorum }}
     targetPort: {{ .Values.node.ports.quorum }}
   selector:
-    service.rpc: {{ .Values.node.Name }}
+    service.rpc: {{ .Values.node.name }}

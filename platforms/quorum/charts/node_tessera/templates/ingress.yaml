@@ -8,21 +8,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.node.name }}
+  name: {{ .Values.node_name }}
   namespace: {{ .Values.metadata.namespace }}
   annotations:
     kubernetes.io/ingress.class: "haproxy"
     ingress.kubernetes.io/ssl-passthrough: "true"  
 spec:
   rules:
-  - host: {{ .Values.node.name }}tm.{{ .Values.proxy.external_url }}
+  - host: {{ .Values.node_name }}tm.{{ .Values.proxy.external_url }}
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: {{ .Values.node.name }}-tessera
+            name: {{ .Values.node_name }}-tessera
             port:
               number: {{ .Values.node.ports.tm }}
 {{- end }}

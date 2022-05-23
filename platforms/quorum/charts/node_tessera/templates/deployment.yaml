@@ -10,20 +10,20 @@ metadata:
   namespace: {{ .Values.metadata.namespace }}
   creationTimestamp: null
   labels:
-    app.kubernetes.io/name: {{ .Values.node.name }}-tessera
+    app.kubernetes.io/name: {{ .Values.node_name }}-tessera
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
-  name: {{ .Values.node.name }}-tessera
+  name: {{ .Values.node_name }}-tessera
 spec:
-  serviceName: {{ .Values.node.name }}-tessera
+  serviceName: {{ .Values.node_name }}-tessera
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: consortiumchain
-      service.rpc: {{ .Values.node.name }}-tessera
-      app.kubernetes.io/name: {{ .Values.node.name }}-tessera
+      service.rpc: {{ .Values.node_name }}-tessera
+      app.kubernetes.io/name: {{ .Values.node_name }}-tessera
       helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       app.kubernetes.io/managed-by: {{ .Release.Service }}
       app.kubernetes.io/instance: {{ .Release.Name }} 
@@ -33,16 +33,16 @@ spec:
       creationTimestamp: null
       labels:
         app: consortiumchain
-        name: {{ .Values.node.name }}-tessera
-        service.rpc: {{ .Values.node.name }}-tessera
-        app.kubernetes.io/name: {{ .Values.node.name }}-tessera
+        name: {{ .Values.node_name }}-tessera
+        service.rpc: {{ .Values.node_name }}-tessera
+        app.kubernetes.io/name: {{ .Values.node_name }}-tessera
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/instance: {{ .Release.Name }} 
         {{- include "labels.custom" . | nindent 2 }}
     spec:
       serviceAccountName: {{ .Values.vault.serviceaccountname }}
-      hostname: {{ .Values.node.name }}-tessera
+      hostname: {{ .Values.node_name }}-tessera
       imagePullSecrets:
           - name: {{ .Values.node.imagePullSecret }}
       volumes:
@@ -54,7 +54,7 @@ spec:
             medium: Memory
         - name: tessera-config
           configMap:
-            name: tessera-config-{{ .Values.node.name }}
+            name: tessera-config-{{ .Values.node_name }}
             items:
               - key: tessera-config.json.tmpl
                 path: tessera-config.json.tmpl
@@ -178,7 +178,7 @@ spec:
           mountPath: /docker-entrypoint-initdb.d
         - name: certificates
           mountPath: /secret
-        - name: {{ .Values.node.name }}-mysql
+        - name: {{ .Values.node_name }}-mysql
           mountPath: "/var/lib/mysql"
           subPath: mysql
       - name: tessera
@@ -248,7 +248,7 @@ spec:
         volumeMounts:
           - name: certificates
             mountPath: {{ .Values.node.mountPath }}/crypto/
-          - name: {{ .Values.node.name }}-tessera-pv
+          - name: {{ .Values.node_name }}-tessera-pv
             mountPath: {{ .Values.node.mountPath }}
           - name: tessera-config
             mountPath: {{ .Values.node.mountPath }}/tessera-config.json.tmpl
@@ -256,7 +256,7 @@ spec:
       restartPolicy: Always
   volumeClaimTemplates:
     - metadata:
-        name: {{ .Values.node.name }}-tessera-pv
+        name: {{ .Values.node_name }}-tessera-pv
       spec:
         storageClassName: {{ .Values.storage.storageclassname }}
         accessModes: [ "ReadWriteOnce" ]
@@ -264,7 +264,7 @@ spec:
           requests:
             storage: {{ .Values.storage.storagesize }}
     - metadata:
-        name: {{ .Values.node.name }}-mysql     
+        name: {{ .Values.node_name }}-mysql     
       spec:
         storageClassName: {{ .Values.storage.storageclassname }}    
         accessModes: [ "ReadWriteOnce" ]
