@@ -80,7 +80,7 @@ spec:
       tls: "{{ network.config.tm_tls | upper }}"
       trust: "{{ network.config.tm_trust | upper }}"
     genesis: {{ genesis }}
-    staticnodes:
+    staticnodes: 
       {{ staticnodes }}
     proxy:
       provider: "ambassador"
