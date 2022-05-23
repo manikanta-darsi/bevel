@@ -11,6 +11,7 @@ spec:
   chart:
    spec:
     chart: platforms/quorum/charts/node_quorum_member
+    version: ">=1.0.0"
     sourceRef:
       kind: GitRepository
       name: flux-dev-mani
@@ -28,6 +29,7 @@ spec:
       busybox: busybox
       mysql: mysql/mysql-server:5.7
     node:
+      Name: cmani
       status: default
       consensus: raft
       subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
