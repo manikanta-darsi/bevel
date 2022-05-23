@@ -17,9 +17,6 @@ spec:
       namespace: flux-dev-mani
   values:
     replicaCount: 1
-    metadata:
-      namespace: cmani-quo
-      labels:
     images:
       node: quorumengineering/quorum:21.4.2
       alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
@@ -27,6 +24,7 @@ spec:
       busybox: busybox
       mysql: mysql/mysql-server:5.7
     node:
+      name: cmani
       status: default
       consensus: raft
       subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
