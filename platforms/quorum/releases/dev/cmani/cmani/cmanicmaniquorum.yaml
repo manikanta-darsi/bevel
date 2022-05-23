@@ -21,7 +21,6 @@ spec:
       namespace: cmani-quo
       labels:
     images:
-      node: quorumengineering/quorum:21.4.2
       alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
       tessera: quorumengineering/tessera:21.7.3
       busybox: busybox
@@ -42,6 +41,8 @@ spec:
         tm: 443
         quorum: 21000
         db: 3306
+      dbname: demodb
+      mysqluser: demouser
     vault:
       address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
       secretprefix: secretsv2/data/cmani-quo/crypto/cmani
