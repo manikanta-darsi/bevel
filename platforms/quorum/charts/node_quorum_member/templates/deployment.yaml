@@ -10,20 +10,20 @@ metadata:
   namespace: {{ .Values.metadata.namespace }}
   creationTimestamp: null
   labels:
-    app.kubernetes.io/name: {{ .Values.Node.name }}
+    app.kubernetes.io/name: {{ .Values.node.Name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     {{- include "labels.custom" . | nindent 2 }}
-  name: {{ .Values.Node.name }}
+  name: {{ .Values.node.Name }}
 spec:
-  serviceName: {{ .Values.Node.name }}
+  serviceName: {{ .Values.node.Name }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: consortiumchain
-      service.rpc: {{ .Values.Node.name }}
-      app.kubernetes.io/name: {{ .Values.Node.name }}
+      service.rpc: {{ .Values.node.Name }}
+      app.kubernetes.io/name: {{ .Values.node.Name }}
       helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       app.kubernetes.io/managed-by: {{ .Release.Service }}
       app.kubernetes.io/instance: {{ .Release.Name }}
@@ -33,16 +33,16 @@ spec:
       creationTimestamp: null
       labels:
         app: consortiumchain
-        name: {{ .Values.Node.name }}
-        service.rpc: {{ .Values.Node.name }}
-        app.kubernetes.io/name: {{ .Values.Node.name }}
+        name: {{ .Values.node.Name }}
+        service.rpc: {{ .Values.node.Name }}
+        app.kubernetes.io/name: {{ .Values.node.Name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         {{- include "labels.custom" . | nindent 2 }}
     spec:
       serviceAccountName: {{ .Values.vault.serviceaccountname }}
-      hostname: {{ .Values.Node.name }}
+      hostname: {{ .Values.node.Name }}
       imagePullSecrets:
           - name: {{ .Values.node.imagePullSecret }}
       volumes:
@@ -52,9 +52,9 @@ spec:
         - name: mysql
           emptyDir:
             medium: Memory
-        - name: {{ .Values.Node.name }}-genesis-volume
+        - name: {{ .Values.node.Name }}-genesis-volume
           configMap:
-            name: genesis-{{ .Values.Node.name }}
+            name: genesis-{{ .Values.node.Name }}
             items:
               - key: genesis.json.base64
                 path: genesis.json.base64
@@ -165,9 +165,9 @@ spec:
           - name: QHOME
             value: {{ .Values.node.mountPath }}
         volumeMounts:
-        - name: {{ .Values.Node.name }}-pv
+        - name: {{ .Values.node.Name }}-pv
           mountPath: {{ .Values.node.mountPath }}
-        - name: {{ .Values.Node.name }}-genesis-volume
+        - name: {{ .Values.node.Name }}-genesis-volume
           mountPath: {{ .Values.node.mountPath }}/genesis
       containers:
       - name: quorum
@@ -253,12 +253,12 @@ spec:
         volumeMounts:
         - name: certificates
           mountPath: {{ .Values.node.mountPath }}/crypto/
-        - name: {{ .Values.Node.name }}-pv
+        - name: {{ .Values.node.Name }}-pv
           mountPath: {{ .Values.node.mountPath }}
       restartPolicy: Always
   volumeClaimTemplates:
     - metadata:
-        name: {{ .Values.Node.name }}-pv
+        name: {{ .Values.node.Name }}-pv
       spec:
         storageClassName: {{ .Values.storage.storageclassname }}
         accessModes: [ "ReadWriteOnce" ]
