@@ -7,6 +7,7 @@ metadata:
     flux.weave.works/automated: "false"
 spec:
   releaseName: {{ component_name }}
+  helmVersion: v3
   chart:
     path: {{ charts_dir }}/tessera_key_mgmt
     git: {{ gitops.git_url }}

@@ -7,6 +7,7 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ component_name }}
+  helmVersion: v3
   chart:
     git: {{ org.gitops.git_url }}
     ref: {{ org.gitops.branch }}
