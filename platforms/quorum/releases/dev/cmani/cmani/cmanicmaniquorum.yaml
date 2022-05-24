@@ -5,7 +5,6 @@ metadata:
   namespace: cmani-quo
   annotations:
     fluxcd.io/automated: "false"
-  helmVersion: v3
 spec:
   releaseName: cmanicmaniquorum
   interval: 1m
