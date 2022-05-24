@@ -42,4 +42,3 @@ spec:
     storage:
       storageclassname: awsstorageclass
       storagesize: 1Gi
-      dbstorage: 1Gi
