@@ -6,6 +6,8 @@ metadata:
   annotations:
     fluxcd.io/automated: "false"
 spec:
+    helmVersion: v3
+spec:
   releaseName: cmanicmaniquorum
   interval: 1m
   chart:
@@ -15,8 +17,6 @@ spec:
       kind: GitRepository
       name: flux-dev-mani
       namespace: flux-dev-mani
-  spec:
-    helmVersion: v3
   values:
     replicaCount: 1
     metadata:
