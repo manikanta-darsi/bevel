@@ -21,7 +21,6 @@ spec:
       namespace: cmani-quo
       labels:
     images:
-      node: quorumengineering/quorum:21.4.2
       alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
       tessera: quorumengineering/tessera:21.7.3
       busybox: busybox
@@ -49,7 +48,7 @@ spec:
       secretprefix: secretsv2/data/cmani-quo/crypto/cmani
       serviceaccountname: vault-auth
       keyname: quorum
-      tm_keyname: tt
+      tm_keyname: tm
       role: vault-role
       authpath: quorumcmani
     tessera:
