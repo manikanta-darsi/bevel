@@ -45,21 +45,6 @@ spec:
         db: 3306
       dbname: demodb
       mysqluser: demouser
-    vault:
-      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
-      secretprefix: secretsv2/data/cmani-quo/crypto/cmani
-      serviceaccountname: vault-auth
-      keyname: quorum
-      tm_keyname: tm
-      role: vault-role
-      authpath: quorumcmani
-    proxy:
-      provider: "ambassador"
-      external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
-      portTM: 443
-      rpcport: 15011
-      quorumport: 15010
-      portRaft: 15012
     storage:
       storageclassname: awsstorageclass
       storagesize: 1Gi
