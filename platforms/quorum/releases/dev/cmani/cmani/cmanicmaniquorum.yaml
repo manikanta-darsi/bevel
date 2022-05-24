@@ -18,9 +18,6 @@ spec:
         namespace: flux-dev-mani
   values:
     replicaCount: 1
-    metadata:
-      namespace: cmani-quo
-      labels: null
     images:
       node: 'quorumengineering/quorum:21.4.2'
       alpineutils: 'index.docker.io/hyperledgerlabs/alpine-utils:1.0'
