@@ -7,10 +7,10 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: cmanicmaniquorum
+  helmVersion: v3
   interval: 1m
   chart:
    spec:
-    helmVersion: v3
     chart: platforms/quorum/charts/node_quorum_member
     sourceRef:
       kind: GitRepository
