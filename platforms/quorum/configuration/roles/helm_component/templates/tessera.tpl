@@ -16,7 +16,7 @@ spec:
       name: flux-{{ network.env.type }}
       namespace: flux-{{ network.env.type }}
   values:
-    node_name: {{ peer.name }}
+    name: {{ peer.name }}
     replicaCount: 1
     metadata:
       namespace: {{ component_ns }}

@@ -37,11 +37,10 @@ images:
   busybox: busybox
   #Provide the valid image name and version for MySQL. This is used as the DB for TM
   mysql: mysql/mysql-server:5.7
-#Provide the name for Quorum node
-node_name:
 node:
   #Provide the name for Quorum node
   #Eg. name: node-1
+  name:
   #Provide the status of the node as default,additional
   #Eg. status: default
   status:
