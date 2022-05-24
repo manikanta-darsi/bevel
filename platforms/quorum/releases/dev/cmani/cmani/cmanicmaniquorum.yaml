@@ -76,3 +76,7 @@ spec:
       rpcport: 15011
       quorumport: 15010
       clientport: 8888
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+      dbstorage: 1Gi
