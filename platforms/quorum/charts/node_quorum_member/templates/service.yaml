@@ -74,5 +74,4 @@ spec:
     protocol: TCP
     port: {{ .Values.node.ports.quorum }}
     targetPort: {{ .Values.node.ports.quorum }}
-  selector:
     service.rpc: {{ .Values.node.name }}
