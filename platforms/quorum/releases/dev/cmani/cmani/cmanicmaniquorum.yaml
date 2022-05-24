@@ -17,10 +17,8 @@ spec:
       namespace: flux-dev-mani
   values:
     replicaCount: 1
-    metadata:
-      namespace: cmani-quo
-      labels:
     images:
+      node: quorumengineering/quorum:21.4.2
       alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
       tessera: quorumengineering/tessera:21.7.3
       busybox: busybox
