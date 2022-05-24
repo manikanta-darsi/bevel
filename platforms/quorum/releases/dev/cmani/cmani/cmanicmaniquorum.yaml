@@ -24,6 +24,18 @@ spec:
       tessera: 'quorumengineering/tessera:21.7.3'
       busybox: busybox
       mysql: 'mysql/mysql-server:5.7'
+    node:
+      name: cmani
+      status: default
+      consensus: raft
+      subject: 'O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB'
+      mountPath: /etc/quorum/qdata
+      imagePullSecret: regcred
+      keystore: keystore_1
+      servicetype: ClusterIP
+      lock: false
+      dbname: demodb
+      mysqluser: demouser
     storage:
       storageclassname: awsstorageclass
       storagesize: 1Gi
