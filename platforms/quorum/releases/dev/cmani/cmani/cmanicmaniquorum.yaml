@@ -37,12 +37,6 @@ spec:
       keystore: keystore_1
       servicetype: ClusterIP
       lock: false
-      ports:
-        rpc: 8546
-        raft: 50401
-        tm: 443
-        quorum: 21000
-        db: 3306
       dbname: demodb
       mysqluser: demouser
     storage:
