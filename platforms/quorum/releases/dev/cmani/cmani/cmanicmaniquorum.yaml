@@ -4,7 +4,7 @@ metadata:
   name: cmanicmaniquorum
   namespace: cmani-quo
   annotations:
-    fluxcd.io/automated: "true"
+    fluxcd.io/automated: "false"
 spec:
   releaseName: cmanicmaniquorum
   interval: 1m
