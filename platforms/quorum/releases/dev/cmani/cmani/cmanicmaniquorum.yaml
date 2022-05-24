@@ -1,16 +1,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: cmanicmaniquorum
+  name: cmanicmanitessera
   namespace: cmani-quo
   annotations:
     fluxcd.io/automated: "false"
 spec:
-  releaseName: cmanicmaniquorum
+  releaseName: cmanicmanitessera
   interval: 1m
   chart:
    spec:
-    chart: platforms/quorum/charts/node_quorum_member
+    chart: platforms/quorum/charts/node_tessera
     sourceRef:
       kind: GitRepository
       name: flux-dev-mani
@@ -20,13 +20,13 @@ spec:
     metadata:
       namespace: cmani-quo
       labels:
-    helmVersion: v3
     images:
       node: quorumengineering/quorum:21.4.2
       alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
-      tessera: quorumengineering/tessera:21.7.3
+      tessera: quorumengineering/tessera:hashicorp-21.7.3
       busybox: busybox
       mysql: mysql/mysql-server:5.7
+      pullPolicy: IfNotPresent
     node:
       name: cmani
       status: default
@@ -39,13 +39,40 @@ spec:
       lock: false
       ports:
         rpc: 8546
-        raft: 50401
         tm: 443
         quorum: 21000
         db: 3306
       dbname: demodb
       mysqluser: demouser
-    storage:
-      storageclassname: awsstorageclass
-      storagesize: 1Gi
-      dbstorage: 1Gi
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretengine: secretsv2
+      tmsecretpath: cmani-quo/crypto/cmani/tm
+      secretprefix: secretsv2/data/cmani-quo/crypto/cmani
+      serviceaccountname: vault-auth
+      keyname: quorum
+      role: vault-role
+      authpath: quorumcmani
+    tessera:
+      dburl: "jdbc:mysql://cmani-tessera:3306/demodb"
+      dbusername: demouser
+      url: "https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:443"
+      clienturl: "http://cmani-tessera:8888" #TODO: Enable tls strict for q2t
+      othernodes:
+        - url: https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://mmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      tls: "STRICT"
+      trust: "TOFU"
+    genesis: ewogICAgImFsbG9jIjogewogICAgICAgICIyY2VmNzYzZDFlN2E4ZDg4NDdjNTBlZmM5YWViNTAwMDMxYWU3MGFiIjogewogICAgICAgICAgICAiYmFsYW5jZSI6ICIxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgImYwZTU2OWE3ZTM4NWZjZDE3ZDdhNGE4OWUzOTFlMzZjYWI1YWFmNGMiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiCiAgICAgICAgfQogICAgfSwKICAgICJjb2luYmFzZSI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgImNvbmZpZyI6IHsKICAgICAgICAiYnl6YW50aXVtQmxvY2siOiAwLAogICAgICAgICJjaGFpbklkIjogMTAsCiAgICAgICAgImNvbnN0YW50aW5vcGxlQmxvY2siOiAwLAogICAgICAgICJlaXAxNTBCbG9jayI6IDAsCiAgICAgICAgImVpcDE1MEhhc2giOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwKICAgICAgICAiZWlwMTU1QmxvY2siOiAwLAogICAgICAgICJlaXAxNThCbG9jayI6IDAsCiAgICAgICAgImhvbWVzdGVhZEJsb2NrIjogMCwKICAgICAgICAiaXNRdW9ydW0iOiB0cnVlLAogICAgICAgICJwZXRlcnNidXJnQmxvY2siOiAwLAogICAgICAgICJyYWZ0U2Vjb25kcyI6IHRydWUsCiAgICAgICAgInR4blNpemVMaW1pdCI6IDEyOAogICAgfSwKICAgICJkaWZmaWN1bHR5IjogIjB4MCIsCiAgICAiZXh0cmFEYXRhIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAiZ2FzTGltaXQiOiAiMHhFMDAwMDAwMDAwIiwKICAgICJtaXhoYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA2NDc1NzI2MTZjNjU3ODczNjU2NDZjNjU3OCIsCiAgICAibm9uY2UiOiAiMHgwIiwKICAgICJwYXJlbnRIYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAidGltZXN0YW1wIjogIjB4MDAiCn0=
+    staticnodes:
+      [
+    "enode://4c10011c29caed37ec0fac4d38eaaa4288aa575f00b1303bb57bec233da946919693bb4df0985c55453a80f2493ce4851019ccf95c4bdb982774e415377a9a73@cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15010?discport=0&raftport=15012",
+    "enode://1e1e8e0453a6171b14b4c5695a01a3699cc3a732cca2da908b8189ef3f093dbd15e56ace7dcd1d9cc96c97b3b068689da762a9e57ad3143751d7e9393526ae6d@mmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15013?discport=0&raftport=15015"
+]
+    proxy:
+      provider: "ambassador"
+      external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
+      portTM: 443
+      rpcport: 15011
+      quorumport: 15010
+      clientport: 8888
