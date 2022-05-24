@@ -10,6 +10,7 @@ spec:
   interval: 1m
   chart:
    spec:
+    helmVersion: v3
     chart: platforms/quorum/charts/node_quorum_member
     sourceRef:
       kind: GitRepository
@@ -20,7 +21,6 @@ spec:
     metadata:
       namespace: cmani-quo
       labels:
-    helmVersion: v3
     images:
       node: quorumengineering/quorum:21.4.2
       alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
