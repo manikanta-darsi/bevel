@@ -4,10 +4,10 @@ metadata:
   name: cmanicmaniquorum
   namespace: cmani-quo
   annotations:
-    fluxcd.io/automated: "false"
+    fluxcd.io/automated: "true"
 spec:
-  releaseName: cmanicmaniquorum
   helmVersion: v3
+  releaseName: cmanicmaniquorum
   interval: 1m
   chart:
    spec:
