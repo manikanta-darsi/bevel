@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: {{ component_name }}
@@ -7,11 +7,14 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ component_name }}
-  helmVersion: v3
+  interval: 1m
   chart:
-    git: {{ git_url }}
-    ref: {{ git_branch }}
-    path: {{ charts_dir }}/node_tessera  
+   spec:
+    chart: {{ charts_dir }}/node_tessera
+    sourceRef:
+      kind: GitRepository
+      name: flux-{{ network.env.type }}
+      namespace: flux-{{ network.env.type }}
   values:
     replicaCount: 1
     metadata:
@@ -75,8 +78,7 @@ spec:
       tls: "{{ network.config.tm_tls | upper }}"
       trust: "{{ network.config.tm_trust | upper }}"
     genesis: {{ genesis }}
-    staticnodes: 
-      {{ staticnodes }}
+    staticnodes: {{ staticnodes }}
     proxy:
       provider: "ambassador"
       external_url: {{ name }}.{{ external_url }}

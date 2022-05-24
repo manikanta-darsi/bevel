@@ -50,6 +50,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
+    service.rpc: {{ .Values.node.name }}
   name: {{ .Values.node.name }}
 spec:
   selector:
@@ -74,5 +75,3 @@ spec:
     protocol: TCP
     port: {{ .Values.node.ports.quorum }}
     targetPort: {{ .Values.node.ports.quorum }}
-  selector:
-    service.rpc: {{ .Values.node.name }}

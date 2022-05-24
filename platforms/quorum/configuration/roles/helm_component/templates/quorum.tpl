@@ -20,7 +20,6 @@ spec:
     metadata:
       namespace: {{ component_ns }}
       labels:
-    helmVersion: v3
     images:
       node: quorumengineering/quorum:{{ network.version }}
       alpineutils: {{ network.docker.url }}/alpine-utils:1.0
@@ -80,8 +79,7 @@ spec:
       tls: "{{ network.config.tm_tls | upper }}"
       trust: "{{ network.config.tm_trust | upper }}"
     genesis: {{ genesis }}
-    staticnodes:
-      {{ staticnodes }}
+    staticnodes: {{ staticnodes }}
     proxy:
       provider: "ambassador"
       external_url: {{ name }}.{{ external_url }}

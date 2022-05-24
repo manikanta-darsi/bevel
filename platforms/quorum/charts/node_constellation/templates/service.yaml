@@ -55,6 +55,7 @@ spec:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
+    service.rpc: {{ .Values.node.name }}
   type: {{ .Values.node.servicetype }}
   ports:
   - name: wsrpc-listener
@@ -75,5 +76,3 @@ spec:
     protocol: TCP
     port: {{ .Values.node.ports.quorum }}
     targetPort: {{ .Values.node.ports.quorum }}
-  selector:
-    service.rpc: {{ .Values.node.name }}

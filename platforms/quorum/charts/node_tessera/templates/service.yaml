@@ -46,6 +46,7 @@ spec:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
+    service.rpc: {{ .Values.node.name }}-tessera
   type: {{ .Values.node.servicetype }}
   ports:
   - name: tm-manager
@@ -64,5 +65,3 @@ spec:
     protocol: TCP
     port: {{ .Values.node.ports.db }}
     targetPort: {{ .Values.node.ports.db }}
-  selector:
-    service.rpc: {{ .Values.node.name }}-tessera

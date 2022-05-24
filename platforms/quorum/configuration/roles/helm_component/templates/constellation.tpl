@@ -55,8 +55,7 @@ spec:
       role: vault-role
       authpath: quorum{{ name }}
     genesis: {{ genesis }}
-    staticnodes:
-      {{ staticnodes }}
+    staticnodes: {{ staticnodes }}
     constellation:
 {% if network.config.tm_tls == 'strict' %}
       url: https://{{ peer.name }}.{{ external_url }}:{{ peer.transaction_manager.ambassador }}/

@@ -20,7 +20,6 @@ spec:
     metadata:
       namespace: {{ component_ns }}
       labels:
-    helmVersion: v3
     images:
       node: quorumengineering/quorum:{{ network.version }}
       alpineutils: {{ network.docker.url }}/alpine-utils:1.0
