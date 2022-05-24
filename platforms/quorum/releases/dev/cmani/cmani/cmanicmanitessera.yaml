@@ -16,7 +16,6 @@ spec:
       name: flux-dev-mani
       namespace: flux-dev-mani
   values:
-    name: cmani
     replicaCount: 1
     metadata:
       namespace: cmani-quo
@@ -29,6 +28,7 @@ spec:
       mysql: mysql/mysql-server:5.7
       pullPolicy: IfNotPresent
     node:
+      name: cmani
       status: default
       consensus: raft
       subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
@@ -53,22 +53,6 @@ spec:
       keyname: quorum
       role: vault-role
       authpath: quorumcmani
-    tessera:
-      dburl: "jdbc:mysql://cmani-tessera:3306/demodb"
-      dbusername: demouser
-      url: "https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:443"
-      clienturl: "http://cmani-tessera:8888" #TODO: Enable tls strict for q2t
-      othernodes:
-        - url: https://cmani.rc.dev2.aws.blockchaincloudpoc-develop.com
-        - url: https://mmani.rc.dev2.aws.blockchaincloudpoc-develop.com
-      tls: "STRICT"
-      trust: "TOFU"
-    genesis: ewogICAgImFsbG9jIjogewogICAgICAgICIyY2VmNzYzZDFlN2E4ZDg4NDdjNTBlZmM5YWViNTAwMDMxYWU3MGFiIjogewogICAgICAgICAgICAiYmFsYW5jZSI6ICIxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIgogICAgICAgIH0sCiAgICAgICAgImYwZTU2OWE3ZTM4NWZjZDE3ZDdhNGE4OWUzOTFlMzZjYWI1YWFmNGMiOiB7CiAgICAgICAgICAgICJiYWxhbmNlIjogIjEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiCiAgICAgICAgfQogICAgfSwKICAgICJjb2luYmFzZSI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgImNvbmZpZyI6IHsKICAgICAgICAiYnl6YW50aXVtQmxvY2siOiAwLAogICAgICAgICJjaGFpbklkIjogMTAsCiAgICAgICAgImNvbnN0YW50aW5vcGxlQmxvY2siOiAwLAogICAgICAgICJlaXAxNTBCbG9jayI6IDAsCiAgICAgICAgImVpcDE1MEhhc2giOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwKICAgICAgICAiZWlwMTU1QmxvY2siOiAwLAogICAgICAgICJlaXAxNThCbG9jayI6IDAsCiAgICAgICAgImhvbWVzdGVhZEJsb2NrIjogMCwKICAgICAgICAiaXNRdW9ydW0iOiB0cnVlLAogICAgICAgICJwZXRlcnNidXJnQmxvY2siOiAwLAogICAgICAgICJyYWZ0U2Vjb25kcyI6IHRydWUsCiAgICAgICAgInR4blNpemVMaW1pdCI6IDEyOAogICAgfSwKICAgICJkaWZmaWN1bHR5IjogIjB4MCIsCiAgICAiZXh0cmFEYXRhIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAiZ2FzTGltaXQiOiAiMHhFMDAwMDAwMDAwIiwKICAgICJtaXhoYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA2NDc1NzI2MTZjNjU3ODczNjU2NDZjNjU3OCIsCiAgICAibm9uY2UiOiAiMHgwIiwKICAgICJwYXJlbnRIYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsCiAgICAidGltZXN0YW1wIjogIjB4MDAiCn0=
-    staticnodes:
-      [
-    "enode://4c10011c29caed37ec0fac4d38eaaa4288aa575f00b1303bb57bec233da946919693bb4df0985c55453a80f2493ce4851019ccf95c4bdb982774e415377a9a73@cmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15010?discport=0&raftport=15012",
-    "enode://1e1e8e0453a6171b14b4c5695a01a3699cc3a732cca2da908b8189ef3f093dbd15e56ace7dcd1d9cc96c97b3b068689da762a9e57ad3143751d7e9393526ae6d@mmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15013?discport=0&raftport=15015"
-]
     proxy:
       provider: "ambassador"
       external_url: cmani.rc.dev2.aws.blockchaincloudpoc-develop.com

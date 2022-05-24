@@ -1,4 +1,4 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
   name: {{ component_name }}
@@ -7,16 +7,12 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ component_name }}
-  interval: 1m
+  helmVersion: v3
   chart:
-   spec:
-    chart: {{ charts_dir }}/node_tessera
-    sourceRef:
-      kind: GitRepository
-      name: flux-{{ network.env.type }}
-      namespace: flux-{{ network.env.type }}
+    git: {{ git_url }}
+    ref: {{ git_branch }}
+    path: {{ charts_dir }}/node_tessera  
   values:
-    name: {{ peer.name }}
     replicaCount: 1
     metadata:
       namespace: {{ component_ns }}
@@ -29,6 +25,7 @@ spec:
       mysql: mysql/mysql-server:5.7
       pullPolicy: IfNotPresent
     node:
+      name: {{ peer.name }}
 {% if add_new_org %}
 {% if network.config.consensus == 'raft' %}
       peer_id: {{ peer_id | int }}
@@ -40,9 +37,9 @@ spec:
       mountPath: /etc/quorum/qdata
       imagePullSecret: regcred
       keystore: keystore_1
-{% if item.cloud_provider == 'minikube' %}
+{% if item.cloud_provider == 'minikube' %}     
       servicetype: NodePort
-{% else %}
+{% else %}      
       servicetype: ClusterIP
 {% endif %}
       lock: {{ peer.lock | lower }}
@@ -56,7 +53,7 @@ spec:
     vault:
       address: {{ vault.url }}
       secretengine: {{ vault.secret_path | default('secretsv2') }}
-      tmsecretpath: {{ component_ns }}/crypto/{{ peer.name }}/tm
+      tmsecretpath: {{ component_ns }}/crypto/{{ peer.name }}/tm      
       secretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto/{{ peer.name }}
       serviceaccountname: vault-auth
       keyname: quorum
@@ -78,7 +75,7 @@ spec:
       tls: "{{ network.config.tm_tls | upper }}"
       trust: "{{ network.config.tm_trust | upper }}"
     genesis: {{ genesis }}
-    staticnodes:
+    staticnodes: 
       {{ staticnodes }}
     proxy:
       provider: "ambassador"
