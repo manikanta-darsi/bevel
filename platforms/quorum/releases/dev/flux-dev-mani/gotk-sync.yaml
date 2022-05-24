@@ -19,7 +19,7 @@ metadata:
   name: flux-dev-mani
   namespace: flux-dev-mani
 spec:
-  interval: 10m0s
+  interval: 1m0s
   path: ./platforms/quorum/releases/dev
   prune: true
   sourceRef:
