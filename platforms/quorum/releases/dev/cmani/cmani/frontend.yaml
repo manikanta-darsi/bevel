@@ -21,7 +21,7 @@ spec:
       nodePorts:
         port: 8080
         targetPort: 80
-      image: index.docker.io/hyperledgerlabs/bevel-supplychain-frontend:latest
+      image: ghcr.io/hyperledger/bevel-supplychain-frontend:stable
       pullPolicy: Always
       pullSecrets: regcred
       env:
