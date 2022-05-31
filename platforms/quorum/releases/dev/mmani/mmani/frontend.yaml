@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mmani-frontend
+  namespace: mmani-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: mmaniquorum-frontend
+  interval: 1m
+  chart:
+   spec:
+    chart: examples/supplychain-app/charts/frontend
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
+  values:
+    nodeName: mmani-frontend
+    metadata:
+      namespace: mmani-quo
+    replicaCount: 1
+    frontend:
+      serviceType: ClusterIP
+      nodePorts:
+        port: 8080
+        targetPort: 80
+      image: ghcr.io/hyperledger/bevel-supplychain-frontend:stable
+      pullPolicy: Always
+      pullSecrets: regcred
+      env:
+        webserver: https://mmaniapi.rc.dev2.aws.blockchaincloudpoc-develop.com
+    deployment:
+      annotations: {}
+    proxy:
+      provider: ambassador
+      peer_name: mmani
+      external_url_suffix: rc.dev2.aws.blockchaincloudpoc-develop.com
+      ambassador_secret: mmani-ambassador-certs
