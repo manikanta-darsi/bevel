@@ -7,7 +7,6 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ name }}{{ network.type }}-expressapi
-  helmVersion: v3
   interval: 1m
   chart:
    spec:
