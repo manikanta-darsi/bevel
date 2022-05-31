@@ -1,0 +1,52 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mmani-expressapi
+  namespace: mmani-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: mmaniquorum-expressapi
+  interval: 1m
+  chart:
+   spec:
+    chart: examples/supplychain-app/charts/expressapp-quorum
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
+  values:
+    nodeName: mmani-expressapi
+    metadata:
+      namespace: mmani-quo
+    replicaCount: 1
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretprefix: secretsv2/data/mmani-quo/smartContracts
+      serviceaccountname: vault-auth
+      keyname: General
+      role: vault-role
+      authpath: quorummmani
+    images:
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+    expressapp:
+      serviceType: ClusterIP
+      image: index.docker.io/hyperledgerlabs/supplychain_quorum:express_app_latest
+      pullPolicy: Always
+      pullSecrets: regcred
+      nodePorts:
+        port: 3000
+        targetPort: 3000
+        name: tcp
+      env:
+        geth_address: http://mmani.rc.dev2.aws.blockchaincloudpoc-develop.com:15014
+        node_subject: O=Manufacturer,OU=Manufacturer,L=47.38/8.54/Zurich,C=CH
+        node_organization: Manufacturer
+        node_organization_unit: manufacturer
+        protocol: raft
+    proxy:
+      provider: ambassador
+      name: mmani
+      type: quorum
+      external_url_suffix: rc.dev2.aws.blockchaincloudpoc-develop.com
+      peer_name: mmani
