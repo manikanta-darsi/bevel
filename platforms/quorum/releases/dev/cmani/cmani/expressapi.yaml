@@ -24,7 +24,7 @@ spec:
       role: vault-role
       authpath: quorumcmani
     images:
-      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
     expressapp:
       serviceType: ClusterIP
       image: index.docker.io/hyperledgerlabs/supplychain_quorum:express_app_latest
