@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: cmani-expressapi
@@ -6,11 +6,16 @@ metadata:
   annotations:
     fluxcd.io/automated: "false"
 spec:
-  chart:
-    path: examples/supplychain-app/charts/expressapp-quorum
-    git: "https://github.com/manikanta-darsi/bevel.git"
-    ref: "flux"
   releaseName: cmaniquorum-expressapi
+  helmVersion: v3
+  interval: 1m
+  chart:
+   spec:
+    chart: examples/supplychain-app/charts/expressapp-quorum
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
   values:
     nodeName: cmani-expressapi
     metadata:
