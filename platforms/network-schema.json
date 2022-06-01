@@ -9,7 +9,7 @@
           "properties": {
               "type": { "type": "string", "enum": ["fabric","corda", "corda-enterprise", "indy", "quorum", "besu"],"description": "Network type"},
               "env": { "$ref":"#/definitions/shared_environment"},
-              "docker": { "$ref":"#/definitions/shared_docker"}
+              "container_registry": { "$ref":"#/definitions/shared_container_registry" }
           },
           "allOf":[
             {"if": {"properties": { "type": { "const": "fabric" } } },
@@ -77,7 +77,7 @@
              }
             }
           ],
-          "required": [ "type","version","env","docker","organizations" ]
+          "required": [ "type","version","env","container_registry","organizations" ]
         }
     },
     "required": [ "network" ] ,
@@ -119,10 +119,10 @@
           },
           "additionalProperties": false
         },
-        "shared_docker":{
+        "shared_container_registry":{
             "type": "object",
             "properties": {
-              "url": { "type": "string","pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9](?::[0-9]{2,5})?(?:\\/[a-z0-9-]{1,61})*$", "description": "Docker registry url. Must be private registry for Corda Enterprise"},
+              "url": { "type": "string","pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9](?::[0-9]{2,5})?(?:\\/[a-z0-9-]{1,61})*$", "description": "container registry url. Must be private registry for Corda Enterprise"},
               "username": { "type": "string","pattern":"^[a-zA-Z0-9._]+$","description": "Username credential required for login."},
               "password": {"type": "string","description": "Password credential required for login."}
              },
