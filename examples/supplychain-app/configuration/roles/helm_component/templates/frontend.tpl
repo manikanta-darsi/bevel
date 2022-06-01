@@ -25,7 +25,7 @@ spec:
       nodePorts:
         port: {{ peer_frontend_port }}
         targetPort: {{ peer_frontend_targetport }}
-      image: {{ network.ghcr.url }}/bevel-supplychain-frontend:stable
+      image: {{ network.docker.url }}/bevel-supplychain-frontend:stable
       pullPolicy: Always
       pullSecrets: regcred
       env:
