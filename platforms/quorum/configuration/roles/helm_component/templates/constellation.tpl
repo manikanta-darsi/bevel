@@ -22,7 +22,7 @@ spec:
       labels:
     images:
       node: quorumengineering/quorum:{{ network.version }}
-      alpineutils: {{ network.docker.url }}/alpine-utils:1.0
+      alpineutils: {{ network.container_registry.url | lower }}/alpine-utils:1.0
       constellation: quorumengineering/constellation:{{ network.config.tm_version }}
     node:
       name: {{ peer.name }}

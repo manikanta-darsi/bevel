@@ -22,9 +22,9 @@ spec:
       namespace: {{ component_ns }}
       external_url: {{ component_name }}.{{ external_url }}
     image:
-      initContainerName: ghcr.io/hyperledger/alpine-utils:1.0
+      initContainerName: {{ network.container_registry.url | lower }}/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
-      certsContainerName: ghcr.io/hyperledger/bevel-build:jdk8-latest
+      certsContainerName: {{ network.container_registry.url | lower }}/bevel-build:jdk8-latest
       imagePullSecret: regcred
       pullPolicy: IfNotPresent
     vault:

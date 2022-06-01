@@ -22,7 +22,7 @@ spec:
       labels:
     images:
       node: quorumengineering/quorum:{{ network.version }}
-      alpineutils: {{ network.docker.url }}/alpine-utils:1.0
+      alpineutils: {{ network.container_registry.url | lower }}/alpine-utils:1.0
       tessera: quorumengineering/tessera:hashicorp-{{ network.config.tm_version }}
       busybox: busybox
       mysql: mysql/mysql-server:5.7
@@ -40,9 +40,9 @@ spec:
       mountPath: /etc/quorum/qdata
       imagePullSecret: regcred
       keystore: keystore_1
-{% if item.cloud_provider == 'minikube' %}     
+{% if item.cloud_provider == 'minikube' %}
       servicetype: NodePort
-{% else %}      
+{% else %}
       servicetype: ClusterIP
 {% endif %}
       lock: {{ peer.lock | lower }}
@@ -56,7 +56,7 @@ spec:
     vault:
       address: {{ vault.url }}
       secretengine: {{ vault.secret_path | default('secretsv2') }}
-      tmsecretpath: {{ component_ns }}/crypto/{{ peer.name }}/tm      
+      tmsecretpath: {{ component_ns }}/crypto/{{ peer.name }}/tm
       secretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto/{{ peer.name }}
       serviceaccountname: vault-auth
       keyname: quorum

@@ -23,7 +23,7 @@ spec:
       name: {{ component_name }}
       namespace: {{ component_ns }}
     image:
-      initContainerName: {{ network.docker.url }}/alpine-utils:1.0
+      initContainerName: {{ network.container_registry.url | lower }}/alpine-utils:1.0
       node: quorumengineering/quorum:{{ network.version }}
       pullPolicy: IfNotPresent
     acceptLicense: YES

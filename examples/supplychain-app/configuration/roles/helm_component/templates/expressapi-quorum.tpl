@@ -28,7 +28,7 @@ spec:
       role: vault-role
       authpath: quorum{{ name }}
     images:
-      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+      alpineutils: {{ network.container_registry.url | lower }}/alpine-utils:1.0
     expressapp:
       serviceType: ClusterIP
       image: {{ network.docker.url }}/{{ expressapi_image }}
