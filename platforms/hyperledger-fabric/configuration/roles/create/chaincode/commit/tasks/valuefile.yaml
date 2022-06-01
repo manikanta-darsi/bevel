@@ -1,3 +1,9 @@
+##############################################################################################
+#  Copyright Accenture. All Rights Reserved.
+#
+#  SPDX-License-Identifier: Apache-2.0
+##############################################################################################
+
 ---
 ############################################################################################
 # This role creates the commit_chaincode value file
@@ -34,16 +40,29 @@
   set_fact:
     commit_chaincode: "{{ result }}"
 
-- name: "Write all endorsing orgs certificates to vault"
-  include_tasks: write.yaml
-  vars:
-    namespace: "{{ org.name |lower }}-net"
-    vault: "{{ org.vault }}"
-    peers: "{{ organization.services.peers | first }}"
-  loop: "{{ network.organizations }}"
+- name: Get endorsers data
+  set_fact:
+    endorsers_orgs={{ endorsers_orgs|default([]) + [ {'name':endorser.name, 'peercoreaddress':endorser.peers | map(attribute='corepeerAddress') | first } ] }}
+  loop: "{{ approvers }}"
   loop_control:
-    loop_var: organization
-  when: organization.type == 'peer'
+    loop_var: endorser
+
+#####################################################################################################################
+# This task create endorser certs secret
+- name: "Create endorser certs secret"
+  include_role:
+    name: create/k8s_secrets
+  vars: 
+    namespace: "{{ org.name |lower }}-net"
+    component_name: "{{ org.name | lower}}-net"
+    vault: "{{ org.vault }}"
+    kubernetes: "{{ org.k8s }}"
+    org_name: "{{ endorser.name }}"
+    cert: "{{ lookup('file', '{{ endorser.peers | map(attribute=\"certificate\") | first }}') | b64encode }}"
+    check: "endorser_certs"
+  loop: "{{ approvers }}"
+  loop_control:
+    loop_var: endorser
 
 # Nested task for chaincode commit
 - name: "Create value file for chaincode commit"
@@ -63,6 +82,7 @@
     fabrictools_image: "hyperledger/fabric-tools:{{ network.version }}"
     alpine_image: "{{ docker_url }}/alpine-utils:1.0"
     component_chaincode: "{{ peer.chaincode }}"
+    endorsers_list: "{{ endorsers_orgs }}"
     values_dir: "{{playbook_dir}}/../../../{{org.gitops.release_dir}}/{{ org.name | lower }}"
   loop: "{{ org.services.peers }}"
   loop_control:
@@ -75,11 +95,7 @@
     name: "{{ playbook_dir }}/../../shared/configuration/roles/git_push"
   vars:
     GIT_DIR: "{{ playbook_dir }}/../../../"
-    GIT_REPO: "{{ org.gitops.git_repo }}"
-    GIT_USERNAME: "{{ org.gitops.username }}"
-    GIT_EMAIL: "{{ org.gitops.email }}"
-    GIT_PASSWORD: "{{ org.gitops.password }}"
-    GIT_BRANCH: "{{ org.gitops.branch }}"
+    gitops: "{{ org.gitops }}"
     GIT_RESET_PATH: "platforms/hyperledger-fabric/configuration"
     msg: "[ci skip] Pushing chaincode commit files"
   when: commit_chaincode.resources|length == 0

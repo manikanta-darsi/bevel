@@ -1,3 +1,9 @@
+##############################################################################################
+#  Copyright Accenture. All Rights Reserved.
+#
+#  SPDX-License-Identifier: Apache-2.0
+##############################################################################################
+
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -22,7 +28,6 @@ spec:
       helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       app.kubernetes.io/managed-by: {{ .Release.Service }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/managed-by: {{ .Release.Service }}
   strategy:
     type: Recreate
     rollingUpdate: null

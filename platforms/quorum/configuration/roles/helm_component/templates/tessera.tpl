@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: {{ component_name }}
@@ -7,11 +7,14 @@ metadata:
     fluxcd.io/automated: "false"
 spec:
   releaseName: {{ component_name }}
-  helmVersion: v3
+  interval: 1m
   chart:
-    git: {{ git_url }}
-    ref: {{ git_branch }}
-    path: {{ charts_dir }}/node_tessera  
+   spec:
+    chart: {{ charts_dir }}/node_tessera
+    sourceRef:
+      kind: GitRepository
+      name: flux-{{ network.env.type }}
+      namespace: flux-{{ network.env.type }}
   values:
     replicaCount: 1
     metadata:
@@ -20,9 +23,10 @@ spec:
     images:
       node: quorumengineering/quorum:{{ network.version }}
       alpineutils: {{ network.docker.url }}/alpine-utils:1.0
-      tessera: quorumengineering/tessera:{{ network.config.tm_version }}
+      tessera: quorumengineering/tessera:hashicorp-{{ network.config.tm_version }}
       busybox: busybox
       mysql: mysql/mysql-server:5.7
+      pullPolicy: IfNotPresent
     node:
       name: {{ peer.name }}
 {% if add_new_org %}
@@ -44,7 +48,6 @@ spec:
       lock: {{ peer.lock | lower }}
       ports:
         rpc: {{ peer.rpc.port }}
-        raft: {{ peer.raft.port }}
         tm: {{ peer.transaction_manager.port }}
         quorum: {{ peer.p2p.port }}
         db: {{ peer.db.port }}
@@ -52,20 +55,22 @@ spec:
       mysqluser: demouser
     vault:
       address: {{ vault.url }}
-      secretprefix: {{ vault.secret_path | default('secret') }}/{{ component_ns }}/crypto/{{ peer.name }}
+      secretengine: {{ vault.secret_path | default('secretsv2') }}
+      tmsecretpath: {{ component_ns }}/crypto/{{ peer.name }}/tm      
+      secretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto/{{ peer.name }}
       serviceaccountname: vault-auth
       keyname: quorum
-      tm_keyname: transaction
       role: vault-role
       authpath: quorum{{ name }}
     tessera:
-      dburl: "jdbc:mysql://{{ peer.name }}:3306/demodb"
+      dburl: "jdbc:mysql://{{ peer.name }}-tessera:3306/demodb"
       dbusername: demouser
 {% if network.config.tm_tls == 'strict' %}
       url: "https://{{ peer.name }}.{{ external_url }}:{{ peer.transaction_manager.ambassador }}"
 {% else %}
       url: "http://{{ peer.name }}.{{ external_url }}:{{ peer.transaction_manager.ambassador }}"
 {% endif %}
+      clienturl: "http://{{ peer.name }}-tessera:{{ peer.transaction_manager.clientport }}" #TODO: Enable tls strict for q2t
       othernodes:
 {% for tm_node in network.config.tm_nodes %}
         - url: {{ tm_node }}
@@ -73,17 +78,14 @@ spec:
       tls: "{{ network.config.tm_tls | upper }}"
       trust: "{{ network.config.tm_trust | upper }}"
     genesis: {{ genesis }}
-    staticnodes: 
-      {{ staticnodes }}
+    staticnodes: {{ staticnodes }}
     proxy:
       provider: "ambassador"
       external_url: {{ name }}.{{ external_url }}
       portTM: {{ peer.transaction_manager.ambassador }}
       rpcport: {{ peer.rpc.ambassador }}
       quorumport: {{ peer.p2p.ambassador }}
-{% if network.config.consensus == 'raft' %}  
-      portRaft: {{ peer.raft.ambassador }}
-{% endif %}
+      clientport: {{ peer.transaction_manager.clientport }}
     storage:
       storageclassname: {{ storageclass_name }}
       storagesize: 1Gi

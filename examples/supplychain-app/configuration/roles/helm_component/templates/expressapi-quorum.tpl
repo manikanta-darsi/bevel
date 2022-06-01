@@ -1,4 +1,4 @@
-apiVersion: helm.fluxcd.io/v1
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: {{ name }}-expressapi
@@ -6,11 +6,15 @@ metadata:
   annotations:
     fluxcd.io/automated: "false"
 spec:
-  chart:
-    path: {{ component_gitops.chart_source }}/expressapp-quorum
-    git: "{{ component_gitops.git_url }}"
-    ref: "{{ component_gitops.branch }}"
   releaseName: {{ name }}{{ network.type }}-expressapi
+  interval: 1m
+  chart:
+   spec:
+    chart: {{ component_gitops.chart_source }}/expressapp-quorum
+    sourceRef:
+      kind: GitRepository
+      name: flux-{{ network.env.type }}
+      namespace: flux-{{ network.env.type }}
   values:
     nodeName: {{ name }}-expressapi
     metadata:
@@ -18,13 +22,13 @@ spec:
     replicaCount: 1
     vault:
       address: {{ organization_data.vault.url }}
-      secretprefix: {{ organization_data.vault.secret_path | default('secret') }}/{{ component_ns }}/smartContracts
+      secretprefix: {{ organization_data.vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/smartContracts
       serviceaccountname: vault-auth
       keyname: General
       role: vault-role
       authpath: quorum{{ name }}
     images:
-      alpineutils: {{ network.docker.url }}/alpine-utils:1.0
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
     expressapp:
       serviceType: ClusterIP
       image: {{ network.docker.url }}/{{ expressapi_image }}

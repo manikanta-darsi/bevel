@@ -1,16 +1,14 @@
+##############################################################################################
+#  Copyright Accenture. All Rights Reserved.
+#
+#  SPDX-License-Identifier: Apache-2.0
+##############################################################################################
+
 #############################################################################################
 # This role deletes the helm releases and uninstalls Flux
 #############################################################################################
 
 #############################################################################################
-# Uninstalling Flux is needed so that everything is clean
-# remove this if not needed
-- name: Uninstall flux
-  shell: |
-    KUBECONFIG={{ kubernetes.config_file }} kubectl delete secret git-auth-{{ network.env.type }}
-    KUBECONFIG={{ kubernetes.config_file }} helm uninstall flux-{{ network.env.type }}
-    KUBECONFIG={{ kubernetes.config_file }} helm uninstall flux-{{ network.env.type }}-helm-operator
-  ignore_errors: yes
 
 # Remove CRD Helmrelease
 - name: "Deletes all the helmreleases in {{ org_namespace }}"
