@@ -29,7 +29,7 @@ network:
     retry_count: 20                 # Retry count for the checks on Kubernetes cluster
     external_dns: enabled           # Should be enabled if using external-dns for automatic route configuration
 
-  # Docker or ghcr  registry details where images are stored. This will be used to create k8s secrets
+  # Docker registry details where images are stored. This will be used to create k8s secrets
   # Please ensure all required images are built and stored in this registry.
   # Do not check-in docker_password.
   docker:
