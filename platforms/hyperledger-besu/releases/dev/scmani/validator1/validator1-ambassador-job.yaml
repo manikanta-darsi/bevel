@@ -4,7 +4,7 @@ metadata:
   name: validator1-ambassador-job
   namespace: scmani-bes
   annotations:
-    flux.weave.works/automated: "false"      
+    flux.weave.works/automated: "false"
 spec:
   releaseName: validator1-ambassador-job
   chart:
@@ -14,15 +14,16 @@ spec:
   values:
     metadata:
       name: validator1-ambassador-job
-      namespace: scmani-bes      
-    image:      
-      alpineutils: hyperledgerlabs/alpine-utils:1.0
+      namespace: scmani-bes
+    image:
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
       pullSecret: regcred
+      pullPolicy: Always
     network:
       tmtls: True
     node:
       name: validator1
-      clientport: 8888 
+      clientport: 8888
     vault:
       address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
       secretengine: secretsv2
@@ -37,6 +38,6 @@ spec:
       domain_name_pub: validator1.rc.dev2.aws.blockchaincloudpoc-develop.com
       domain_name_priv: validator1.scmani-bes
       domain_name_tessera: validator1-tessera.scmani-bes
-    healthcheck: 
+    healthcheck:
       retries: 10
       sleepTimeAfterError: 2
