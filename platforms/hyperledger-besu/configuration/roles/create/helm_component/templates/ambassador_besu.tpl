@@ -4,7 +4,7 @@ metadata:
   name: {{ component_name }}
   namespace: {{ component_ns }}
   annotations:
-    flux.weave.works/automated: "false"      
+    flux.weave.works/automated: "false"
 spec:
   releaseName: {{ component_name }}
   chart:
@@ -14,15 +14,16 @@ spec:
   values:
     metadata:
       name: {{ component_name }}
-      namespace: {{ component_ns }}      
-    image:      
-      alpineutils: hyperledgerlabs/alpine-utils:1.0
+      namespace: {{ component_ns }}
+    image:
+      alpineutils: {{ network.docker.url }}/alpine-utils:1.0
       pullSecret: regcred
+      pullPolicy: Always
     network:
       tmtls: {{ tls_enabled }}
     node:
       name: {{ name }}
-      clientport: {{ tm_clientport }} 
+      clientport: {{ tm_clientport }}
     vault:
       address: {{ vault.url }}
       secretengine: {{ vault.secret_path | default('secretsv2') }}
@@ -37,6 +38,6 @@ spec:
       domain_name_pub: {{ name }}.{{ external_url_suffix }}
       domain_name_priv: {{ name }}.{{ component_ns }}
       domain_name_tessera: {{ name }}-tessera.{{ component_ns }}
-    healthcheck: 
+    healthcheck:
       retries: 10
       sleepTimeAfterError: 2
