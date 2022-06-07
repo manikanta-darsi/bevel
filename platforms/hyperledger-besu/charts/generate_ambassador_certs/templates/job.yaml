@@ -231,7 +231,6 @@ spec:
               export DIGEST=$(awk '{print $2}' ${NODE_NAME}-certchain-sha256 | sed -n 's/Fingerprint=\(.*\)/\1/p')
               printf '%s\n' "${NODE_NAME}-tessera.${COMPONENT_NS}:${TM_CLIENT_PORT} $DIGEST" "${DOMAIN_NAME_PUB} $DIGEST" > ${NODE_NAME}-knownServer
             fi;
-            tail -f /dev/null
             touch ${MOUNT_PATH}/flag_finish.txt
         volumeMounts:
           - name: certificates
@@ -448,7 +447,7 @@ spec:
                         \"rootca_key\": \"${ROOTCAKEY_FORMAT}\"
                       }
                   }" > payload.json
-
+                tail -f /dev/null
                 # This command copy the rootca certificates to the Vault
                   curl \
                     -H "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
