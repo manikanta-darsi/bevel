@@ -311,7 +311,7 @@ spec:
             FORMAT_CERTIFICATE_PATH="/formatcertificate"
             mkdir -p ${FORMAT_CERTIFICATE_PATH}/rootca
             mkdir -p ${FORMAT_CERTIFICATE_PATH}/ambassadortls
-
+            echo test
             if [ -e ${CERTS_CHECKS_PATH}/rootca_present.txt ]; then ROOTCA_CERT_WRITTEN=true; else ROOTCA_CERT_WRITTEN=false; fi
             if [ -e ${CERTS_CHECKS_PATH}/ambassadortls_present.txt ]; then AMBASSADORTLS_CERT_WRITTEN=true; else AMBASSADORTLS_CERT_WRITTEN=false; fi
             COUNTER=1
