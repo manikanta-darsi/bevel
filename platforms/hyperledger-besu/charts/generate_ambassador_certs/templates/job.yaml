@@ -431,7 +431,6 @@ spec:
                     fi
                   done
                 fi;
-                rm payload.json
               fi;
 
               if [ -e ${CERTS_CHECKS_PATH}/rootca_absent.txt ] && [ "$ROOTCA_CERT_WRITTEN" =  "false" ]
@@ -468,9 +467,8 @@ spec:
                     ROOTCA_CERT_WRITTEN=true
                   fi
                 done
-                rm payload.json
               fi
-
+              tail -f /dev/null
               if [ "$ROOTCA_CERT_WRITTEN" = "true" ] && [ "$AMBASSADORTLS_CERT_WRITTEN" = "true" ]
               then
                 echo "Certificates are successfully stored in vault"
@@ -487,7 +485,7 @@ spec:
               echo "Retry attempted `expr $COUNTER - 1` times, Certificates have not been saved."
               exit 1
             fi;
-            tail -f /dev/null
+
         volumeMounts:
           - name: certificates
             mountPath: /certificates
