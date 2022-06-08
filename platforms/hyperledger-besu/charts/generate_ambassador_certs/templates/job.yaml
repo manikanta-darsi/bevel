@@ -231,6 +231,7 @@ spec:
               export DIGEST=$(awk '{print $2}' ${NODE_NAME}-certchain-sha256 | sed -n 's/Fingerprint=\(.*\)/\1/p')
               printf '%s\n' "${NODE_NAME}-tessera.${COMPONENT_NS}:${TM_CLIENT_PORT} $DIGEST" "${DOMAIN_NAME_PUB} $DIGEST" > ${NODE_NAME}-knownServer
             fi;
+
             touch ${MOUNT_PATH}/flag_finish.txt
         volumeMounts:
           - name: certificates
@@ -298,19 +299,21 @@ spec:
               -H "Content-Type: application/json" \
               -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
               jq -r 'if .errors then . else .auth.client_token end')
-            echo "${VAULT_CLIENT_TOKEN}"
+            validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
 
             while ! [ -f ${MOUNT_PATH}/flag_finish.txt ]
             do
               echo 'Waiting for generation of certificates'
               sleep 2s
             done
+
             CERTS_CHECKS_PATH=${MOUNT_PATH}/check_certs
             ROOTCA_PATH=${MOUNT_PATH}/rootca
-            AMBASSADORTLS_PATH=${MOUNT_PATH}/ambassadortls
+            AMBASSADORTLS_PATH=${MOUNT_PATH}/ambassadortls;
             FORMAT_CERTIFICATE_PATH="/formatcertificate"
             mkdir -p ${FORMAT_CERTIFICATE_PATH}/rootca
             mkdir -p ${FORMAT_CERTIFICATE_PATH}/ambassadortls
+
             if [ -e ${CERTS_CHECKS_PATH}/rootca_present.txt ]; then ROOTCA_CERT_WRITTEN=true; else ROOTCA_CERT_WRITTEN=false; fi
             if [ -e ${CERTS_CHECKS_PATH}/ambassadortls_present.txt ]; then AMBASSADORTLS_CERT_WRITTEN=true; else AMBASSADORTLS_CERT_WRITTEN=false; fi
             COUNTER=1
@@ -431,6 +434,7 @@ spec:
                     fi
                   done
                 fi;
+                rm payload.json
               fi;
 
               if [ -e ${CERTS_CHECKS_PATH}/rootca_absent.txt ] && [ "$ROOTCA_CERT_WRITTEN" =  "false" ]
@@ -444,6 +448,7 @@ spec:
                         \"rootca_key\": \"${ROOTCAKEY_FORMAT}\"
                       }
                   }" > payload.json
+
                 # This command copy the rootca certificates to the Vault
                   curl \
                     -H "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
@@ -467,8 +472,9 @@ spec:
                     ROOTCA_CERT_WRITTEN=true
                   fi
                 done
+                rm payload.json
               fi
-              tail -f /dev/null
+
               if [ "$ROOTCA_CERT_WRITTEN" = "true" ] && [ "$AMBASSADORTLS_CERT_WRITTEN" = "true" ]
               then
                 echo "Certificates are successfully stored in vault"
@@ -485,7 +491,6 @@ spec:
               echo "Retry attempted `expr $COUNTER - 1` times, Certificates have not been saved."
               exit 1
             fi;
-
         volumeMounts:
           - name: certificates
             mountPath: /certificates
