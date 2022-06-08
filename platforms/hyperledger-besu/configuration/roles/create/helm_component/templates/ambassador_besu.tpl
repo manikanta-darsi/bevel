@@ -18,7 +18,7 @@ spec:
     image:
       alpineutils: {{ network.docker.url }}/alpine-utils:1.0
       pullSecret: regcred
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
     network:
       tmtls: {{ tls_enabled }}
     node:
