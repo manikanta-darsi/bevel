@@ -434,9 +434,8 @@ spec:
                     fi
                   done
                 fi;
-                rm payload.json
               fi;
-
+              tail -f /dev/null
               if [ -e ${CERTS_CHECKS_PATH}/rootca_absent.txt ] && [ "$ROOTCA_CERT_WRITTEN" =  "false" ]
               then
                 # this command creates the json with the data that will be saved in the vault
