@@ -308,7 +308,7 @@ spec:
 
             CERTS_CHECKS_PATH=${MOUNT_PATH}/check_certs
             ROOTCA_PATH=${MOUNT_PATH}/rootca
-            AMBASSADORTLS_PATH=${MOUNT_PATH}/ambassadortls;
+            AMBASSADORTLS_PATH=${MOUNT_PATH}/ambassadortls
             FORMAT_CERTIFICATE_PATH="/formatcertificate"
             mkdir -p ${FORMAT_CERTIFICATE_PATH}/rootca
             mkdir -p ${FORMAT_CERTIFICATE_PATH}/ambassadortls
