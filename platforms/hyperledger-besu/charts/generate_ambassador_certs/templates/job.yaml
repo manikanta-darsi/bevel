@@ -305,7 +305,6 @@ spec:
               echo 'Waiting for generation of certificates'
               sleep 2s
             done
-
             CERTS_CHECKS_PATH=${MOUNT_PATH}/check_certs
             ROOTCA_PATH=${MOUNT_PATH}/rootca
             AMBASSADORTLS_PATH=${MOUNT_PATH}/ambassadortls
