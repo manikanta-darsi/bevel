@@ -258,7 +258,7 @@ spec:
           value: "{{ $.Values.network.tmtls }}"
         - name: MOUNT_PATH
           value: "/certificates"
-        command: ["/bin/bash", "-c"]
+        command: ["sh", "-c"]
         args:
           - |-
             apk update && apk add jq curl;
