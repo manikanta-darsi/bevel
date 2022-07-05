@@ -23,10 +23,10 @@ metadata:
       {{ $k }}: {{ $v | quote }}
     {{- end }}
     {{- end }}
-    {{- end }}     
+    {{- end }}
 spec:
   updateStrategy:
-    type: RollingUpdate 
+    type: RollingUpdate
   serviceName: "{{ $.Values.peer.name }}"
   replicas: 1
   selector:
@@ -44,7 +44,7 @@ spec:
         app.kubernetes.io/name: {{ $.Values.peer.name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         app.kubernetes.io/instance: {{ .Release.Name }}
-    spec:   
+    spec:
       serviceAccountName: {{ $.Values.vault.serviceaccountname }}
       imagePullSecrets:
         - name: {{ $.Values.vault.imagesecretname }}
@@ -95,7 +95,7 @@ spec:
             -H "Content-Type: application/json" \
             -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
             jq -r 'if .errors then . else .auth.client_token end')
-     
+
           validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
 
           vault_secret_key="${VAULT_SECRET_PREFIX}/tls"
@@ -152,8 +152,8 @@ spec:
               ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
             validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
             PASSWORD=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data.data[\"${vault_data_key}\"]")
-            echo "${PASSWORD}" >> ${MOUNT_PATH}/user_cred 
-          fi            
+            echo "${PASSWORD}" >> ${MOUNT_PATH}/user_cred
+          fi
         volumeMounts:
         {{ if .Values.vault.tls  }}
         - name: vaultca
@@ -209,6 +209,8 @@ spec:
         command: ["sh", "-c"]
         args:
         - |-
+          apk add --no-cache jq bash go
+          mkdir -r /builders/external
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
           peer node start
@@ -229,6 +231,10 @@ spec:
           mountPath: /host/var/run/docker.sock
         - name: certificates
           mountPath: /etc/hyperledger/fabric/crypto
+        - name: {{ $.Values.peer.name }}-externalbuilder
+          mountPath: /builders/external
+        - name: {{ $.Values.peer.name }}-core
+          mountPath: /config/core.yaml:/etc/hyperledger/fabric/core.yaml
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
           readOnly: true
@@ -241,10 +247,10 @@ spec:
             cpu: {{ .Values.config.pod.resources.limits.cpu }}
       - name: grpc-web
         image: "ghcr.io/hyperledger-labs/grpc-web:latest"
-        imagePullPolicy: IfNotPresent        
+        imagePullPolicy: IfNotPresent
         ports:
         - name: grpc-web
-          containerPort: 7443        
+          containerPort: 7443
         env:
         - name: BACKEND_ADDRESS
           value: "{{ $.Values.peer.name }}.{{ $.Values.metadata.namespace }}:{{ $.Values.service.ports.grpc.clusteripport }}"
@@ -268,7 +274,7 @@ spec:
           value: 5m
         - name: USE_WEBSOCKETS
           value: "true"
-        volumeMounts:        
+        volumeMounts:
         - name: certificates
           mountPath: /certs
       volumes:
@@ -303,7 +309,7 @@ spec:
           {{ $k }}: {{ $v | quote }}
         {{- end }}
         {{- end }}
-        {{- end }}   
+        {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: {{ .Values.storage.peer.storageclassname }}
@@ -319,7 +325,7 @@ spec:
           {{ $k }}: {{ $v | quote }}
         {{- end }}
         {{- end }}
-        {{- end }}   
+        {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: {{ .Values.storage.couchdb.storageclassname }}
