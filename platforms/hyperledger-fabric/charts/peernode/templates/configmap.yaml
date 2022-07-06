@@ -75,35 +75,6 @@ data:
           Certificate: cacerts/ca.crt
           OrganizationalUnitIdentifier: {{ $.Values.peer.mspconfig.nodeOUs.ordererOUidentifier.organizationalunitidentifier }}
 ---
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $.Values.peer.name }}-externalbuilder
-  namespace: {{ $.Values.metadata.namespace }}
-  labels:
-    app.kubernetes.io/name: {{ $.Values.peer.name }}-externalbuilder
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    {{- include "labels.custom" . | nindent 2 }}
-data:
-  detect: |
-    #!/bin/sh
-
-    set -euo pipefail
-
-    METADIR=$2
-    # check if the "type" field is set to "external"
-    # crude way without jq which is not in the default fabric peer image
-    TYPE=$(tr -d '\n' < "$METADIR/metadata.json" | awk -F':' '{ for (i = 1; i < NF; i++){ if ($i~/type/) { print $(i+1); break }}}'| cut -d\" -f2)
-
-    if [ "$TYPE" = "external" ]; then
-        exit 0
-    fi
-
-    exit 1
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -747,7 +718,7 @@ data:
         # chaincode. The external builder detection processing will iterate over the
         # builders in the order specified below.
         externalBuilders:
-            - path: /builders/external
+            - path: /root/builders/external
               name: external-builder
             #   propagateEnvironment:
             #      - ENVVAR_NAME_TO_PROPAGATE_FROM_PEER
@@ -941,4 +912,3 @@ data:
 
             # prefix is prepended to all emitted statsd metrics
             prefix:
-
