@@ -209,7 +209,7 @@ spec:
         command: ["sh", "-c"]
         args:
         - |-
-          mkdir $HOME//builders/external
+          mkdir -p $HOME/builders/external
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
           peer node start
