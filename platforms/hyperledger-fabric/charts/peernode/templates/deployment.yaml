@@ -209,7 +209,8 @@ spec:
         command: ["sh", "-c"]
         args:
         - |-
-          mkdir -p $HOME/builders/external
+          apk add --no-cache jq bash go build
+          mkdir -r $HOME/builders/external
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
           peer node start
@@ -230,6 +231,17 @@ spec:
           mountPath: /host/var/run/docker.sock
         - name: certificates
           mountPath: /etc/hyperledger/fabric/crypto
+        - name: {{ $.Values.peer.name }}-externalbuilder
+          mountPath: /root/builders/external/detect.sh
+          subPath: detect.sh
+        - name: {{ $.Values.peer.name }}-externalbuilder
+          mountPath: /root/builders/external/build.sh
+          subPath: build.sh
+        - name: {{ $.Values.peer.name }}-externalbuilder
+          mountPath: /root/builders/external/release.sh
+          subPath: release.sh
+        - name: {{ $.Values.peer.name }}-core
+          mountPath: /config/core.yaml:/etc/hyperledger/fabric/core.yaml
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
           readOnly: true
