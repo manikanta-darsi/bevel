@@ -212,6 +212,7 @@ spec:
           apk add --no-cache jq bash go build
           mkdir -r $HOME/builders/external
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
+          cp /etc/hyperledger/fabric/core/core.yaml  /etc/hyperledger/fabric/core.yaml
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
           peer node start
         ports:
@@ -232,7 +233,7 @@ spec:
         - name: certificates
           mountPath: /etc/hyperledger/fabric/crypto
         - name: core
-          mountPath: /etc/hyperledger/fabric/core.yaml
+          mountPath: /etc/hyperledger/fabric/core
           readOnly: false
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
