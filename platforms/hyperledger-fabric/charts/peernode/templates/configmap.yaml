@@ -644,7 +644,7 @@ data:
         # builders in the order specified below.
         externalBuilders:
             - path: /builders/external
-               name: external-builder
+              name: external-builder
             #   propagateEnvironment:
             #      - ENVVAR_NAME_TO_PROPAGATE_FROM_PEER
             #      - GOPROXY
