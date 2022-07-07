@@ -214,6 +214,8 @@ spec:
 
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
           cp /etc/hyperledger/fabric/core/core.yaml  /etc/hyperledger/fabric/core.yaml
+          cp /$HOME/builders/detect/detect.sh /etc/hyperledger/fabric/external-builder
+          cp /$HOME/builders/release/release.sh /etc/hyperledger/fabric/external-builder
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
           peer node start
         ports:
@@ -236,11 +238,14 @@ spec:
         - name: core
           mountPath: /etc/hyperledger/fabric/core
           readOnly: false
-        - name: builders
-          mountPath: /root/builders/external
-          subPath: build.sh
-          subPath: release.sh
-          subPath: detect.sh
+        - name: detect
+          mountPath: /root/builders/detect
+          readOnly: false
+        - name: release
+          mountPath: /root/builders/release
+          readOnly: false
+        - name: build
+          mountPath: /root/builders/build
           readOnly: false
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
@@ -312,15 +317,25 @@ spec:
           items:
             - key: core.yaml
               path: core.yaml
-      - name: builders
+      - name: detect
         configMap:
           name: {{ $.Values.peer.name }}-externalbuilder
           defaultMode: 0775
           items:
             - key: detect.sh
               path: detect.sh
+      - name: build
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0775
+          items:
             - key: build.sh
               path: build.sh
+      - name: release
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0775
+          items:
             - key: release.sh
               path: release.sh
   volumeClaimTemplates:
