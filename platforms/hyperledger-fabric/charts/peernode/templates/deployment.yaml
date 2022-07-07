@@ -233,7 +233,7 @@ spec:
         - name: certificates
           mountPath: /etc/hyperledger/fabric/crypto
         - name: core
-          mountPath: /etc/hyperledger/fabric/core
+          mountPath: /etc/hyperledger/fabric/core.yaml
           readOnly: false
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
@@ -301,7 +301,10 @@ spec:
       - name: core
         configMap:
           name: {{ $.Values.peer.name }}-core
-          defaultMode: 0777
+          defaultMode: 0775
+          items:
+            - key: core.yaml
+              path: core.yaml
   volumeClaimTemplates:
   #Lables are not being taken by Kubernetes as it dynamically creates PVC
   - metadata:
