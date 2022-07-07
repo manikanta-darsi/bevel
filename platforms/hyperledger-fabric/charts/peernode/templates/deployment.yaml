@@ -241,9 +241,11 @@ spec:
           readOnly: false
         - name: release
           mountPath: /root/builders/external
+          subPath: release.sh
           readOnly: false
         - name: build
           mountPath: /root/builders/external
+          subPath: build.sh
           readOnly: false
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
