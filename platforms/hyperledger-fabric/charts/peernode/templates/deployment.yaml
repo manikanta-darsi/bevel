@@ -231,7 +231,7 @@ spec:
           mountPath: /host/var/run/docker.sock
         - name: certificates
           mountPath: /etc/hyperledger/fabric/crypto
-        - name: core.yaml
+        - name: core
           mountPath: /etc/hyperledger/fabric/
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
@@ -296,7 +296,7 @@ spec:
           items:
             - key: mspconfig
               path: mspconfig
-      - name: core.yaml
+      - name: core
         configMap:
           name: {{ $.Values.peer.name }}-core
           defaultMode: 0775
