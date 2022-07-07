@@ -718,7 +718,7 @@ data:
         # chaincode. The external builder detection processing will iterate over the
         # builders in the order specified below.
         externalBuilders:
-            - path: /etc/hyperledger/fabric/external-builder
+            - path: /etc/hyperledger/fabric/external-builder/bin
               name: external-builder
             #   propagateEnvironment:
             #      - ENVVAR_NAME_TO_PROPAGATE_FROM_PEER

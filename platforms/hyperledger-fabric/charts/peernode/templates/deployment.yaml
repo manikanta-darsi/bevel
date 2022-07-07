@@ -211,11 +211,12 @@ spec:
         - |-
           apk add --no-cache jq bash go build
           mkdir -p $HOME/builders/
-
+          mkdir -p /etc/hyperledger/fabric/external-builder/bin
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
           cp /etc/hyperledger/fabric/core/core.yaml  /etc/hyperledger/fabric/core.yaml
-          cp /$HOME/builders/detect/detect.sh /etc/hyperledger/fabric/external-builder
-          cp /$HOME/builders/release/release.sh /etc/hyperledger/fabric/external-builder
+          cp /$HOME/builders/detect/detect.sh /etc/hyperledger/fabric/external-builder/bin
+          cp /$HOME/builders/release/release.sh /etc/hyperledger/fabric/external-builder/bin
+          cp /$HOME/builders/build/build.sh /etc/hyperledger/fabric/external-builder/bin
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
           peer node start
         ports:
