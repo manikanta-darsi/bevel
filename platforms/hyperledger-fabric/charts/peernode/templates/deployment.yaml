@@ -210,7 +210,8 @@ spec:
         args:
         - |-
           apk add --no-cache jq bash go build
-          mkdir -p $HOME/builders/external
+          mkdir -p $HOME/builders/
+
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
           cp /etc/hyperledger/fabric/core/core.yaml  /etc/hyperledger/fabric/core.yaml
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
@@ -236,13 +237,13 @@ spec:
           mountPath: /etc/hyperledger/fabric/core
           readOnly: false
         - name: detect
-          mountPath: /root/builders/external/detect.sh
+          mountPath: /root/builders/external
           readOnly: false
         - name: release
-          mountPath: /root/builders/external/release.sh
+          mountPath: /root/builders/external
           readOnly: false
         - name: build
-          mountPath: /root/builders/external/build.sh
+          mountPath: /root/builders/external
           readOnly: false
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
