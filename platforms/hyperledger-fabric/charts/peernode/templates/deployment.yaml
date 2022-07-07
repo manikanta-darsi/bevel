@@ -236,16 +236,11 @@ spec:
         - name: core
           mountPath: /etc/hyperledger/fabric/core
           readOnly: false
-        - name: detect
-          mountPath: /root/builders/external
-          readOnly: false
-        - name: release
-          mountPath: /root/builders/external
-          subPath: release.sh
-          readOnly: false
-        - name: build
+        - name: builders
           mountPath: /root/builders/external
           subPath: build.sh
+          subPath: release.sh
+          subPath: detect.sh
           readOnly: false
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
@@ -317,25 +312,15 @@ spec:
           items:
             - key: core.yaml
               path: core.yaml
-      - name: detect
+      - name: builders
         configMap:
           name: {{ $.Values.peer.name }}-externalbuilder
           defaultMode: 0775
           items:
             - key: detect.sh
               path: detect.sh
-      - name: build
-        configMap:
-          name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
-          items:
             - key: build.sh
               path: build.sh
-      - name: release
-        configMap:
-          name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
-          items:
             - key: release.sh
               path: release.sh
   volumeClaimTemplates:
