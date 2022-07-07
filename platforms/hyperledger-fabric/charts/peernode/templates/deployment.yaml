@@ -232,7 +232,7 @@ spec:
         - name: certificates
           mountPath: /etc/hyperledger/fabric/crypto
         - name: core.yaml
-          mountPath: /etc/hyperledger/fabric/core.yaml
+          mountPath: /etc/hyperledger/fabric/
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
           readOnly: true
