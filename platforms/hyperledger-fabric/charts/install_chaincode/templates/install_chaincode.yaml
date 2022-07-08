@@ -138,12 +138,12 @@ spec:
 
           # GIT user creds
           vault_secret_key={{ $.Values.vault.secretgitprivatekey }}
-          
+
           LOOKUP_SECRET_RESPONSE=$(curl -sS \
               --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
           ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
           validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
-          VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data.data[\"git_password\"]")         
+          VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data.data[\"git_password\"]")
           echo "${VALUE_OF_SECRET}" >> ${MOUNT_PATH}/user_cred
 
         volumeMounts:
@@ -165,7 +165,7 @@ spec:
         - |-
           #!/bin/bash sh
           ## Git repository clone for chaincode
-          mkdir -p /root/.ssh/          
+          mkdir -p /root/.ssh/
           apk add curl openssh
           ssh-keyscan {{ $.Values.chaincode.repository.hostname }} > /root/.ssh/known_hosts
           git_password=$(cat /opt/gopath/src/github.com/hyperledger/fabric/crypto/user_cred)
@@ -198,7 +198,7 @@ spec:
 
           elif [ ${CC_RUNTIME_LANGUAGE} = "java" ]
           then
-            ## Copying desired chaincode to a location 
+            ## Copying desired chaincode to a location
             mkdir -p $GOPATH/src/github.com/chaincode
             cp -R /tmp/chaincode/{{ $.Values.chaincode.repository.path }}/* $GOPATH/src/github.com/chaincode/
 
@@ -248,7 +248,7 @@ spec:
             echo "Installing Chaincode for ${NETWORK_VERSION}"
             ## Installing chaincode on a peer
             peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -p ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE}
-            echo "Chaincode installed for Fabric v.1.4.X"         
+            echo "Chaincode installed for Fabric v.1.4.X"
           else
 
             ## Checking installed chaincode
@@ -282,6 +282,7 @@ spec:
             #query installed
             echo "peer query installed"
             peer lifecycle chaincode queryinstalled
+            tail -f /dev/null
           fi
         env:
         - name: PEER_NAME
@@ -326,4 +327,3 @@ spec:
         - name: certificates
           mountPath: /opt/gopath/src/github.com/hyperledger/fabric/crypto
           readOnly: true
-
