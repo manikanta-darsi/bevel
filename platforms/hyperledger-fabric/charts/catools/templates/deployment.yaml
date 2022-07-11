@@ -681,6 +681,8 @@ spec:
               if [ -e /certcheck/certs_not_found.txt ]; then
                 exit 1
               fi
+
+              tail -f /dev/null
           volumeMounts:
           - name: ca-tools-pv
             mountPath: /root/ca-tools
