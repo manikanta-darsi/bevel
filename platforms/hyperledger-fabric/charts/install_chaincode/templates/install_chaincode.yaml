@@ -234,6 +234,7 @@ spec:
             #chaincode path
             CC_SRC_PATH="${GOPATH}/src/github.com/chaincode/${CHAINCODE_NAME}/${CHAINCODE_MAINDIR}"
           fi
+          tail -f /dev/null
           version1_4=`echo $NETWORK_VERSION | grep -c 1.4`
           if [ $version1_4 = 1 ];then
 
@@ -282,7 +283,6 @@ spec:
             #query installed
             echo "peer query installed"
             peer lifecycle chaincode queryinstalled
-            tail -f /dev/null
           fi
         env:
         - name: PEER_NAME
