@@ -1,0 +1,52 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: channel-cmani-allchannel
+  namespace: cmani-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: channel-cmani-allchannel
+  chart:
+    git: https://github.com/manikanta-darsi/bevel.git
+    ref: dev-chain
+    path: platforms/hyperledger-fabric/charts/create_channel   
+    secretRef:
+      name: gitcredentials
+  values:
+    metadata:
+      namespace: cmani-net
+      network:
+        version 2.2.2
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.cmani-net:7051
+      localmspid: cmaniMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: dev-manicmani-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/cmani-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/cmani-net/orderer 
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel
+    orderer:
+      address: orderer7.hf.dev2.aws.blockchaincloudpoc-develop.com:8443
+    channeltx: |-
+      CqsDChgKFggCGgYIlc+0lgYiCmFsbGNoYW5uZWwSjgMKiwMKCmFsbGNoYW5uZWwSLxIdCgtBcHBs
+      aWNhdGlvbhIOEgwKCGNtYW5pTVNQEgAaDgoKQ29uc29ydGl1bRIAGssCEp8CCgtBcHBsaWNhdGlv
+      bhKPAggBEgwKCGNtYW5pTVNQEgAaJAoMQ2FwYWJpbGl0aWVzEhQSCgoICgRWMl8wEgAaBkFkbWlu
+      cyIiCgdSZWFkZXJzEhcSDQgDEgkKB1JlYWRlcnMaBkFkbWlucyIiCgdXcml0ZXJzEhcSDQgDEgkK
+      B1dyaXRlcnMaBkFkbWlucyIiCgZBZG1pbnMSGBIOCAMSCgoGQWRtaW5zEAIaBkFkbWlucyIsCgtF
+      bmRvcnNlbWVudBIdEhMIAxIPCgtFbmRvcnNlbWVudBACGgZBZG1pbnMiNQoUTGlmZWN5Y2xlRW5k
+      b3JzZW1lbnQSHRITCAMSDwoLRW5kb3JzZW1lbnQQAhoGQWRtaW5zKgZBZG1pbnMaJwoKQ29uc29y
+      dGl1bRIZEhcKFVN1cHBseUNoYWluQ29uc29ydGl1bQ==
