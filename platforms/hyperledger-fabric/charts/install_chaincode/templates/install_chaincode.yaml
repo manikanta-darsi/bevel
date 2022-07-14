@@ -55,22 +55,22 @@ spec:
           name: {{ $.Values.peer.name }}-externalbuilder
           defaultMode: 0775
           items:
-            - key: detect.sh
-              path: detect.sh
+            - key: detect
+              path: detect
       - name: build
         configMap:
           name: {{ $.Values.peer.name }}-externalbuilder
           defaultMode: 0775
           items:
-            - key: build.sh
-              path: build.sh
+            - key: build
+              path: build
       - name: release
         configMap:
           name: {{ $.Values.peer.name }}-externalbuilder
           defaultMode: 0775
           items:
-            - key: release.sh
-              path: release.sh
+            - key: release
+              path: release
       initContainers:
       - name: certificates-init
         image: {{ $.Values.metadata.images.alpineutils }}
