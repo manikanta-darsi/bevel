@@ -43,6 +43,34 @@ spec:
       - name: certificates
         emptyDir:
           medium: Memory
+      - name: core
+        configMap:
+          name: {{ $.Values.peer.name }}-core
+          defaultMode: 0775
+          items:
+            - key: core.yaml
+              path: core.yaml
+      - name: detect
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0775
+          items:
+            - key: detect.sh
+              path: detect.sh
+      - name: build
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0775
+          items:
+            - key: build.sh
+              path: build.sh
+      - name: release
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0775
+          items:
+            - key: release.sh
+              path: release.sh
       initContainers:
       - name: certificates-init
         image: {{ $.Values.metadata.images.alpineutils }}
@@ -327,3 +355,15 @@ spec:
         - name: certificates
           mountPath: /opt/gopath/src/github.com/hyperledger/fabric/crypto
           readOnly: true
+        - name: core
+          mountPath: /etc/hyperledger/fabric/core
+          readOnly: false
+        - name: detect
+          mountPath: /builders/external/bin/detect
+          readOnly: false
+        - name: release
+          mountPath: /builders/external/bin/release
+          readOnly: false
+        - name: build
+          mountPath: /builders/external/bin/build
+          readOnly: false
