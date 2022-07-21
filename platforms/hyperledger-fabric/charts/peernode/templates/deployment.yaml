@@ -4,92 +4,65 @@
 #  SPDX-License-Identifier: Apache-2.0
 ##############################################################################################
 
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
-  name: installchaincode-{{ $.Values.peer.name }}-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}
+  name: {{ $.Values.peer.name }}
   namespace: {{ $.Values.metadata.namespace }}
   labels:
-    app: installchaincode-{{ $.Values.peer.name }}-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}
-    app.kubernetes.io/name: installchaincode-{{ $.Values.chaincode.name }}{{ $.Values.chaincode.version }}
+    name: {{ $.Values.peer.name }}
+    app.kubernetes.io/name: {{ $.Values.peer.name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     {{- include "labels.custom" . | nindent 2 }}
+  annotations:
+    {{- if $.Values.annotations }}
+    {{- range $key, $value := $.Values.annotations.deployment }}
+    {{- range $k, $v := $value }}
+      {{ $k }}: {{ $v | quote }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
 spec:
-  backoffLimit: 6
+  updateStrategy:
+    type: RollingUpdate
+  serviceName: "{{ $.Values.peer.name }}"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $.Values.peer.name }}
+      app.kubernetes.io/name: {{ $.Values.peer.name }}
+      helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
-        app: installchaincode-{{ $.Values.peer.name }}-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}
-        app.kubernetes.io/name: installchaincode-{{ $.Values.chaincode.name }}{{ $.Values.chaincode.version }}
+        app: {{ $.Values.peer.name }}
+        app.kubernetes.io/name: {{ $.Values.peer.name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-        app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      restartPolicy: OnFailure
       serviceAccountName: {{ $.Values.vault.serviceaccountname }}
       imagePullSecrets:
         - name: {{ $.Values.vault.imagesecretname }}
-      volumes:
-      {{ if .Values.vault.tls  }}
-      - name: vaultca
-        secret:
-          secretName: {{ $.Values.vault.tls }}
-          items:
-          - key: ca.crt.pem
-            path: ca-certificates.crt
-      {{ end  }}
-      - name: certificates
-        emptyDir:
-          medium: Memory
-      - name: core
-        configMap:
-          name: {{ $.Values.peer.name }}-core
-          defaultMode: 0775
-          items:
-            - key: core.yaml
-              path: core.yaml
-      - name: detect
-        configMap:
-          name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
-          items:
-            - key: detect
-              path: detect
-      - name: build
-        configMap:
-          name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
-          items:
-            - key: build
-              path: build
-      - name: release
-        configMap:
-          name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
-          items:
-            - key: release
-              path: release
       initContainers:
       - name: certificates-init
-        image: {{ $.Values.metadata.images.alpineutils }}
+        image: {{ $.Values.metadata.images.alpineutils}}
         imagePullPolicy: IfNotPresent
         env:
         - name: VAULT_ADDR
           value: {{ $.Values.vault.address }}
+        - name: VAULT_SECRET_PREFIX
+          value: "{{ $.Values.vault.secretprefix }}"
         - name: KUBERNETES_AUTH_PATH
           value: {{ $.Values.vault.authpath }}
         - name: VAULT_APP_ROLE
           value: {{ $.Values.vault.role }}
-        - name: VAULT_PEER_SECRET_PREFIX
-          value: "{{ $.Values.vault.adminsecretprefix }}"
-        - name: VAULT_ORDERER_SECRET_PREFIX
-          value: "{{ $.Values.vault.orderersecretprefix }}"
         - name: MOUNT_PATH
           value: /secret
-        - name: NETWORK_VERSION
-          value: "{{ $.Values.metadata.network.version }}"
         command: ["sh", "-c"]
         args:
         - |-
@@ -122,27 +95,30 @@ spec:
             -H "Content-Type: application/json" \
             -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
             jq -r 'if .errors then . else .auth.client_token end')
+
           validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
 
-          vault_secret_key="${VAULT_ORDERER_SECRET_PREFIX}/tls"
-          echo "Getting Orderer TLS certificates from Vault using key $vault_secret_key"
+          vault_secret_key="${VAULT_SECRET_PREFIX}/tls"
+          echo "Getting TLS certificates from Vault using key $vault_secret_key"
 
-          OUTPUT_PATH="${MOUNT_PATH}/orderer/tls"
-          LOOKUP_SECRET_RESPONSE=$(curl -sS \
-            --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
-            ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
+          OUTPUT_PATH="${MOUNT_PATH}/tls"
+          LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
 
           validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
 
           TLS_CA_CERT=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["ca.crt"]')
+          TLS_SERVER_CERT=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["server.crt"]')
+          TLS_SERVER_KEY=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data.data["server.key"]')
 
           mkdir -p ${OUTPUT_PATH}
           echo "${TLS_CA_CERT}" >> ${OUTPUT_PATH}/ca.crt
+          echo "${TLS_SERVER_CERT}" >> ${OUTPUT_PATH}/server.crt
+          echo "${TLS_SERVER_KEY}" >> ${OUTPUT_PATH}/server.key
 
-          vault_secret_key="${VAULT_PEER_SECRET_PREFIX}/msp"
+          vault_secret_key="${VAULT_SECRET_PREFIX}/msp"
           echo "Getting MSP certificates from Vault using key $vault_secret_key"
 
-          OUTPUT_PATH="${MOUNT_PATH}/admin/msp"
+          OUTPUT_PATH="${MOUNT_PATH}/msp"
           LOOKUP_SECRET_RESPONSE=$(curl -sS --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
           validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
 
@@ -164,16 +140,20 @@ spec:
           echo "${SIGNCERTS}" >> ${OUTPUT_PATH}/signcerts/server.crt
           echo "${TLSCACERTS}" >> ${OUTPUT_PATH}/tlscacerts/tlsca.crt
 
-          # GIT user creds
-          vault_secret_key={{ $.Values.vault.secretgitprivatekey }}
-
-          LOOKUP_SECRET_RESPONSE=$(curl -sS \
+          # COUCH_DB CREDENTIALS
+          echo "Getting couch db credentials"
+          SECRET_COUCHDB_PASS={{ $.Values.vault.secretcouchdbpass }}
+          if [ ! -z $SECRET_COUCHDB_PASS ]
+          then
+            vault_secret_key=$(echo ${SECRET_COUCHDB_PASS} |awk -F "?" '{print $1}')
+            vault_data_key=$(echo ${SECRET_COUCHDB_PASS} |awk -F "?" '{print $2}')
+            LOOKUP_SECRET_RESPONSE=$(curl -sS \
               --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
-          ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
-          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
-          VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data.data[\"git_password\"]")
-          echo "${VALUE_OF_SECRET}" >> ${MOUNT_PATH}/user_cred
-
+              ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
+            validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
+            PASSWORD=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data.data[\"${vault_data_key}\"]")
+            echo "${PASSWORD}" >> ${MOUNT_PATH}/user_cred
+          fi
         volumeMounts:
         {{ if .Values.vault.tls  }}
         - name: vaultca
@@ -183,189 +163,168 @@ spec:
         - name: certificates
           mountPath: /secret
       containers:
-      - name: installchaincode
-        image: {{ $.Values.metadata.images.fabrictools }}
+      - name: couchdb
+        image: {{ $.Values.metadata.images.couchdb }}
         imagePullPolicy: IfNotPresent
-        stdin: true
-        tty: true
         command: ["sh", "-c"]
         args:
         - |-
-          #!/bin/bash sh
-          ## Git repository clone for chaincode
-          mkdir -p /root/.ssh/
-          mkdir /release
-          mkdir /build
-          apk add curl openssh
-          ssh-keyscan {{ $.Values.chaincode.repository.hostname }} > /root/.ssh/known_hosts
-          git_password=$(cat /opt/gopath/src/github.com/hyperledger/fabric/crypto/user_cred)
-          cd /tmp && git clone https://{{ $.Values.chaincode.repository.git_username }}:$git_password@{{ $.Values.chaincode.repository.url }} -b {{ $.Values.chaincode.repository.branch }} chaincode > git.log 2>&1
-          ## Check if the repository was cloned correctly
-          if [[ ! $? -eq 0 ]];
+          chown -R couchdb:couchdb /opt/couchdb
+          chmod -R 0770 /opt/couchdb/data
+          chmod 664 /opt/couchdb/etc/*.ini
+          chmod 664 /opt/couchdb/etc/local.d/*.ini
+          chmod 775 /opt/couchdb/etc/*.d
+          if [ -e /etc/hyperledger/fabric/crypto/user_cred ] && [ -z $COUCHDB_USER ]
           then
-            cat git.log
+            echo " Error! Please provide username for the password "
             exit 1
-          fi
-          ls
-          echo $GOPATH
-          if [ ${CC_RUNTIME_LANGUAGE} = "golang" ]
+            break
+          elif [ -e /etc/hyperledger/fabric/crypto/user_cred ] && [ ! -z $COUCHDB_USER ]
           then
-            ## Copying desired chaincode to a location relative to $GOPATH/src
-            mkdir -p $GOPATH/src/github.com/chaincode
-            cp -R /tmp/chaincode/{{ $.Values.chaincode.repository.path }}/* $GOPATH/src/github.com/chaincode/
-
-            # Get dependencies
-            mkdir -p $GOPATH/bin && curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            cd $GOPATH/src/github.com/chaincode && dep ensure
-
-            #chaincode path
-            CC_SRC_PATH="github.com/chaincode/${CHAINCODE_NAME}/${CHAINCODE_MAINDIR}"
-
-            if ! [ -d "vendor" ];then
-              GO111MODULE=on go mod vendor
-              CC_SRC_PATH="${PWD}"
-            fi
-
-          elif [ ${CC_RUNTIME_LANGUAGE} = "java" ]
+            export COUCHDB_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
+            break
+          elif [ ! -e /etc/hyperledger/fabric/crypto/user_cred ] && [ ! -z $COUCHDB_USER ]
           then
-            ## Copying desired chaincode to a location
-            mkdir -p $GOPATH/src/github.com/chaincode
-            cp -R /tmp/chaincode/{{ $.Values.chaincode.repository.path }}/* $GOPATH/src/github.com/chaincode/
-
-            # Get dependencies
-            apk add openjdk8
-            java -version
-            apk add gradle
-            gradle -v
-            cd $GOPATH/src/github.com/chaincode && dep ensure
-
-            CC_SRC_PATH="/$GOPATH/src/github.com/chaincode/"
-
-            echo "CC_SRC_PATH= $CC_SRC_PATH"
-            current_path=`pwd`
-            echo $current_path
-
-            echo "Compiling Java code..."
-            chmod +x gradlew
-            ./gradlew installDist --stacktrace
-            cd $current_path
-            echo "Finished compiling Java code"
-
-            #chaincode path
-            CC_SRC_PATH=$CC_SRC_PATH/build/install/${CHAINCODE_NAME}
-
-            echo $CC_SRC_PATH
-          elif [ ${CC_RUNTIME_LANGUAGE} = "node" ]
-          then
-            ## Copying desired chaincode to a location relative to $GOPATH/src
-            mkdir -p $GOPATH/src/github.com/chaincode
-            cp -R /tmp/chaincode/{{ $.Values.chaincode.repository.path }}/* $GOPATH/src/github.com/chaincode/
-
-            #chaincode path
-            CC_SRC_PATH="${GOPATH}/src/github.com/chaincode/${CHAINCODE_NAME}/${CHAINCODE_MAINDIR}"
-          fi
-          tail -f /dev/null
-          version1_4=`echo $NETWORK_VERSION | grep -c 1.4`
-          if [ $version1_4 = 1 ];then
-
-            ## Checking installed chaincode
-            INSTALLED=$(peer chaincode list --installed | grep "Name: ${CHAINCODE_NAME}, Version: ${CHAINCODE_VERSION},")
-            if [ -n "${INSTALLED}" ]
-            then
-              echo "chaincode ${CHAINCODE_NAME} version ${CHAINCODE_VERSION} is installed, skipping... "
-              exit 0
-            fi
-
-            echo "Installing Chaincode for ${NETWORK_VERSION}"
-            ## Installing chaincode on a peer
-            peer chaincode install -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -p ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE}
-            echo "Chaincode installed for Fabric v.1.4.X"
+            echo " Error! Please provide password for username $COUCHDB_USER "
+            exit 1
+            break
           else
-
-            ## Checking installed chaincode
-            INSTALLED=$(peer lifecycle chaincode queryinstalled -O json | jq '.installed_chaincodes?' | \
-              jq --arg CCLABEL "${CHAINCODE_NAME}_${CHAINCODE_VERSION}" '.[]? | select(.label==$CCLABEL)')
-            if [ -n "${INSTALLED}" ]
-            then
-              echo "chaincode ${CHAINCODE_NAME}_${CHAINCODE_VERSION} is installed, skipping... "
-              exit 0
-            fi
-
-            echo "Installing Chaincode for ${NETWORK_VERSION}"
-            if [ $PEER_NAME = "peer0" ];then
-              ## packaging chaincode
-              echo "Packaging chaincode for the first peer"
-              peer lifecycle chaincode package ${CHAINCODE_NAME}.tar.gz --path ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE} --label ${CHAINCODE_NAME}_${CHAINCODE_VERSION}
-            else
-              export CORE_PEER_ADDRESS=${PEER0_ADDRESS}
-              echo "Extracting package id"
-              peer lifecycle chaincode queryinstalled > log.txt
-              PACKAGE_ID=$(cat log.txt | grep "${CHAINCODE_NAME}_${CHAINCODE_VERSION}" | sed -n "/${CC_NAME}_${CC_VERSION}/{s/^Package ID: //; s/, Label:.*$//; p;}")
-              echo "Package Id Extracted ${PACKAGE_ID}"
-              peer lifecycle chaincode getinstalledpackage --package-id ${PACKAGE_ID}
-              export CORE_PEER_ADDRESS=${PEER_ADDRESS}
-              export CHAINCODE_NAME=${PACKAGE_ID}
-              echo "installing ${CHAINCODE_NAME} on ${CORE_PEER_ADDRESS}"
-            fi
-            ## Installing Chaincode
-            peer lifecycle chaincode install ${CHAINCODE_NAME}.tar.gz
-            echo "Chaincode installed for Fabric v.2.X"
-            #query installed
-            echo "peer query installed"
-            peer lifecycle chaincode queryinstalled
+            :
           fi
+          tini -- /docker-entrypoint.sh /opt/couchdb/bin/couchdb
+
+        ports:
+        - containerPort: 5984
         env:
-        - name: PEER_NAME
-          value: {{ $.Values.peer.name }}
-        - name: PEER0_ADDRESS
-          value: peer0.{{ $.Values.metadata.namespace }}:7051
-        - name: PEER_ADDRESS
-          value: {{ $.Values.peer.address }}
-        - name: CORE_VM_ENDPOINT
-          value: unix:///host/var/run/docker.sock
-        - name: FABRIC_LOGGING_SPEC
-          value: {{ $.Values.peer.loglevel }}
-        - name: CORE_PEER_ID
-          value: {{ $.Values.peer.name }}.{{ $.Values.metadata.namespace }}
-        - name: CORE_PEER_ADDRESS
-          value: {{ $.Values.peer.address }}
-        - name: CORE_PEER_LOCALMSPID
-          value: {{ $.Values.peer.localmspid }}
-        - name: CORE_PEER_TLS_ENABLED
-          value: "{{ $.Values.peer.tlsstatus }}"
-        - name: CORE_PEER_TLS_ROOTCERT_FILE
-          value: /opt/gopath/src/github.com/hyperledger/fabric/crypto/admin/msp/tlscacerts/tlsca.crt
-        - name: ORDERER_CA
-          value: /opt/gopath/src/github.com/hyperledger/fabric/crypto/orderer/tls/ca.crt
-        - name: ORDERER_URL
-          value: {{ $.Values.orderer.address }}
-        - name: CORE_PEER_MSPCONFIGPATH
-          value: /opt/gopath/src/github.com/hyperledger/fabric/crypto/admin/msp
-        - name: CHAINCODE_NAME
-          value: "{{ $.Values.chaincode.name }}"
-        - name: CHAINCODE_MAINDIR
-          value: "{{ $.Values.chaincode.maindirectory }}"
-        - name: CHAINCODE_VERSION
-          value: "{{ $.Values.chaincode.version }}"
-        - name: CORE_CHAINCODE_BUILDER
-          value: "{{ $.Values.chaincode.builder }}"
-        - name: NETWORK_VERSION
-          value: "{{ $.Values.metadata.network.version }}"
-        - name: CC_RUNTIME_LANGUAGE
-          value: "{{ $.Values.chaincode.lang }}"
+        - name: COUCHDB_USER
+          value: "{{ $.Values.peer.couchdb.username }}"
+        volumeMounts:
+        - name: datadir-couchdb
+          mountPath: /opt/couchdb/data
+        - name: certificates
+          mountPath: /etc/hyperledger/fabric/crypto
+      - name: {{ $.Values.peer.name }}
+        image: {{ $.Values.metadata.images.peer }}
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c"]
+        args:
+        - |-
+          apk add --no-cache jq bash go build
+          mkdir -p /builders/
+          cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
+          export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
+          peer node start
+        ports:
+        - name: grpc
+          containerPort: 7051
+        - name: events
+          containerPort: 7053
+        - name: operations
+          containerPort: 9443
+        envFrom:
+        - configMapRef:
+            name: {{ $.Values.peer.name }}-config
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/hyperledger/production
+        - name: dockersocket
+          mountPath: /host/var/run/docker.sock
+        - name: certificates
+          mountPath: /etc/hyperledger/fabric/crypto
+        - name: {{ $.Values.peer.name }}-msp-config-volume
+          mountPath: /etc/hyperledger/fabric/NodeOUconfig
+          readOnly: true
+        resources:
+          requests:
+            memory: {{ .Values.config.pod.resources.requests.memory }}
+            cpu: {{ .Values.config.pod.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.config.pod.resources.limits.memory }}
+            cpu: {{ .Values.config.pod.resources.limits.cpu }}
+      - name: grpc-web
+        image: "ghcr.io/hyperledger-labs/grpc-web:latest"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: grpc-web
+          containerPort: 7443
+        env:
+        - name: BACKEND_ADDRESS
+          value: "{{ $.Values.peer.name }}.{{ $.Values.metadata.namespace }}:{{ $.Values.service.ports.grpc.clusteripport }}"
+        - name: SERVER_TLS_CERT_FILE
+          value: /certs/tls/server.crt
+        - name: SERVER_TLS_KEY_FILE
+          value: /certs/tls/server.key
+        - name: BACKEND_TLS_CA_FILES
+          value: /certs/tls/ca.crt
+        - name: SERVER_BIND_ADDRESS
+          value: "0.0.0.0"
+        - name: SERVER_HTTP_DEBUG_PORT
+          value: "8080"
+        - name: SERVER_HTTP_TLS_PORT
+          value: "7443"
+        - name: BACKEND_TLS
+          value: "true"
+        - name: SERVER_HTTP_MAX_WRITE_TIMEOUT
+          value: 5m
+        - name: SERVER_HTTP_MAX_READ_TIMEOUT
+          value: 5m
+        - name: USE_WEBSOCKETS
+          value: "true"
         volumeMounts:
         - name: certificates
-          mountPath: /opt/gopath/src/github.com/hyperledger/fabric/crypto
-          readOnly: true
-        - name: core
-          mountPath: /etc/hyperledger/fabric/core
-          readOnly: false
-        - name: detect
-          mountPath: /builders/external/bin/detect
-          readOnly: false
-        - name: release
-          mountPath: /builders/external/bin/release
-          readOnly: false
-        - name: build
-          mountPath: /builders/external/bin/build
-          readOnly: false
+          mountPath: /certs
+      volumes:
+      {{ if .Values.vault.tls  }}
+      - name: vaultca
+        secret:
+          secretName: {{ $.Values.vault.tls }}
+          items:
+          - key: ca.crt.pem
+            path: ca-certificates.crt
+      {{ end }}
+      - name: certificates
+        emptyDir:
+          medium: Memory
+      - name: dockersocket
+        hostPath:
+          path: /var/run/docker.sock
+      - name: {{ $.Values.peer.name }}-msp-config-volume
+        configMap:
+          name: {{ $.Values.peer.name }}-msp-config
+          items:
+            - key: mspconfig
+              path: mspconfig
+  volumeClaimTemplates:
+  #Lables are not being taken by Kubernetes as it dynamically creates PVC
+  - metadata:
+      name: datadir
+      annotations:
+        {{- if $.Values.annotations }}
+        {{- range $key, $value := $.Values.annotations.pvc }}
+        {{- range $k, $v := $value }}
+          {{ $k }}: {{ $v | quote }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.storage.peer.storageclassname }}
+      resources:
+        requests:
+          storage: {{ .Values.storage.peer.storagesize }}
+  - metadata:
+      name: datadir-couchdb
+      annotations:
+        {{- if $.Values.annotations }}
+        {{- range $key, $value := $.Values.annotations.pvc }}
+        {{- range $k, $v := $value }}
+          {{ $k }}: {{ $v | quote }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.storage.couchdb.storageclassname }}
+      resources:
+        requests:
+          storage: {{ .Values.storage.couchdb.storagesize }}
