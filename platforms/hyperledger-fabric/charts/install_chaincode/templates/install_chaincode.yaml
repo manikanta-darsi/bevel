@@ -194,6 +194,8 @@ spec:
           #!/bin/bash sh
           ## Git repository clone for chaincode
           mkdir -p /root/.ssh/
+          mkdir /release
+          mkdir /build
           apk add curl openssh
           ssh-keyscan {{ $.Values.chaincode.repository.hostname }} > /root/.ssh/known_hosts
           git_password=$(cat /opt/gopath/src/github.com/hyperledger/fabric/crypto/user_cred)
@@ -351,6 +353,8 @@ spec:
           value: "{{ $.Values.metadata.network.version }}"
         - name: CC_RUNTIME_LANGUAGE
           value: "{{ $.Values.chaincode.lang }}"
+        - name: CORE_CHAINCODE_EXTRENALBUILDER
+          value: /etc/hyperledger/fabric/core/core.yaml
         volumeMounts:
         - name: certificates
           mountPath: /opt/gopath/src/github.com/hyperledger/fabric/crypto
