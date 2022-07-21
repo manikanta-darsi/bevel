@@ -309,28 +309,28 @@ spec:
       - name: core
         configMap:
           name: {{ $.Values.peer.name }}-core
-          defaultMode: 0775
+          defaultMode: 0777
           items:
             - key: core.yaml
               path: core.yaml
       - name: detect
         configMap:
           name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
+          defaultMode: 0777
           items:
             - key: detect
               path: detect
       - name: build
         configMap:
           name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
+          defaultMode: 0777
           items:
             - key: build
               path: build
       - name: release
         configMap:
           name: {{ $.Values.peer.name }}-externalbuilder
-          defaultMode: 0775
+          defaultMode: 0777
           items:
             - key: release
               path: release
