@@ -314,6 +314,9 @@ spec:
             echo "peer query installed"
             peer lifecycle chaincode queryinstalled
           fi
+        envFrom:
+        - configMapRef:
+            name: {{ $.Values.peer.name }}-config
         env:
         - name: PEER_NAME
           value: {{ $.Values.peer.name }}
