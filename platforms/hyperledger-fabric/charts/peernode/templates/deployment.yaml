@@ -231,6 +231,18 @@ spec:
           mountPath: /host/var/run/docker.sock
         - name: certificates
           mountPath: /etc/hyperledger/fabric/crypto
+        - name: core
+          mountPath: /etc/hyperledger/fabric/core
+          readOnly: false
+        - name: detect
+          mountPath: /builders/external/bin/detect
+          readOnly: false
+        - name: release
+          mountPath: /builders/external/bin/release
+          readOnly: false
+        - name: build
+          mountPath: /builders/external/bin/build
+          readOnly: false
         - name: {{ $.Values.peer.name }}-msp-config-volume
           mountPath: /etc/hyperledger/fabric/NodeOUconfig
           readOnly: true
@@ -294,6 +306,34 @@ spec:
           items:
             - key: mspconfig
               path: mspconfig
+      - name: core
+        configMap:
+          name: {{ $.Values.peer.name }}-core
+          defaultMode: 0777
+          items:
+            - key: core.yaml
+              path: core.yaml
+      - name: detect
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0777
+          items:
+            - key: detect
+              path: detect
+      - name: build
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0777
+          items:
+            - key: build
+              path: build
+      - name: release
+        configMap:
+          name: {{ $.Values.peer.name }}-externalbuilder
+          defaultMode: 0777
+          items:
+            - key: release
+              path: release
   volumeClaimTemplates:
   #Lables are not being taken by Kubernetes as it dynamically creates PVC
   - metadata:
