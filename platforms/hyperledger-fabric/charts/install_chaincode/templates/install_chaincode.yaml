@@ -194,6 +194,7 @@ spec:
           #!/bin/bash sh
           ## Git repository clone for chaincode
           mkdir -p /root/.ssh/
+          nkdir /biulders-ext
           mkdir /release
           mkdir /build
           mkdir -p /builders/external/bin
