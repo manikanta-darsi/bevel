@@ -194,7 +194,7 @@ spec:
           #!/bin/bash sh
           ## Git repository clone for chaincode
           mkdir -p /root/.ssh/
-          mkdir /ccexternal
+          mkdir -p /ccexternal
           mkdir /release
           mkdir /build
           mkdir -p /builders/external/bin
@@ -373,11 +373,11 @@ spec:
           mountPath: /etc/hyperledger/fabric/core
           readOnly: false
         - name: detect
-          mountPath: /ccexternal
+          mountPath: /ccexternal/detect
           readOnly: false
         - name: release
-          mountPath: /ccexternal
+          mountPath: /ccexternal/release
           readOnly: false
         - name: build
-          mountPath: /ccexternal
+          mountPath: /ccexternal/build
           readOnly: false

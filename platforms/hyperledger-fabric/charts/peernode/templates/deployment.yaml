@@ -211,6 +211,7 @@ spec:
         - |-
           apk add --no-cache jq bash go build
           mkdir -p /builders/
+          cp /etc/hyperledger/fabric/core/core.yaml /etc/hyperledger/fabric/core.yaml
           cp /etc/hyperledger/fabric/NodeOUconfig/mspconfig  /etc/hyperledger/fabric/crypto/msp/config.yaml
           export CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=`cat /etc/hyperledger/fabric/crypto/user_cred`
           peer node start
