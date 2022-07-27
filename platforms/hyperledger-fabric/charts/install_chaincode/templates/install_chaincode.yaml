@@ -198,6 +198,7 @@ spec:
           mkdir /release
           mkdir /build
           mkdir -p /builders/external/bin
+          chmod 777 /builders/external/bin
           cp /biulders-ext/detect/detect /builders/external/bin
           cp /biulders-ext/release/release /builders/external/bin
           cp /biulders-ext/build/build /builders/external/bin
