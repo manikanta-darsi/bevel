@@ -194,14 +194,14 @@ spec:
           #!/bin/bash sh
           ## Git repository clone for chaincode
           mkdir -p /root/.ssh/
-          nkdir /biulders-ext
+          mkdir /ccexternal
           mkdir /release
           mkdir /build
           mkdir -p /builders/external/bin
           chmod 777 /builders/external/bin
-          cp /biulders-ext/detect/detect /builders/external/bin
-          cp /biulders-ext/release/release /builders/external/bin
-          cp /biulders-ext/build/build /builders/external/bin
+          cp /ccexternal/detect/detect /builders/external/bin
+          cp /ccexternal/release/release /builders/external/bin
+          cp /ccexternal/build/build /builders/external/bin
           cp /etc/hyperledger/fabric/core/core.yaml /etc/hyperledger/fabric/core.yaml
           apk add curl openssh
           ssh-keyscan {{ $.Values.chaincode.repository.hostname }} > /root/.ssh/known_hosts
@@ -373,11 +373,11 @@ spec:
           mountPath: /etc/hyperledger/fabric/core
           readOnly: false
         - name: detect
-          mountPath: /biulders-ext
+          mountPath: /ccexternal
           readOnly: false
         - name: release
-          mountPath: /biulders-ext
+          mountPath: /ccexternal
           readOnly: false
         - name: build
-          mountPath: /biulders-ext
+          mountPath: /ccexternal
           readOnly: false
