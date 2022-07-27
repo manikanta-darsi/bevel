@@ -196,6 +196,11 @@ spec:
           mkdir -p /root/.ssh/
           mkdir /release
           mkdir /build
+          mkdir -p /builders/external/bin
+          cp /biulders-ext/detect/detect /builders/external/bin
+          cp /biulders-ext/release/release /builders/external/bin
+          cp /biulders-ext/build/build /builders/external/bin
+          cp /etc/hyperledger/fabric/core/core.yaml /etc/hyperledger/fabric/core.yaml
           apk add curl openssh
           ssh-keyscan {{ $.Values.chaincode.repository.hostname }} > /root/.ssh/known_hosts
           git_password=$(cat /opt/gopath/src/github.com/hyperledger/fabric/crypto/user_cred)
@@ -366,11 +371,11 @@ spec:
           mountPath: /etc/hyperledger/fabric/core
           readOnly: false
         - name: detect
-          mountPath: /builders/external/bin/detect
+          mountPath: /biulders-ext
           readOnly: false
         - name: release
-          mountPath: /builders/external/bin/release
+          mountPath: /biulders-ext
           readOnly: false
         - name: build
-          mountPath: /builders/external/bin/build
+          mountPath: /biulders-ext
           readOnly: false

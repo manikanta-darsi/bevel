@@ -106,7 +106,7 @@ data:
         # The CHAINCODE_SOURCE_DIR and CHAINCODE_METADATA_DIR should be treated as read only inputs.
         # If the buildpack should be applied to the chaincode source package, detect must return an exit code of 0;
         # any other exit code will indicate that the buildpack should not be applied.
-        CHAINCODE_METADATA_DIR="$2"
+        CHAINCODE_METADATA_DIR="/go/src/github.com/chaincode/supplychain/metadata"
         set -euo pipefail
         # use jq to extract the chaincode type from metadata.json and exit with
         # success if the chaincode type is golang
@@ -129,9 +129,9 @@ data:
         # BUILD_OUTPUT_DIR is the directory where build must place artifacts needed by release and run.
         # The build script should treat the input directories CHAINCODE_SOURCE_DIR and
         # CHAINCODE_METADATA_DIR as read only, but the BUILD_OUTPUT_DIR is writeable.
-        CHAINCODE_SOURCE_DIR="$1"
-        CHAINCODE_METADATA_DIR="$2"
-        BUILD_OUTPUT_DIR="$3"
+        CHAINCODE_SOURCE_DIR="/go/src/github.com/chaincode/supplychain"
+        CHAINCODE_METADATA_DIR="/go/src/github.com/chaincode/supplychain/metadata"
+        BUILD_OUTPUT_DIR="/build"
         set -euo pipefail
         #external chaincodes expect connection.json file in the chaincode package
         if [ ! -f "$CHAINCODE_SOURCE_DIR/connection.json" ]; then
@@ -158,8 +158,8 @@ data:
         # populated by the build program and should be treated as read only input.
         # RELEASE_OUTPUT_DIR is the directory where release must place artifacts to be consumed by the peer.
         set -euo pipefail
-        BUILD_OUTPUT_DIR="$1"
-        RELEASE_OUTPUT_DIR="$2"
+        BUILD_OUTPUT_DIR="/build"
+        RELEASE_OUTPUT_DIR="/release"
         # copy indexes from metadata/* to the output directory
         # if [ -d "$BUILD_OUTPUT_DIR/metadata" ] ; then
         #    cp -a "$BUILD_OUTPUT_DIR/metadata/"* "$RELEASE_OUTPUT_DIR/"
