@@ -1,0 +1,67 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: smani-net-ca-tools
+  namespace: smani-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: smani-net-ca-tools
+  chart:
+    git: https://github.com/manikanta-darsi/bevel.git
+    ref: dev-chain
+    path: platforms/hyperledger-fabric/charts/catools
+    secretRef:
+      name: gitcredentials
+  values:
+    metadata:
+      namespace: smani-net
+      name: ca-tools
+      component_type: orderer
+      org_name: smani
+      proxy: haproxy
+    replicaCount: 1
+
+    image:
+      repository: hyperledger/fabric-ca-tools
+      tag: 1.2.1
+      pullPolicy: IfNotPresent
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      
+    storage:
+      storageclassname: smanisc
+      storagesize: 512Mi
+    
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      authpath: dev-manismani-net-auth
+      secretmsp: secretsv2/data/crypto/ordererOrganizations/smani-net/users/admin/msp
+      secrettls: secretsv2/data/crypto/ordererOrganizations/smani-net/users/admin/tls
+      secretorderer: secretsv2/data/crypto/ordererOrganizations/smani-net/orderers
+      secretpeer: secretsv2/data/crypto/ordererOrganizations/smani-net/peers
+      secretpeerorderertls: secretsv2/data/crypto/ordererOrganizations/smani-net/orderer/tls
+      secretambassador: secretsv2/data/crypto/ordererOrganizations/smani-net/ambassador
+      secretcert: secretsv2/data/crypto/ordererOrganizations/smani-net/ca?ca.smani-net-cert.pem
+      secretkey: secretsv2/data/crypto/ordererOrganizations/smani-net/ca?smani-net-CA.key
+      secretcouchdb: secretsv2/data/credentials/smani-net/couchdb/smani
+      secretconfigfile: secretsv2/data/crypto/ordererOrganizations/smani-net/msp/config
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    healthcheck: 
+      retries: 10
+      sleepTimeAfterError: 2
+
+    
+    org_data:
+      external_url_suffix: hf.dev2.aws.blockchaincloudpoc-develop.com
+      component_subject: O=Orderer,L=51.50/-0.13/London,C=GB
+      cert_subject: O=Orderer/L=51.50,-0.13,London/C=GB
+      component_country: UK
+      component_state: London
+      component_location: London
+      ca_url: ca.smani-net:7054
+
+    orderers:
+      name: orderer7-orderer8-orderer9-
