@@ -370,14 +370,18 @@ spec:
           mountPath: /opt/gopath/src/github.com/hyperledger/fabric/crypto
           readOnly: true
         - name: core
-          mountPath: /etc/hyperledger/fabric/core
+          mountPath: /etc/hyperledger/fabric/core.yaml
+          subPath: core.yaml
           readOnly: false
         - name: detect
           mountPath: /ccexternal/detect
+          subPath: detect
           readOnly: false
         - name: release
           mountPath: /ccexternal/release
+          subPath: release
           readOnly: false
         - name: build
           mountPath: /ccexternal/build
+          subPath: build
           readOnly: false
