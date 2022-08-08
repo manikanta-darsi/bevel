@@ -199,10 +199,6 @@ spec:
           mkdir /build
           mkdir -p /builders/external/bin
           chmod 777 /builders/external/bin
-          cp /ccexternal/detect/detect /builders/external/bin
-          cp /ccexternal/release/release /builders/external/bin
-          cp /ccexternal/build/build /builders/external/bin
-          cp /etc/hyperledger/fabric/core/core.yaml /etc/hyperledger/fabric/core.yaml
           apk add curl openssh
           ssh-keyscan {{ $.Values.chaincode.repository.hostname }} > /root/.ssh/known_hosts
           git_password=$(cat /opt/gopath/src/github.com/hyperledger/fabric/crypto/user_cred)
@@ -374,14 +370,14 @@ spec:
           subPath: core.yaml
           readOnly: false
         - name: detect
-          mountPath: /ccexternal/detect
+          mountPath: /builders/external/bin/detect
           subPath: detect
           readOnly: false
         - name: release
-          mountPath: /ccexternal/release
+          mountPath: /builders/external/bin/release
           subPath: release
           readOnly: false
         - name: build
-          mountPath: /ccexternal/build
+          mountPath: /builders/external/bin/build
           subPath: build
           readOnly: false
