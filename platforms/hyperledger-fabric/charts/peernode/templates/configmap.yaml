@@ -41,7 +41,7 @@ data:
   GODEBUG: "netdns=go"
   CORE_PEER_GOSSIP_SKIPHANDSHAKE: "true"
   CORE_CHAINCODE_BUILDER: "{{ $.Values.peer.builder }}"
-  CORE_CHAINCODE_EXTRENALBUILDER: /etc/hyperledger/fabric/core/core.yaml
+  CORE_CHAINCODE_EXTRENALBUILDER: /etc/hyperledger/fabric/core.yaml
   CHAINCODE_METADATA_DIR: /go/src/github.com/chaincode/supplychain/metadata
   CHAINCODE_SOURCE_DIR: /go/src/github.com/chaincode/supplychain
   BUILD_OUTPUT_DIR: /build
