@@ -37,7 +37,7 @@ compileKotlin {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-websocket:$spring_boot_version")
+    compile("org.springframework.boot","name:spring-boot-starter-websocket:$spring_boot_version")
     compile "io.springfox:springfox-swagger2:$springfox_version"
     compile "io.springfox:springfox-swagger-ui:$springfox_version"
     compile "net.corda:corda-jackson:$corda_release_version"
