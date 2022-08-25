@@ -201,7 +201,7 @@ jobs:
         tags: ${{ env.IMAGE_PATH }}/bevel-corda:${{ steps.vars.outputs.tag }},${{ env.IMAGE_PATH }}/bevel-corda:stable
 
   publish:
-    if: ${{ startsWith(github.ref, 'refs/heads/develop') }}
+    # if: ${{ startsWith(github.ref, 'refs/heads/develop') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
