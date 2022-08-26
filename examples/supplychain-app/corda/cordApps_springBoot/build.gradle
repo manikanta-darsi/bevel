@@ -8,8 +8,8 @@ apply plugin: 'maven-publish'
 buildscript {
     ext {
         corda_release_group = 'net.corda'
-        corda_release_version = '4.7'             
-        corda_gradle_plugins_version = '5.0.12'  
+        corda_release_version = '4.7'
+        corda_gradle_plugins_version = '5.0.12'
         kotlin_version = '1.2.71'
         junit_version = '4.12'
         testng_version = '6.10'
@@ -19,7 +19,7 @@ buildscript {
         spring_boot_gradle_plugin_version = '2.0.2.RELEASE'
         springfox_version = '2.9.2'
         slf4j_version = '1.7.25'
-        log4j_version = '2.11.2'     
+        log4j_version = '2.11.2'
     }
 
     repositories {
@@ -115,7 +115,7 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         rpcSettings {
             address("notary:10011")
             adminAddress("notary:10012")
-           
+
         }
         sshdPort 2222
         cordapps = [
