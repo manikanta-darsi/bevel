@@ -4,6 +4,7 @@ apply plugin: 'net.corda.plugins.cordformation'
 apply plugin: 'net.corda.plugins.quasar-utils'
 apply plugin: 'org.sonarqube'
 apply plugin: 'maven-publish'
+apply plugin: 'spring-boot'
 
 buildscript {
     ext {
@@ -214,7 +215,7 @@ publishing{
         publishContracts(MavenPublication) {
             groupId 'com.supplychain.bcc'
             artifactId 'cordapp-contracts-states'
-            version "${project.version}"
+            version "${project.bootVersion}"
             artifact("cordapp-contracts-states/build/libs/cordapp-contracts-states-$version"+".jar")
         }
     }
