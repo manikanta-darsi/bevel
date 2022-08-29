@@ -4,7 +4,6 @@ apply plugin: 'net.corda.plugins.cordformation'
 apply plugin: 'net.corda.plugins.quasar-utils'
 apply plugin: 'org.sonarqube'
 apply plugin: 'maven-publish'
-apply plugin: 'spring-boot'
 
 buildscript {
     ext {
@@ -215,7 +214,7 @@ publishing{
         publishContracts(MavenPublication) {
             groupId 'com.supplychain.bcc'
             artifactId 'cordapp-contracts-states'
-            version "${project.bootVersion}"
+            version "${project.version}"
             artifact("cordapp-contracts-states/build/libs/cordapp-contracts-states-$version"+".jar")
         }
     }
@@ -224,7 +223,7 @@ publishing{
             url = project.findProperty("repoURI")
             credentials {
                 username = System.getenv("GH_USER_NAME")
-                password = System.getenv("GITHUB_TOKEN")
+                password = System.getenv("GH_TOKEN")
             }
         }
     }
