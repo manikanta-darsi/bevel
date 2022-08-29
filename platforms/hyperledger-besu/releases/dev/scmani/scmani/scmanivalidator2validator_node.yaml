@@ -1,0 +1,75 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: scmanivalidator2validator-node
+  namespace: scmani-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: scmanivalidator2validator-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_validator
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
+  values:
+    replicaCount: 1
+
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+
+    staticnodes:
+      - "enode://08a0545e777fa61ea5346e2c990c590c2bfa163e003792314cc7fa0e0f920c852e07e90a8eb16c8478e2b605c3f9e4980e5c1f544caf5ab1b8e503b5db08941d@validator1.bes.dev2.aws.blockchaincloudpoc-develop.com:30303"
+      - "enode://946a57b6f9bb0b5c26d0b236d0338a314107a93da5c6afcaca764b9e6a6c24c55154b790fe17ba0ea92a9f37b11ae5c316ee40f9ada08d3ee92d8dcd9204d7f8@validator2.bes.dev2.aws.blockchaincloudpoc-develop.com:30303"
+      - "enode://7dbaf9b5dc265e7203dee612f2215968d26f03efb62905f059f4d58ca2b49e8ea6fea0bb4fd5aefc67113a705bcdf79d7d6a73ad0cb6327d72877a2a4ab4920a@cmani.bes.dev2.aws.blockchaincloudpoc-develop.com:30303"
+
+    metadata:
+      namespace: scmani-bes
+      labels:
+
+    ambassador:
+      external_url_suffix: bes.dev2.aws.blockchaincloudpoc-develop.com
+
+    liveliness_check:
+      enabled: false
+    proxy:
+      provider: none
+      external_url: scmani.scmani-bes
+      p2p: 30303
+      rpc: 8545
+
+    images:
+      node: hyperledger/besu:21.10.6
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+      pullPolicy: IfNotPresent
+
+    node:
+      name: validator2
+      tls: True
+      consensus: ibft
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretprefix: secretsv2/data/scmani-bes/crypto/validator2
+      serviceaccountname: vault-auth
+      keyname: data
+      tlsdir: tls
+      role: vault-role
+      authpath: besuscmani
+
+    genesis: ewogICJjb25maWciOiB7CiAgICAiY2hhaW5JZCI6IDIwMTgsCiAgICAiY29uc3RhbnRpbm9wbGVmaXhibG9jayI6IDAsCiAgICAiY29udHJhY3RTaXplTGltaXQiOiAyMTQ3NDgzNjQ3LAogICAgImliZnQyIjogewogICAgICAiYmxvY2twZXJpb2RzZWNvbmRzIjogMiwKICAgICAgImVwb2NobGVuZ3RoIjogMzAwMDAsCiAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiOiAxMAogICAgfQogIH0sCiAgIm5vbmNlIjogIjB4MCIsCiAgInRpbWVzdGFtcCI6ICIweDU4ZWU0MGJhIiwKICAiZ2FzTGltaXQiOiAiMHgxZmZmZmZmZmZmZmZmZiIsCiAgImRpZmZpY3VsdHkiOiAiMHgxIiwKICAiZXh0cmFEYXRhIjogIjB4Zjg1M2EwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGVhOTQ4ZGQ5OWJiODdlYmVjMGQ2Y2M3MTVjM2I3OWM3MGU5MGNmMjJmMTk1OTRjMmIzOGE2NTZjZmFiMmY4MmI2NTIzNTNmMWQwZWFjOGFhNTM4MjFiODA4NDAwMDAwMDAwYzAiCn0=
