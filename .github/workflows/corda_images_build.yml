@@ -35,6 +35,7 @@ on:
     paths:
       - 'platforms/r3-corda/images/**'
       - '.github/workflows/corda_images_build.yml'
+      - 'examples/supplychain-app/corda/cordApps_springBoot/**'
 
 env:
   REGISTRY: ghcr.io
@@ -196,14 +197,14 @@ jobs:
         file: platforms/r3-corda/images/Dockerfile-corda-tls
         push: true
         tags: ${{ env.IMAGE_PATH }}/bevel-corda:${{ steps.vars.outputs.tag }},${{ env.IMAGE_PATH }}/bevel-corda:stable
-  push:
-    branches:
-        - develop
-    paths:
-        - 'examples/supplychain-app/corda/cordApps_springBoot/**'
+  # push:
+  #   branches:
+  #       - develop
+  #   paths:
+  #       - 'examples/supplychain-app/corda/cordApps_springBoot/**'
 
   publish:
-    // if: ${{ startsWith(github.ref, 'refs/heads/develop') }}
+    # if: ${{ startsWith(github.ref, 'refs/heads/develop') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
