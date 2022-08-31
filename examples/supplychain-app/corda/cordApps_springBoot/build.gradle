@@ -223,7 +223,7 @@ publishing{
             url = project.findProperty("repoURI")
             credentials {
                 username = System.getenv("GH_USER_NAME")
-                password = System.getenv("GH_TOKEN")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
