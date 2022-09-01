@@ -30,7 +30,7 @@ spec:
     vault:
       address: {{ vault.url }}
       role: vault-role
-      authpath: quorum{{ org_name }}
+      authpath: quorum{{ org.name }}
       serviceaccountname: vault-auth
       certsecretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ org.name | lower }}-quo
       retries: 30
