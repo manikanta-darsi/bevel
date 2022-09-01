@@ -15,25 +15,12 @@ on:
   workflow_dispatch:
     inputs:
       corda_version:
-        description: 'Enter Corda OS Version to build'
-        required: true
         default: '4.7'
-        type: choice
-        options:
-        - '4.4'
-        - '4.7'
-      gmaps_key:
-        description: 'Enter Google Maps API key'
-        required: false
-        default: 'Google API key for Network Map'
-  create:
-    tags:
-      - v*
   push:
     branches:
-      - cor-bug
+      - develop
     paths:
-      # - '.github/workflows/corda_images_publish.yaml'
+      - '.github/workflows/corda_images_publish.yaml'
       - 'examples/supplychain-app/corda/cordApps_springBoot/**'
 
 env:
@@ -44,7 +31,6 @@ jobs:
   # on push to develop branch, create docker tags latest
 
   publish:
-    # if: ${{ startsWith(github.ref, 'refs/heads/develop') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
