@@ -1,0 +1,75 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cmanicmanimember-node
+  namespace: cmani-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: cmanicmanimember-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_besu
+    sourceRef:
+      kind: GitRepository
+      name: flux-dev-mani
+      namespace: flux-dev-mani
+  values:
+    metadata:
+      namespace: cmani-bes
+      labels:
+    replicaCount: 1
+    staticnodes:
+      - "enode://37afd7f1355af6beacc10857fb32feaadc07288d2101579629b269d5780dc7f5cf0d7438d4d212470133a67bceab5454c62772268b3387d49f27383d6a7db17a@validator1.bes.dev2.aws.blockchaincloudpoc-develop.com:30303"
+      - "enode://bebbfe7b1615e2b142167ed849cfa51f2730d78f26f80ea73cc44fb1a60a6f35a757a2ae86970c4d4716aa5d158a9f7fa5efa156bedd1d4d2954e3d056a29747@validator2.bes.dev2.aws.blockchaincloudpoc-develop.com:30303"
+      - "enode://7dca2048ae67407e03b5f00d526b5a1191f914b19f62442d74d869070e85109697ad646b33e57d697997485720f4ffdd1a7dd1f333f3a671b57e1c29ba81439a@cmani.bes.dev2.aws.blockchaincloudpoc-develop.com:30303"
+
+    liveliness_check:
+      enabled: false
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+    proxy:
+      provider: none
+      external_url: cmani.cmani-bes
+      p2p: 30303
+      rpc: 8545
+
+    images:
+      node: hyperledger/besu:21.10.6
+      alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+      pullPolicy: IfNotPresent
+
+    node:
+      name: cmani
+      consensus: ibft
+      subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+    tm:
+      type: tessera
+      tls: True
+      url: "https://cmani-tessera.cmani-bes:8888"
+
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretprefix: secretsv2/data/cmani-bes/crypto/cmani
+      serviceaccountname: vault-auth
+      keyname: data
+      tmdir: tm
+      tlsdir: tls
+      role: vault-role
+      authpath: besucmani
+
+    genesis: ewogICJjb25maWciOiB7CiAgICAiY2hhaW5JZCI6IDIwMTgsCiAgICAiY29uc3RhbnRpbm9wbGVmaXhibG9jayI6IDAsCiAgICAiY29udHJhY3RTaXplTGltaXQiOiAyMTQ3NDgzNjQ3LAogICAgImliZnQyIjogewogICAgICAiYmxvY2twZXJpb2RzZWNvbmRzIjogMiwKICAgICAgImVwb2NobGVuZ3RoIjogMzAwMDAsCiAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiOiAxMAogICAgfQogIH0sCiAgIm5vbmNlIjogIjB4MCIsCiAgInRpbWVzdGFtcCI6ICIweDU4ZWU0MGJhIiwKICAiZ2FzTGltaXQiOiAiMHgxZmZmZmZmZmZmZmZmZiIsCiAgImRpZmZpY3VsdHkiOiAiMHgxIiwKICAiZXh0cmFEYXRhIjogIjB4Zjg1M2EwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGVhOTQ4NWJlOTYwYWI2ZGE1MDlmN2FmZmE3NjFhYmEwNTE0MjA4NDUxZjAzOTQ2NDY2NGVlOTg3NTI5NTI4ZjAwM2RjZGM3OWQ0NDQ0NWRiY2QzMGM5ODA4NDAwMDAwMDAwYzAiCn0=
