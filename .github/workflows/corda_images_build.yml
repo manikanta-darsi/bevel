@@ -198,11 +198,11 @@ jobs:
         tags: ${{ env.IMAGE_PATH }}/bevel-corda:${{ steps.vars.outputs.tag }},${{ env.IMAGE_PATH }}/bevel-corda:stable
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - develop
-    paths:
-      - 'examples/supplychain-app/corda/cordApps_springBoot/**'
+    push:
+      branches:
+        - develop
+      paths:
+        - 'examples/supplychain-app/corda/cordApps_springBoot/**'
 
   publish:
     # if: ${{ startsWith(github.ref, 'refs/heads/develop') }}
