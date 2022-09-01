@@ -29,7 +29,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 }
 cordapp {
     info {
-        name "Supply Chain All Contracts"
+        name "Supply Chain All Contracts testttt"
         vendor "Hyperledger"
         targetPlatformVersion 4
         minimumPlatformVersion 4
