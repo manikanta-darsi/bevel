@@ -33,7 +33,7 @@ on:
     branches:
       - cor-bug
     paths:
-      - '.github/workflows/corda_images_publish.yaml'
+      # - '.github/workflows/corda_images_publish.yaml'
       - 'examples/supplychain-app/corda/cordApps_springBoot/**'
 
 env:
