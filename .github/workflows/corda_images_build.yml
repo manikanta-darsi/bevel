@@ -197,11 +197,6 @@ jobs:
         file: platforms/r3-corda/images/Dockerfile-corda-tls
         push: true
         tags: ${{ env.IMAGE_PATH }}/bevel-corda:${{ steps.vars.outputs.tag }},${{ env.IMAGE_PATH }}/bevel-corda:stable
-  # push:
-  #   branches:
-  #       - develop
-  #   paths:
-  #       - 'examples/supplychain-app/corda/cordApps_springBoot/**'
 
   publish:
     # if: ${{ startsWith(github.ref, 'refs/heads/develop') }}
