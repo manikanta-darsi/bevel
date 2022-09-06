@@ -41,7 +41,6 @@ spec:
       tcp:
           port: 27017
           targetPort: 27017
-      type: NodePort
       annotations: {}
     deployment:
       annotations: {}
