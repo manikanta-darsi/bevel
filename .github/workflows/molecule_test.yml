@@ -129,13 +129,13 @@ jobs:
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s notary
-    #   if: contains(github.event.pull_request.title, 'corda')
+      if: contains(github.event.pull_request.title, 'corda')
 
     - name: Test Stage Corda networkmap
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s networkmap
-      if: contains(github.event.pull_request.title, 'corda')
+    #   if: contains(github.event.pull_request.title, 'corda')
 
     - name: Test Stage Corda node
       run: |
@@ -164,7 +164,7 @@ jobs:
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s ambassador-certs
-      # if: contains(github.event.pull_request.title, 'quorum')
+      if: contains(github.event.pull_request.title, 'quorum')
 
     - name: Test Stage Quorum crypto-ibft
       run: |
