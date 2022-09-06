@@ -11,28 +11,31 @@
 name: Test Ansible using Molecule
 
 on:
-  pull_request:
-    branches: [ develop ]
-    types: [opened, edited, synchronize, reopened]
+  push:
+    branches:
+      - test-net2
+#   pull_request:
+#     branches: [ develop ]
+#     types: [opened, edited, synchronize, reopened]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: deepakputhraya/action-pr-title@master
-      with:
-        regex: '\[.*\].*' # Regex the title should match.
-        allowed_prefixes: '[shared],[docs],[indy],[fabric],[corda],[besu],[quorum],[corda-ent],[chore]' # title should start with the given prefix.
-        disallowed_prefixes: 'feat/,hotfix' # title should not start with the given prefix.
-        prefix_case_sensitive: true # title prefix are case sensitive.
-        min_length: 6 # Min length of the title.
-        max_length: 100 # Max length of the title.
-        github_token: ${{ github.token }} # Default: ${{ github.token }}
+    # - uses: deepakputhraya/action-pr-title@master
+    #   with:
+    #     regex: '\[.*\].*' # Regex the title should match.
+    #     allowed_prefixes: '[shared],[docs],[indy],[fabric],[corda],[besu],[quorum],[corda-ent],[chore]' # title should start with the given prefix.
+    #     disallowed_prefixes: 'feat/,hotfix' # title should not start with the given prefix.
+    #     prefix_case_sensitive: true # title prefix are case sensitive.
+    #     min_length: 6 # Min length of the title.
+    #     max_length: 100 # Max length of the title.
+    #     github_token: ${{ github.token }} # Default: ${{ github.token }}
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python 3.6
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.6
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -48,11 +51,10 @@ jobs:
 
         # export the bin path
         export PATH=~/bin:$PATH
-      if: |
-        contains(github.event.pull_request.title, 'shared') ||
-        contains(github.event.pull_request.title, 'corda') ||
-        contains(github.event.pull_request.title, 'fabric') ||
-        contains(github.event.pull_request.title, 'quorum')
+      # if: |
+      #   contains(github.event.pull_request.title, 'shared') ||
+      #   contains(github.event.pull_request.title, 'corda') ||
+      #   contains(github.event.pull_request.title, 'fabric')
 #######################################################################################
   #the below test within the /shared folder
     - name: Test Stage Shared default
@@ -127,7 +129,7 @@ jobs:
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s notary
-      if: contains(github.event.pull_request.title, 'corda')
+    #   if: contains(github.event.pull_request.title, 'corda')
 
     - name: Test Stage Corda networkmap
       run: |
@@ -162,7 +164,7 @@ jobs:
       run: |
         cd ./platforms/quorum/configuration
         molecule test -s ambassador-certs
-      if: contains(github.event.pull_request.title, 'quorum')
+      # if: contains(github.event.pull_request.title, 'quorum')
 
     - name: Test Stage Quorum crypto-ibft
       run: |
