@@ -41,9 +41,9 @@ spec:
       tcp:
           port: 27017
           targetPort: 27017
-{% if services.doorman.ports.nodePort is defined %}
+{% if services.mongodb.ports.nodePort is defined %}
       type: NodePort
-      nodePort: {{ services.doorman.ports.nodePort }}
+      nodePort: {{ services.mongodb.ports.nodePort }}
 {% else %}
       type: ClusterIP
 {% endif %}
