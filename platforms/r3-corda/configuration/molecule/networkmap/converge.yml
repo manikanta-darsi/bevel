@@ -10,6 +10,7 @@
   connection: local
   vars:
     network:
+    type: "corda"
       docker:
         url: "test_url"
         username: "test_username"
