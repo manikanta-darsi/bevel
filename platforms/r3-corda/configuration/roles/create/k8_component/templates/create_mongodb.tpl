@@ -41,12 +41,7 @@ spec:
       tcp:
           port: 27017
           targetPort: 27017
-{% if services.mongodb.ports.nodePort is defined %}
       type: NodePort
-      nodePort: {{ services.mongodb.ports.nodePort }}
-{% else %}
-      type: ClusterIP
-{% endif %}
       annotations: {}
     deployment:
       annotations: {}
