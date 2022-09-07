@@ -117,31 +117,31 @@ jobs:
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s default
-      # if: contains(github.event.pull_request.title, 'corda')
+      if: contains(github.event.pull_request.title, 'corda')
 
     - name: Test Stage Corda doorman
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s doorman
-      # if: contains(github.event.pull_request.title, 'corda')
+      if: contains(github.event.pull_request.title, 'corda')
 
     - name: Test Stage Corda notary
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s notary
-      # if: contains(github.event.pull_request.title, 'corda')
+      if: contains(github.event.pull_request.title, 'corda')
 
     - name: Test Stage Corda networkmap
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s networkmap
-    #   if: contains(github.event.pull_request.title, 'corda')
+      if: contains(github.event.pull_request.title, 'corda')
 
     - name: Test Stage Corda node
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s node
-      # if: contains(github.event.pull_request.title, 'corda')
+      if: contains(github.event.pull_request.title, 'corda')
     - name: Test Stage Corda delete node
       run: |
         cd ./platforms/r3-corda/configuration
