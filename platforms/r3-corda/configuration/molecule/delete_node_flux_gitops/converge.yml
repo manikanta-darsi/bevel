@@ -25,7 +25,6 @@
       bin_directory: "~/bin"
     gitops: "{{ item.gitops }}"
     flux_mainfest_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}/flux-{{ network.env.type }}"
-    release_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}"
     network:
       type: "corda"
       docker:
@@ -239,7 +238,7 @@
         nms_root_certs:
           failed: True
         release_dir: "{{ playbook_dir }}/../../../releases/dev"
-
+        gitops: "{{ item.gitops }}"
     ####################################################################################
     # Testing delete/vault_secrets role
     - name: "Test delete/vault_secrets role for node"
