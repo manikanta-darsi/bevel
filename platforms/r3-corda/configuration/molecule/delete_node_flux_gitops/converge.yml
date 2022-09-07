@@ -23,7 +23,17 @@
     tmp_directory: "{{ lookup('env', 'TMPDIR') | default('/tmp',true) }}"
     aws_cli:
       bin_directory: "~/bin"
-    gitops: "{{ item.gitops }}"
+    gitops:
+      git_protocol: "https"
+      git_url: "https://github.com/<username>/bevel.git"
+      branch: "develop"
+      release_dir: "platforms/r3-corda/releases/dev"
+      chart_source: "platforms/r3-corda/charts"
+      git_repo: "github.com/<username>/bevel.git"
+      username: "git_username"
+      password: "git_access_token"
+      email: "git_email"
+      private_key: "path_to_private_key"
     flux_mainfest_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}/flux-{{ network.env.type }}"
     network:
       type: "corda"
