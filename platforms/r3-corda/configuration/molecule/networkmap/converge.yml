@@ -16,6 +16,7 @@
         username: "test_username"
         password: "test_password"
       env:
+        type: test
         retry_count: 30
         proxy: haproxy
     kubernetes:
