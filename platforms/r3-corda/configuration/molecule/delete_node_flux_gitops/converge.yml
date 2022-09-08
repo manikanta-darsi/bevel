@@ -23,7 +23,7 @@
     tmp_directory: "{{ lookup('env', 'TMPDIR') | default('/tmp',true) }}"
     aws_cli:
       bin_directory: "~/bin"
-    flux_mainfest_dir: "{{ playbook_dir }}/../../../releases/dev/flux-{{ network.env.type }}"
+    flux_mainfest_dir: "{{ playbook_dir }}/../../../releases/dev/"
     network:
       type: "corda"
       docker:
