@@ -151,7 +151,7 @@ jobs:
       run: |
         cd ./platforms/r3-corda/configuration
         molecule test -s delete_notary
-      # if: contains(github.event.pull_request.title, 'corda')
+      if: contains(github.event.pull_request.title, 'corda')
 #######################################################################################
   #the below test within the /quorum folder
     - name: Test Stage Quorum default

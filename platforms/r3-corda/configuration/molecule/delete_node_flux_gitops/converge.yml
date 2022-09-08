@@ -23,7 +23,7 @@
     tmp_directory: "{{ lookup('env', 'TMPDIR') | default('/tmp',true) }}"
     aws_cli:
       bin_directory: "~/bin"
-    flux_mainfest_dir: "{{ playbook_dir }}/../../../releases/dev/"
+    flux_mainfest_dir: "{{ playbook_dir }}/../../../releases/dev/ }}"
     network:
       type: "corda"
       docker:
@@ -236,7 +236,7 @@
           failed: True
         nms_root_certs:
           failed: True
-        release_dir: "{{ playbook_dir }}/../../../releases/dev"
+        release_dir: "{{ playbook_dir }}/../../../releases/dev }}"
 
     ####################################################################################
     # Testing delete/vault_secrets role
