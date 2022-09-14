@@ -1,0 +1,33 @@
+# This playbook executes required tasks to commit chaincode
+# on existing Kubernetes clusters. The Kubernetes clusters should already be created and the infomation
+# to connect to the clusters be updated in the network.yaml file that is used as an input to this playbook
+###########################################################################################
+# To Run this playbook from this directory, use the following command (network.yaml also in this directory)
+#  ansible-playbook platforms/hyperledger-fabric/configuration/commit-chaincode.yaml -e "@./network.yaml"
+############################################################################################
+# Please ensure that the ../../shared/configuration playbooks have been run using the same network.yaml
+---
+  # This will apply to ansible_provisioners. /etc/ansible/hosts should be configured with this group
+- hosts: ansible_provisioners
+  gather_facts: no
+  tasks:
+
+    ############################################################################################
+    # This task commits the desired approved chaincode
+    - name: Commit chaincode
+      include_role:
+        name: "create/chaincode/commit"
+      vars:
+        participants: "{{ item.participants }}"
+        docker_url: "{{ network.docker.url }}"
+        approvers: "{{ item.endorsers }}"
+      loop: "{{ network['channels'] }}"
+      when: add_new_org == 'false' and '2.' in network.version
+
+  vars: #These variables can be overriden from the command line
+    privilege_escalate: false           #Default to NOT escalate to root privledges
+    install_os: "linux"                 #Default to linux OS
+    install_arch:  "amd64"              #Default to amd64 architecture
+    bin_install_dir:  "~/bin"            #Default to /bin install directory for binaries
+    add_new_org: 'false'                # Default to false as this is for main network creation
+    external_chaincode: false                # Default to false
